@@ -3,11 +3,28 @@ export const dynamic = "force-dynamic"; // This disables SSG and ISR
 import prisma from "@/lib/prisma";
 import Link from "next/link";
 
-export default async function Home() {
+const SORT_OPTIONS = [
+  { label: "新しい", value: "createdAt" },
+  { label: "テーマ", value: "title" },
+  { label: "作者", value: "author" },
+];
+
+function getOrderBy(sort: string) {
+  if (sort === "title") return { title: "asc" };
+  if (sort === "author") return { author: { name: "asc" } };
+  return { createdAt: "desc" };
+}
+
+export default async function Home({
+  searchParams,
+}: {
+  searchParams?: { sort?: string };
+}) {
+  const sort = searchParams?.sort || "createdAt";
+  const orderBy = getOrderBy(sort);
+
   const posts = await prisma.post.findMany({
-    orderBy: {
-      createdAt: "desc",
-    },
+    orderBy,
     take: 6,
     include: {
       author: {
@@ -19,10 +36,28 @@ export default async function Home() {
   });
 
   return (
-    <div className="min-h-screen bg-gray-50 flex flex-col items-center justify-center -mt-16 p-8">
-      <h1 className="text-5xl font-extrabold mb-12 text-[#333333]">
-        Recent Posts
-      </h1>
+    <div className="min-h-screen bg-gray-50 flex flex-col items-center justify-center p-4">
+      <div className="mb-2 w-full max-w-6xl flex flex-wrap items-center justify-between">
+        <h1 className="text-xl font-bold text-[#333333] whitespace-nowrap mr-4">
+          分类导航
+        </h1>
+        <div className="flex flex-wrap gap-3">
+          {SORT_OPTIONS.map((option) => (
+            <Link
+              key={option.value}
+              href={`/?sort=${option.value}`}
+              className={`px-4 py-2 rounded-lg border text-base ${
+                sort === option.value
+                  ? "bg-blue-500 text-white border-blue-500"
+                  : "bg-white text-gray-700 border-gray-300 hover:bg-blue-50"
+              } transition`}
+              scroll={false}
+            >
+              {option.label}
+            </Link>
+          ))}
+        </div>
+      </div>
       <div className="grid gap-8 md:grid-cols-2 lg:grid-cols-3 w-full max-w-6xl">
         {posts.map((post) => (
           <Link key={post.id} href={`/posts/${post.id}`} className="group">
