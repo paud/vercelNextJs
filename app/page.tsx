@@ -10,9 +10,9 @@ const SORT_OPTIONS = [
 ];
 
 function getOrderBy(sort: string) {
-  if (sort === "title") return { title: "asc" };
-  if (sort === "author") return { author: { name: "asc" } };
-  return { createdAt: "desc" };
+  if (sort === "title") return '{ "title": "asc" }';
+  if (sort === "author") return '{ "author": { "name": "asc" } }';
+  return '{ "createdAt": "desc" }';
 }
 
 
@@ -27,9 +27,7 @@ export default async function Home({ searchParams }: any) {
   const orderBystr = getOrderBy(sort);
 
   const posts = await prisma.post.findMany({
-    orderBy: {
-      createdAt: "desc",
-    },
+    orderBy: JSON.parse(orderBystr),  //{createdAt: "desc",}
     take: 6,
     include: {
       author: {
