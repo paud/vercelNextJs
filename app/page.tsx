@@ -15,6 +15,30 @@ function getOrderBy(sort: string) {
   return { createdAt: "desc" };
 }
 
+// 更通用的 searchParams 类型
+interface HomePageProps {
+  searchParams?: Record<string, string | string[] | undefined>;
+}
+export default async function Home({ searchParams }: HomePageProps) {
+  // 如果只需要 sort，可以这样安全取值
+  const sort = Array.isArray(searchParams?.sort)
+    ? searchParams.sort[0]
+    : searchParams?.sort || "createdAt";
+
+  const orderBy = getOrderBy(sort);
+
+  const posts = await prisma.post.findMany({
+    orderBy,
+    take: 6,
+    include: {
+      author: {
+        select: {
+          name: true,
+        },
+      },
+    },
+  });
+  /*
 export default async function Home({
   searchParams,
 }: {
@@ -34,7 +58,7 @@ export default async function Home({
       },
     },
   });
-
+*/
   return (
     <div className="min-h-screen bg-gray-50 flex flex-col items-center justify-center p-4">
       <div className="mb-2 w-full max-w-6xl flex flex-wrap items-center justify-between">
