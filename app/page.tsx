@@ -15,20 +15,21 @@ function getOrderBy(sort: string) {
   return { createdAt: "desc" };
 }
 
-// 更通用的 searchParams 类型
-interface HomePageProps {
-  searchParams?: Record<string, string | string[] | undefined>;
-}
-export default async function Home({ searchParams }: HomePageProps) {
+
+export default async function Home({ searchParams }: any) {
   // 如果只需要 sort，可以这样安全取值
   const sort = Array.isArray(searchParams?.sort)
     ? searchParams.sort[0]
     : searchParams?.sort || "createdAt";
 
-  const orderBy = getOrderBy(sort);
+  //const sort = searchParams?.sort || "createdAt";
+
+  const orderBystr = getOrderBy(sort);
 
   const posts = await prisma.post.findMany({
-    orderBy,
+    orderBy: {
+      createdAt: "desc",
+    },
     take: 6,
     include: {
       author: {
@@ -38,27 +39,8 @@ export default async function Home({ searchParams }: HomePageProps) {
       },
     },
   });
-  
-/* export default async function Home({
-  searchParams,
-}: {
-  searchParams?: { sort?: string };
-}) {
-  const sort = searchParams?.sort || "createdAt";
-  const orderBy = getOrderBy(sort);
 
-  const posts = await prisma.post.findMany({
-    orderBy,
-    take: 6,
-    include: {
-      author: {
-        select: {
-          name: true,
-        },
-      },
-    },
-  });
- */
+
   return (
     <div className="min-h-screen bg-gray-50 flex flex-col items-center justify-center p-4">
       <div className="mb-2 w-full max-w-6xl flex flex-wrap items-center justify-between">
@@ -70,11 +52,10 @@ export default async function Home({ searchParams }: HomePageProps) {
             <Link
               key={option.value}
               href={`/?sort=${option.value}`}
-              className={`px-4 py-2 rounded-lg border text-base ${
-                sort === option.value
+              className={`px-4 py-2 rounded-lg border text-base ${sort === option.value
                   ? "bg-blue-500 text-white border-blue-500"
                   : "bg-white text-gray-700 border-gray-300 hover:bg-blue-50"
-              } transition`}
+                } transition`}
               scroll={false}
             >
               {option.label}
