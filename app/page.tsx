@@ -38,8 +38,8 @@ export default async function Home({ searchParams }: HomePageProps) {
       },
     },
   });
-  /*
-export default async function Home({
+  
+/* export default async function Home({
   searchParams,
 }: {
   searchParams?: { sort?: string };
@@ -58,7 +58,7 @@ export default async function Home({
       },
     },
   });
-*/
+ */
   return (
     <div className="min-h-screen bg-gray-50 flex flex-col items-center justify-center p-4">
       <div className="mb-2 w-full max-w-6xl flex flex-wrap items-center justify-between">
