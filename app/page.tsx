@@ -3,10 +3,10 @@
 import prisma from "@/lib/prisma";
 import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
-import { useState, useEffect } from "react";
+import { useState, useEffect, Suspense } from "react";
 import { useTranslations } from "next-intl";
 
-export default function Home() {
+function HomeContent() {
   const t = useTranslations("Home");
   const router = useRouter();
   const searchParams = useSearchParams();
@@ -134,5 +134,13 @@ export default function Home() {
         ))}
       </div>
     </div>
+  );
+}
+
+export default function Home() {
+  return (
+    <Suspense fallback={<div className="p-8 text-center">Loading...</div>}>
+      <HomeContent />
+    </Suspense>
   );
 }
