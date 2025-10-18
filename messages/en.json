@@ -1,0 +1,56 @@
+{
+  "title": "Secondhand Marketplace",
+  "sort_latest": "Latest",
+  "sort_price": "Price",
+  "sort_title": "Title",
+  "sort_seller": "Seller",
+  "Home": {
+    "market_title": "Secondhand Marketplace",
+    "sort_latest": "Latest",
+    "sort_price": "Price",
+    "sort_title": "Title",
+    "sort_seller": "Seller",
+    "currency": "$",
+    "seller": "Seller",
+    "anonymous": "Anonymous",
+    "date_locale": "en-US",
+    "no_description": "No description"
+  },
+  "Header": {
+    "region_osaka": "Osaka",
+    "region_tokyo": "Tokyo",
+    "region_kyoto": "Kyoto",
+    "search": "Search",
+    "items_list": "Items List",
+    "items_new": "Add Item",
+    "region_select_label": "Select region",
+    "lang_select_label": "Select language",
+    "register": "Register"
+  },
+  "ItemNew": {
+    "page_title": "Add Secondhand Item",
+    "title": "Title",
+    "description": "Description",
+    "price": "Price",
+    "uploading": "Uploading image...",
+    "upload_fail": "Image upload failed",
+    "form_incomplete": "Please fill in all fields and upload an image",
+    "submit_fail": "Submission failed",
+    "submit": "Submit",
+    "preview_alt": "Preview"
+  },
+  "ItemDetail": {
+    "not_found": "Item not found",
+    "seller": "Seller",
+    "contact": "Contact",
+    "anonymous": "Anonymous",
+    "no_contact": "No contact info",
+    "published_at": "Published at"
+  },
+  "ItemsList": {
+    "page_title": "All Items",
+    "seller": "Seller",
+    "anonymous": "Anonymous",
+    "no_description": "No description"
+  }
+}

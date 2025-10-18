@@ -1,0 +1,56 @@
+{
+  "title": "二手物品市场",
+  "sort_latest": "最新",
+  "sort_price": "价格",
+  "sort_title": "标题",
+  "sort_seller": "卖家",
+  "Home": {
+    "market_title": "二手物品市场",
+    "sort_latest": "最新",
+    "sort_price": "价格",
+    "sort_title": "标题",
+    "sort_seller": "卖家",
+    "currency": "￥",
+    "seller": "卖家",
+    "anonymous": "匿名",
+    "date_locale": "zh-CN",
+    "no_description": "暂无描述"
+  },
+  "Header": {
+    "region_osaka": "大阪",
+    "region_tokyo": "东京",
+    "region_kyoto": "京都",
+    "search": "搜索",
+    "items_list": "商品列表",
+    "items_new": "商品发布",
+    "region_select_label": "选择地域",
+    "lang_select_label": "选择语言",
+    "register": "注册"
+  },
+  "ItemNew": {
+    "page_title": "发布二手物品",
+    "title": "标题",
+    "description": "描述",
+    "price": "价格",
+    "uploading": "图片上传中...",
+    "upload_fail": "图片上传失败",
+    "form_incomplete": "请填写完整信息并上传图片",
+    "submit_fail": "发布失败",
+    "submit": "发布",
+    "preview_alt": "预览"
+  },
+  "ItemDetail": {
+    "not_found": "未找到该商品",
+    "seller": "卖家",
+    "contact": "联系方式",
+    "anonymous": "匿名",
+    "no_contact": "无",
+    "published_at": "发布时间"
+  },
+  "ItemsList": {
+    "page_title": "全部商品",
+    "seller": "卖家",
+    "anonymous": "匿名",
+    "no_description": "暂无描述"
+  }
+}

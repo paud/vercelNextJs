@@ -4,15 +4,10 @@ import prisma from "@/lib/prisma";
 import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useState, useEffect } from "react";
-
-const SORT_OPTIONS = [
-  { label: "最新", value: "createdAt" },
-  { label: "价格", value: "price" },
-  { label: "标题", value: "title" },
-  { label: "卖家", value: "seller" },
-];
+import { useTranslations } from "next-intl";
 
 export default function Home() {
+  const t = useTranslations("Home");
   const router = useRouter();
   const searchParams = useSearchParams();
   const [sort, setSort] = useState(searchParams.get("sort") || "createdAt");
@@ -51,18 +46,27 @@ export default function Home() {
     router.push(`/?sort=${sort}&order=${newOrder}`);
   }
 
+  const SORT_OPTIONS = [
+    { label: t("sort_latest"), value: "createdAt" },
+    { label: t("sort_price"), value: "price" },
+    { label: t("sort_title"), value: "title" },
+    { label: t("sort_seller"), value: "seller" },
+  ];
+
   return (
     <div className="min-h-screen bg-gray-50 flex flex-col items-center p-4">
       <div className="mb-4 w-full max-w-6xl flex flex-wrap items-center justify-between">
         <h1 className="text-xl font-bold text-[#333333] whitespace-nowrap mr-4">
-          二手物品市场
+          {t("market_title")}
         </h1>
         <div className="flex flex-wrap gap-3 items-center">
           {SORT_OPTIONS.map((option) => (
             <button
               key={option.value}
               onClick={() => handleSortChange(option.value)}
-              className={`px-4 py-2 rounded-lg text-base font-semibold shadow bg-blue-500 text-white hover:bg-blue-600 transition ${sort === option.value ? "" : "opacity-80"}`}
+              className={`px-4 py-2 rounded-lg text-base font-semibold shadow bg-blue-500 text-white hover:bg-blue-600 transition ${
+                sort === option.value ? "" : "opacity-80"
+              }`}
             >
               {option.label}
             </button>
@@ -75,11 +79,19 @@ export default function Home() {
               className="sr-only"
             />
             <div
-              className={`w-12 h-6 flex items-center bg-gray-300 rounded-full p-1 transition ${order === "asc" ? "bg-blue-500" : ""}`}
-              onClick={() => handleOrderChange({ target: { checked: order !== "asc" } } as React.ChangeEvent<HTMLInputElement>)}
+              className={`w-12 h-6 flex items-center bg-gray-300 rounded-full p-1 transition ${
+                order === "asc" ? "bg-blue-500" : ""
+              }`}
+              onClick={() =>
+                handleOrderChange({
+                  target: { checked: order !== "asc" },
+                } as React.ChangeEvent<HTMLInputElement>)
+              }
             >
               <div
-                className={`bg-white w-5 h-5 rounded-full shadow-md transform transition ${order === "asc" ? "translate-x-6" : ""}`}
+                className={`bg-white w-5 h-5 rounded-full shadow-md transform transition ${
+                  order === "asc" ? "translate-x-6" : ""
+                }`}
               />
             </div>
           </div>
@@ -90,24 +102,32 @@ export default function Home() {
           <Link key={item.id} href={`/items/${item.id}`} className="group">
             <div className="border rounded-lg shadow-md bg-white p-4 hover:shadow-lg transition-shadow duration-300 flex flex-col">
               {item.imageUrl && (
-                <img src={item.imageUrl} alt={item.title} className="w-full h-40 object-cover rounded mb-2" />
+                <img
+                  src={item.imageUrl}
+                  alt={item.title}
+                  className="w-full h-40 object-cover rounded mb-2"
+                />
               )}
               <h2 className="text-lg font-semibold text-blue-600 group-hover:underline mb-1">
                 {item.title}
               </h2>
-              <p className="text-base text-green-600 font-bold mb-1">￥{item.price}</p>
+              <p className="text-base text-green-600 font-bold mb-1">
+                {t("currency")}
+                {item.price}
+              </p>
               <p className="text-sm text-gray-500 mb-1">
-                卖家: {item.seller ? item.seller.name : "匿名"}
+                {t("seller")}:{" "}
+                {item.seller ? item.seller.name : t("anonymous")}
               </p>
               <p className="text-xs text-gray-400 mb-2">
-                {new Date(item.createdAt).toLocaleDateString("zh-CN", {
+                {new Date(item.createdAt).toLocaleDateString(t("date_locale"), {
                   year: "numeric",
                   month: "long",
                   day: "numeric",
                 })}
               </p>
               <p className="text-gray-700 leading-relaxed line-clamp-2">
-                {item.description || "暂无描述"}
+                {item.description || t("no_description")}
               </p>
             </div>
           </Link>

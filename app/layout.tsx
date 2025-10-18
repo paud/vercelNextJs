@@ -1,24 +1,26 @@
 // app/layout.tsx
 import "./globals.css";
-import Header from "./Header";
+import { NextIntlClientProvider } from "next-intl";
+import { getMessages } from "next-intl/server";
 
 export const metadata = {
   title: "AI_UI",
   description: "A blog app using Next.js and Prisma",
 };
 
-export default function RootLayout({
+export default async function RootLayout({
   children,
 }: {
   children: React.ReactNode;
 }) {
+  const messages = await getMessages();
   return (
     <html lang="en" className="h-full">
-      <body className="h-full ">
-        <div className="min-h-screen flex flex-col">
-          <Header />
-          <main className="flex-1 overflow-auto">{children}</main>
-        </div>
+      <body>
+        <NextIntlClientProvider messages={messages}>
+          {/* 只渲染 children，不再渲染 Header */}
+          {children}
+        </NextIntlClientProvider>
       </body>
     </html>
   );

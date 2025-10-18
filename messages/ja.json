@@ -1,0 +1,56 @@
+{
+  "title": "中古マーケット",
+  "sort_latest": "新しい",
+  "sort_price": "価格",
+  "sort_title": "タイトル",
+  "sort_seller": "出品者",
+  "Home": {
+    "market_title": "中古マーケット",
+    "sort_latest": "新しい",
+    "sort_price": "価格",
+    "sort_title": "タイトル",
+    "sort_seller": "出品者",
+    "currency": "￥",
+    "seller": "出品者",
+    "anonymous": "匿名",
+    "date_locale": "ja-JP",
+    "no_description": "説明なし"
+  },
+  "Header": {
+    "region_osaka": "大阪",
+    "region_tokyo": "東京",
+    "region_kyoto": "京都",
+    "search": "検索",
+    "items_list": "商品一覧",
+    "items_new": "商品出品",
+    "region_select_label": "地域を選択",
+    "lang_select_label": "言語を選択",
+    "register": "登録"
+  },
+  "ItemNew": {
+    "page_title": "中古品を出品する",
+    "title": "タイトル",
+    "description": "説明",
+    "price": "価格",
+    "uploading": "画像アップロード中...",
+    "upload_fail": "画像のアップロードに失敗しました",
+    "form_incomplete": "すべての項目を入力し、画像をアップロードしてください",
+    "submit_fail": "出品に失敗しました",
+    "submit": "出品する",
+    "preview_alt": "プレビュー"
+  },
+  "ItemDetail": {
+    "not_found": "商品が見つかりません",
+    "seller": "出品者",
+    "contact": "連絡先",
+    "anonymous": "匿名",
+    "no_contact": "なし",
+    "published_at": "出品日時"
+  },
+  "ItemsList": {
+    "page_title": "全ての商品",
+    "seller": "出品者",
+    "anonymous": "匿名",
+    "no_description": "説明なし"
+  }
+}
