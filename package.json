@@ -13,6 +13,7 @@
   "dependencies": {
     "@prisma/client": "latest",
     "@prisma/extension-accelerate": "latest",
+    "@vercel/blob": "^2.0.0",
     "next": "latest",
     "react": "^19.0.0",
     "react-dom": "^19.0.0"

@@ -1,8 +1,12 @@
-import { PrismaClient } from "../lib/generated/prisma-client";
+import { PrismaClient } from "@prisma/client";
 
 const prisma = new PrismaClient();
 
 async function main() {
+  // 清空数据表，避免唯一约束冲突
+  await prisma.item.deleteMany({});
+  await prisma.user.deleteMany({});
+
   // Create 5 users
   await prisma.user.createMany({
     data: [
@@ -18,123 +22,92 @@ async function main() {
   const userRecords = await prisma.user.findMany();
 
   const userIdMapping = {
-    alice: userRecords.find((user) => user.email === "alice@example.com")?.id,
-    bob: userRecords.find((user) => user.email === "bob@example.com")?.id,
-    charlie: userRecords.find((user) => user.email === "charlie@example.com")
+    alice: userRecords.find((user: any) => user.email === "alice@example.com")
       ?.id,
-    diana: userRecords.find((user) => user.email === "diana@example.com")?.id,
-    edward: userRecords.find((user) => user.email === "edward@example.com")?.id,
+    bob: userRecords.find((user: any) => user.email === "bob@example.com")?.id,
+    charlie: userRecords.find((user: any) => user.email === "charlie@example.com")
+      ?.id,
+    diana: userRecords.find((user: any) => user.email === "diana@example.com")?.id,
+    edward: userRecords.find((user: any) => user.email === "edward@example.com")?.id,
   };
 
-  // Create 15 posts distributed among users
-  await prisma.post.createMany({
+  // Create 15 items distributed among users
+  await prisma.item.createMany({
     data: [
-      // Alice's posts
+      // Alice's items
       {
-        title: "Getting Started with TypeScript and Prisma",
-        content:
-          "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Fusce id erat a lorem tincidunt ultricies. Vivamus porta bibendum nulla vel accumsan.",
-        published: true,
-        authorId: userIdMapping.alice!,
+        title: "二手iPhone 12",
+        description: "成色很好，电池健康度90%，无维修。",
+        price: 3200,
+        imageUrl: "https://images.unsplash.com/photo-1511707171634-5f897ff02aa9",
+        sellerId: userIdMapping.alice!,
       },
       {
-        title: "How ORMs Simplify Complex Queries",
-        content:
-          "Duis sagittis urna ut sapien tristique convallis. Aenean vel ligula felis. Phasellus bibendum sem at elit dictum volutpat.",
-        published: false,
-        authorId: userIdMapping.alice!,
+        title: "小米空气净化器",
+        description: "家用，几乎全新，带原包装。",
+        price: 400,
+        imageUrl: "https://images.unsplash.com/photo-1506744038136-46273834b3fb",
+        sellerId: userIdMapping.alice!,
       },
-
-      // Bob's posts
+      // Bob's items
       {
-        title: "Mastering Prisma: Efficient Database Migrations",
-        content:
-          "Ut ullamcorper nec erat id auctor. Nullam nec ligula in ex feugiat tincidunt. Cras accumsan vehicula tortor ut eleifend.",
-        published: true,
-        authorId: userIdMapping.bob!,
-      },
-      {
-        title: "Best Practices for Type Safety in ORMs",
-        content:
-          "Aliquam erat volutpat. Suspendisse potenti. Maecenas fringilla elit vel eros laoreet, et tempor sapien vulputate.",
-        published: true,
-        authorId: userIdMapping.bob!,
+        title: "二手山地自行车",
+        description: "适合城市骑行，刹车灵敏。",
+        price: 800,
+        imageUrl: "https://images.unsplash.com/photo-1465101046530-73398c7f28ca",
+        sellerId: userIdMapping.bob!,
       },
       {
-        title: "TypeScript Utility Types for Database Models",
-        content:
-          "Donec ac magna facilisis, vestibulum ligula at, elementum nisl. Morbi volutpat eget velit eu egestas.",
-        published: false,
-        authorId: userIdMapping.bob!,
+        title: "Kindle Paperwhite",
+        description: "屏幕无划痕，送保护套。",
+        price: 500,
+        imageUrl: "https://images.unsplash.com/photo-1519125323398-675f0ddb6308",
+        sellerId: userIdMapping.bob!,
       },
-
-      // Charlie's posts (no posts for Charlie)
-
-      // Diana's posts
+      // Charlie's items
       {
-        title: "Exploring Database Indexes and Their Performance Impact",
-        content:
-          "Vivamus ac velit tincidunt, sollicitudin erat quis, fringilla enim. Aenean posuere est a risus placerat suscipit.",
-        published: true,
-        authorId: userIdMapping.diana!,
+        title: "二手显示器 24寸",
+        description: "无坏点，色彩正常。",
+        price: 350,
+        imageUrl: "https://images.unsplash.com/photo-1517336714731-489689fd1ca8",
+        sellerId: userIdMapping.charlie!,
       },
       {
-        title: "Choosing the Right Database for Your TypeScript Project",
-        content:
-          "Sed vel suscipit lorem. Duis et arcu consequat, sagittis justo quis, pellentesque risus. Curabitur sed consequat est.",
-        published: false,
-        authorId: userIdMapping.diana!,
+        title: "二手吉他",
+        description: "音色好，适合初学者。",
+        price: 200,
+        imageUrl: "https://images.unsplash.com/photo-1515378791036-0648a3ef77b2",
+        sellerId: userIdMapping.charlie!,
+      },
+      // Diana's items
+      {
+        title: "二手微波炉",
+        description: "加热快，外观完好。",
+        price: 150,
+        imageUrl: "https://images.unsplash.com/photo-1509228468518-180dd4864904",
+        sellerId: userIdMapping.diana!,
       },
       {
-        title: "Designing Scalable Schemas with Prisma",
-        content:
-          "Phasellus ut erat nec elit ultricies egestas. Vestibulum rhoncus urna eget magna varius pharetra.",
-        published: true,
-        authorId: userIdMapping.diana!,
+        title: "二手滑板",
+        description: "轮子顺滑，板面无损。",
+        price: 120,
+        imageUrl: "https://images.unsplash.com/photo-1465101178521-c1a4c8a0a8b5",
+        sellerId: userIdMapping.diana!,
+      },
+      // Edward's items
+      {
+        title: "二手耳机",
+        description: "音质好，线材完好。",
+        price: 80,
+        imageUrl: "https://images.unsplash.com/photo-1519985176271-adb1088fa94c",
+        sellerId: userIdMapping.edward!,
       },
       {
-        title: "Handling Relations Between Models in ORMs",
-        content:
-          "Integer luctus ac augue at tristique. Curabitur varius nisl vitae mi fringilla, vel tincidunt nunc dictum.",
-        published: false,
-        authorId: userIdMapping.diana!,
-      },
-
-      // Edward's posts
-      {
-        title: "Why TypeORM Still Has Its Place in 2025",
-        content:
-          "Morbi non arcu nec velit cursus feugiat sit amet sit amet mi. Etiam porttitor ligula id sem molestie, in tempor arcu bibendum.",
-        published: true,
-        authorId: userIdMapping.edward!,
-      },
-      {
-        title: "NoSQL vs SQL: The Definitive Guide for Developers",
-        content:
-          "Suspendisse a ligula sit amet risus ullamcorper tincidunt. Curabitur tincidunt, sapien id fringilla auctor, risus libero gravida odio, nec volutpat libero orci nec lorem.",
-        published: true,
-        authorId: userIdMapping.edward!,
-      },
-      {
-        title: "Optimizing Queries with Prisma’s Select and Include",
-        content:
-          "Proin vel diam vel nisi facilisis malesuada. Sed vitae diam nec magna mollis commodo a vitae nunc.",
-        published: false,
-        authorId: userIdMapping.edward!,
-      },
-      {
-        title: "PostgreSQL Optimizations Every Developer Should Know",
-        content:
-          "Nullam mollis quam sit amet lacus interdum, at suscipit libero pellentesque. Suspendisse in mi vitae magna finibus pretium.",
-        published: true,
-        authorId: userIdMapping.edward!,
-      },
-      {
-        title: "Scaling Applications with Partitioned Tables in PostgreSQL",
-        content:
-          "Cras vitae tortor in mauris tristique elementum non id ipsum. Nunc vitae pulvinar purus.",
-        published: true,
-        authorId: userIdMapping.edward!,
+        title: "二手台灯",
+        description: "亮度可调，节能。",
+        price: 60,
+        imageUrl: "https://images.unsplash.com/photo-1504198453319-5ce911bafcde",
+        sellerId: userIdMapping.edward!,
       },
     ],
   });
