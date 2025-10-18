@@ -1,0 +1,37 @@
+{
+  "Home": {
+    "market_title": "二手市场",
+    "sort_latest": "最新",
+    "sort_price": "价格",
+    "sort_title": "标题",
+    "sort_seller": "卖家",
+    "currency": "¥",
+    "seller": "卖家",
+    "anonymous": "匿名",
+    "no_description": "无描述",
+    "date_locale": "zh-CN"
+  },
+  "Header": {
+    "home": "首页",
+    "items": "商品",
+    "new_item": "发布商品",
+    "register": "注册"
+  },
+  "ItemDetail": {
+    "price": "价格",
+    "seller": "卖家",
+    "created_at": "发布时间",
+    "description": "描述",
+    "no_description": "无描述",
+    "back_to_list": "返回列表"
+  },
+  "NewItem": {
+    "title": "发布新商品",
+    "item_title": "商品标题",
+    "description": "商品描述",
+    "price": "价格",
+    "image": "商品图片",
+    "submit": "发布商品",
+    "cancel": "取消"
+  }
+}

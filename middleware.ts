@@ -11,13 +11,19 @@ export function middleware(request: NextRequest) {
   if (hasLocalePrefix) {
     return NextResponse.next();
   }
+  
   // 检测浏览器语言
   const acceptLang = request.headers.get('accept-language');
   let detected = DEFAULT_LOCALE;
   if (acceptLang) {
     const langs = acceptLang.split(',').map(l => l.split(';')[0].trim());
-    detected = langs.find(l => SUPPORTED_LOCALES.includes(l.split('-')[0])) || DEFAULT_LOCALE;
+    // 处理语言代码映射，比如 zh-CN -> zh, zh-TW -> zh 等
+    detected = langs.find(l => {
+      const lang = l.split('-')[0]; // 取主语言代码
+      return SUPPORTED_LOCALES.includes(lang);
+    })?.split('-')[0] || DEFAULT_LOCALE;
   }
+  
   // 重定向到对应语言前缀
   const url = request.nextUrl.clone();
   url.pathname = `/${detected}${pathname}`;
