@@ -25,7 +25,8 @@
     "items_new": "Add Item",
     "region_select_label": "Select region",
     "lang_select_label": "Select language",
-    "register": "Register"
+    "register": "Register",
+    "menu": "Menu"
   },
   "ItemNew": {
     "page_title": "Add Secondhand Item",

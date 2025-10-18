@@ -25,7 +25,8 @@
     "items_new": "商品发布",
     "region_select_label": "选择地域",
     "lang_select_label": "选择语言",
-    "register": "注册"
+    "register": "注册",
+    "menu": "菜单"
   },
   "ItemNew": {
     "page_title": "发布二手物品",

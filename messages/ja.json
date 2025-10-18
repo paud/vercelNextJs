@@ -25,7 +25,8 @@
     "items_new": "商品出品",
     "region_select_label": "地域を選択",
     "lang_select_label": "言語を選択",
-    "register": "登録"
+    "register": "登録",
+    "menu": "メニュー"
   },
   "ItemNew": {
     "page_title": "中古品を出品する",

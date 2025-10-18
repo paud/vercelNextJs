@@ -93,11 +93,11 @@ export default function Header() {
             <div className="relative mr-2" ref={menuRef}>
               <button
                 onClick={() => setMenuOpen((v) => !v)}
-                className="bg-blue-500 text-white font-bold rounded-lg px-4 py-2 shadow hover:bg-blue-600 focus:outline-none transition flex items-center"
+                className="bg-blue-500 text-white font-bold rounded-lg px-6 py-3 text-lg shadow-lg hover:bg-blue-600 focus:outline-none transition-all transform hover:scale-105 flex items-center"
                 aria-label="Open menu"
               >
                 <svg
-                  className="w-6 h-6"
+                  className="w-8 h-8 mr-2"
                   fill="none"
                   stroke="currentColor"
                   strokeWidth={2.5}
@@ -109,19 +109,20 @@ export default function Header() {
                     d="M4 8h16M4 16h16"
                   />
                 </svg>
+                <span>{t('menu') || '菜单'}</span>
               </button>
               {menuOpen && (
-                <div className="absolute right-0 mt-2 w-40 bg-white rounded-lg shadow-lg z-10">
+                <div className="absolute right-0 mt-3 w-56 bg-white rounded-xl shadow-2xl border border-gray-200 z-10 overflow-hidden">
                   <Link
                     href={`/${locale}/items`}
-                    className="block px-4 py-2 text-blue-700 font-semibold hover:bg-blue-50 rounded-lg"
+                    className="block px-6 py-4 text-blue-700 text-lg font-semibold hover:bg-blue-50 hover:text-blue-800 transition-colors border-b border-gray-100 last:border-b-0"
                     onClick={() => setMenuOpen(false)}
                   >
                     {t('items_list')}
                   </Link>
                   <Link
                     href={`/${locale}/items/new`}
-                    className="block px-4 py-2 text-blue-700 font-semibold hover:bg-blue-50 rounded-lg"
+                    className="block px-6 py-4 text-blue-700 text-lg font-semibold hover:bg-blue-50 hover:text-blue-800 transition-colors border-b border-gray-100 last:border-b-0"
                     onClick={() => setMenuOpen(false)}
                   >
                     {t('items_new')}
