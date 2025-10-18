@@ -6,18 +6,49 @@ export async function POST(req: Request) {
   try {
     const data = await req.json();
     console.log('Request data:', data);
-    const { title, description, price, imageUrl } = data;
+    const { title, description, price, imageUrl, sellerId } = data;
     
     // Validate required fields
     if (!title || !price) {
       console.log('Validation failed: missing title or price');
-      return NextResponse.json({ error: "Title and price are required" }, { status: 400 });
+      return NextResponse.json({ 
+        error: "Title and price are required",
+        message: "商品标题和价格为必填项"
+      }, { status: 400 });
     }
     
-    console.log('Creating item with data:', { title, description, price, imageUrl });
+    // Strict validation: sellerId is absolutely required (no anonymous posting)
+    if (!sellerId) {
+      console.log('Validation failed: missing sellerId - anonymous posting not allowed');
+      return NextResponse.json({ 
+        error: "User authentication required",
+        message: "禁止匿名发布商品，请先登录"
+      }, { status: 401 });
+    }
     
-    // Check if user with ID 1 exists, otherwise create item without seller
-    const user = await prisma.user.findUnique({ where: { id: 1 } });
+    // Convert sellerId to number if it's a string (to handle both traditional and OAuth users)
+    const sellerIdNum = typeof sellerId === 'string' ? parseInt(sellerId, 10) : sellerId;
+    
+    // Ensure sellerId is a valid number
+    if (typeof sellerIdNum !== 'number' || isNaN(sellerIdNum) || sellerIdNum <= 0) {
+      console.log('Validation failed: invalid sellerId format');
+      return NextResponse.json({ 
+        error: "Invalid user ID",
+        message: "用户ID格式无效"
+      }, { status: 400 });
+    }
+    
+    console.log('Creating item with data:', { title, description, price, imageUrl, sellerId: sellerIdNum });
+    
+    // Verify the seller exists and is active
+    const user = await prisma.user.findUnique({ where: { id: sellerIdNum } });
+    if (!user) {
+      console.log('Validation failed: user not found');
+      return NextResponse.json({ 
+        error: "User not found",
+        message: "用户不存在或已被删除"
+      }, { status: 404 });
+    }
     
     const item = await prisma.item.create({
       data: {
@@ -25,7 +56,7 @@ export async function POST(req: Request) {
         description,
         price,
         imageUrl,
-        sellerId: user ? 1 : null, // Only set seller if user exists
+        sellerId: sellerIdNum,
       },
     });
     

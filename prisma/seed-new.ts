@@ -12,39 +12,54 @@ async function main() {
 
   console.log("👥 创建测试用户...");
   
-  // 创建用户数据 - 使用最基本的字段
+  // 创建用户数据 - 使用基本字段
   const alice = await prisma.user.create({
     data: { 
       email: "alice@example.com", 
-      name: "Alice Johnson"
+      name: "Alice Johnson",
+      password: "password123",
+      image: "https://images.unsplash.com/photo-1494790108755-2616b612b786?w=150&h=150&fit=crop&crop=face",
+      emailVerified: new Date('2024-01-15T10:30:00Z')
     }
   });
 
   const bob = await prisma.user.create({
     data: { 
       email: "bob@example.com", 
-      name: "Bob Smith"
+      name: "Bob Smith",
+      password: "password123",
+      image: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=150&h=150&fit=crop&crop=face",
+      emailVerified: new Date('2024-02-10T14:20:00Z')
     }
   });
 
   const charlie = await prisma.user.create({
     data: { 
       email: "charlie@example.com", 
-      name: "Charlie Brown"
+      name: "Charlie Brown",
+      password: "password123",
+      image: "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=150&h=150&fit=crop&crop=face",
+      emailVerified: new Date('2024-03-05T09:45:00Z')
     }
   });
 
   const diana = await prisma.user.create({
     data: { 
       email: "diana@example.com", 
-      name: "Diana Prince"
+      name: "Diana Prince",
+      password: "password123",
+      image: "https://images.unsplash.com/photo-1487412720507-e7ab37603c6f?w=150&h=150&fit=crop&crop=face",
+      emailVerified: new Date('2024-04-12T16:10:00Z')
     }
   });
 
   const edward = await prisma.user.create({
     data: { 
       email: "edward@example.com", 
-      name: "Edward Chen"
+      name: "Edward Chen",
+      password: "password123",
+      image: "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=150&h=150&fit=crop&crop=face",
+      emailVerified: new Date('2024-05-20T11:25:00Z')
     }
   });
 

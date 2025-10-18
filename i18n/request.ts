@@ -1,24 +1,14 @@
 import {getRequestConfig} from 'next-intl/server';
 
 export default getRequestConfig(async ({locale}) => {
-  // Map locales to available message files
-  const localeMap: Record<string, string> = {
-    'zh': 'zh',
-    'zh-CN': 'zh',
-    'zh-TW': 'zh',
-    'en': 'en',
-    'en-US': 'en',
-    'en-GB': 'en',
-    'ja': 'ja',
-    'ja-JP': 'ja'
-  };
-  
+  // 确保locale参数被正确使用
   const supportedLocales = ['zh', 'en', 'ja'];
-  const mappedLocale = localeMap[locale || ''] || 'zh';
-  const safeLocale = supportedLocales.includes(mappedLocale) ? mappedLocale : 'zh';
+  
+  // 验证locale是否受支持，如果不受支持则使用默认值
+  const validLocale = locale && supportedLocales.includes(locale) ? locale : 'zh';
   
   return {
-    locale: safeLocale,
-    messages: (await import(`../messages/${safeLocale}.json`)).default
+    locale: validLocale,
+    messages: (await import(`../messages/${validLocale}.json`)).default
   };
 });

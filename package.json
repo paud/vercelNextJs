@@ -5,17 +5,20 @@
     "build": "next build",
     "start": "next start",
     "lint": "eslint .",
-    "postinstall": "prisma generate --no-engine"
+    "postinstall": "prisma generate"
   },
   "prisma": {
     "seed": "tsx prisma/seed.ts"
   },
   "dependencies": {
+    "@auth/prisma-adapter": "^2.11.0",
     "@prisma/client": "latest",
     "@prisma/extension-accelerate": "latest",
     "@vercel/blob": "^2.0.0",
     "next": "latest",
+    "next-auth": "^4.24.11",
     "next-intl": "^4.3.12",
+    "node-fetch": "^3.3.2",
     "react": "^19.0.0",
     "react-dom": "^19.0.0"
   },
