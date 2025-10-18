@@ -60,23 +60,23 @@ export default function Header() {
                     d="M4 8h16M4 16h16"
                   />
                 </svg>
-                <span className="ml-2 font-semibold"></span>
+
               </button>
               {menuOpen && (
                 <div className="absolute right-0 mt-2 w-40 bg-white rounded-lg shadow-lg z-10">
                   <Link
-                    href="/posts"
+                    href="/items"
                     className="block px-4 py-2 text-blue-700 font-semibold hover:bg-blue-50 rounded-lg"
                     onClick={() => setMenuOpen(false)}
                   >
-                    Posts
+                    商品列表
                   </Link>
                   <Link
-                    href="/posts/new"
+                    href="/items/new"
                     className="block px-4 py-2 text-blue-700 font-semibold hover:bg-blue-50 rounded-lg"
                     onClick={() => setMenuOpen(false)}
                   >
-                    New Post
+                    商品发布
                   </Link>
                 </div>
               )}
