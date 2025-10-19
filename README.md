@@ -1,8 +1,33 @@
-# Prisma ORM + Next.js starter
+# 二手商品交易平台 - Second-hand Item Trading Platform
 
-This repository provides boilerplate to quickly set up a simple Next.js CRUD application with [Prisma Postgres](https://www.prisma.io/postgres?utm_source=nextjs&utm_medium=example&utm_campaign=nextjs_example) and [Prisma ORM](https://www.prisma.io/orm?utm_source=nextjs&utm_medium=example&utm_campaign=nextjs_example) for database operations.
+基于Next.js和Prisma ORM构建的现代化二手商品交易平台，支持精确的日本地理位置定位和OAuth认证。
 
-## Getting started
+A modern second-hand item trading platform built with Next.js and Prisma ORM, featuring precise Japanese geographic location support and OAuth authentication.
+
+## ✨ 主要功能 Key Features
+
+- 🗾 **五级地理层级** - 完整的日本行政区划支持（地方→都道府県→市区町村→区域→区町）
+- 🔐 **OAuth认证** - 支持Google、GitHub等第三方登录
+- 📱 **响应式设计** - 适配桌面和移动设备
+- 🌐 **多语言支持** - 地名支持日文、英文、中文
+- 🔍 **智能搜索** - 基于地理位置的商品搜索
+- 📊 **性能优化** - 数据库索引和查询优化
+
+## 🏗️ 地理层级结构 Geographic Hierarchy
+
+```
+地方 (Region)               ← 八大地方：北海道、関東、関西、四国、九州等
+    ↓
+都道府県 (Prefecture)       ← 47个都道府県
+    ↓  
+市区町村 (City)            ← 政令指定都市、特别区、一般市等
+    ↓
+区域 (District)            ← 城市下属区域
+    ↓
+区町 (Ward)                ← 最小行政单位
+```
+
+## 🚀 快速开始 Getting Started
 
 Follow these steps to quickly set up the project and start using Prisma ORM with Next.js.
 
@@ -257,3 +282,36 @@ For further learning and support:
 - [Prisma Client API reference](https://www.prisma.io/docs/orm/prisma-client?utm_source=nextjs&utm_medium=example&utm_campaign=nextjs_example)
 - [Join our Discord community](https://pris.ly/discord?utm_source=nextjs&utm_medium=example&utm_campaign=nextjs_example)
 - [Follow us on Twitter](https://pris.ly/x?utm_source=nextjs&utm_medium=example&utm_campaign=nextjs_example)
+
+## 🛠️ 技术栈 Tech Stack
+
+### 前端 Frontend
+- **Next.js 15** - React全栈框架
+- **TypeScript** - 类型安全的JavaScript
+- **Tailwind CSS** - 实用工具优先的CSS框架
+- **NextAuth.js** - 身份验证解决方案
+
+### 后端 Backend  
+- **Prisma ORM** - 现代化数据库ORM
+- **PostgreSQL** - 关系型数据库
+- **Prisma Accelerate** - 数据库连接池和缓存
+
+### 开发工具 Development Tools
+- **Prisma Studio** - 数据库可视化管理
+- **TypeScript** - 开发时类型检查
+- **ESLint** - 代码质量检查
+
+## 📊 数据模型 Data Models
+
+### 核心模型 Core Models
+- `User` - 用户信息（支持OAuth）
+- `Item` - 商品信息
+- `Account` - OAuth账户
+- `Session` - 用户会话
+
+### 地理位置模型 Geographic Models
+- `Region` - 地方区划（8个）
+- `Prefecture` - 都道府県（47个）
+- `City` - 市区町村
+- `District` - 区域
+- `Ward` - 区町
