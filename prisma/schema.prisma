@@ -1,75 +1,335 @@
+// Prisma Client 生成器配置
+// Prisma Client Generator Configuration
 generator client {
   provider = "prisma-client-js"
 }
 
+// 数据库连接配置 - PostgreSQL
+// Database Connection Configuration - PostgreSQL
 datasource db {
   provider = "postgresql"
   url      = env("PRISMA_DATABASE_URL")
 }
 
+// 用户模型 - 系统用户信息
+// User Model - System user information
 model User {
-  id            Int       @id @default(autoincrement())
-  username      String?   @unique
-  email         String    @unique
-  name          String?
-  phone         String?
-  password      String?   @default("temp123")
-  image         String?   // 添加 NextAuth 需要的 image 字段
-  emailVerified DateTime? // 添加 NextAuth 需要的 emailVerified 字段
-  createdAt     DateTime  @default(now())
-  updatedAt     DateTime  @updatedAt
+  // 基础字段 Basic Fields
+  id            Int         @id @default(autoincrement()) // 用户唯一标识 User unique identifier
+  username      String?     @unique                       // 用户名 Username (可选/optional)
+  email         String      @unique                       // 邮箱地址 Email address (必填/required)
+  name          String?                                   // 显示名称 Display name
+  phone         String?                                   // 电话号码 Phone number
+  password      String?     @default("temp123")           // 密码 Password (临时默认/temp default)
   
-  // Relations
-  item          Item[]
-  accounts      Account[]
-  sessions      Session[]
+  // NextAuth集成字段 NextAuth Integration Fields  
+  image         String?                                   // 头像URL Avatar URL
+  emailVerified DateTime?                                 // 邮箱验证时间 Email verification time
+  
+  // 地理位置信息 Geographic Location Information
+  region        String?     @default("kansai")            // 地方代码 Region code (默认关西/default Kansai)
+  regionId      Int?                                      // 地方ID Region ID
+  prefectureId  Int?                                      // 都道府县ID Prefecture ID
+  cityId        Int?                                      // 城市ID City ID  
+  districtId    Int?                                      // 区域ID District ID
+  wardId        Int?                                      // 区町ID Ward ID
+  
+  // 时间戳 Timestamps
+  createdAt     DateTime    @default(now())               // 创建时间 Creation time
+  updatedAt     DateTime    @updatedAt                    // 更新时间 Update time
+  
+  // 关联关系 Relations
+  accounts      Account[]                                 // OAuth账户 OAuth accounts
+  item          Item[]                                    // 用户商品 User items
+  sessions      Session[]                                 // 用户会话 User sessions
+  Region        Region?     @relation(fields: [regionId], references: [id])     // 所属地方 Belongs to region
+  City          City?       @relation(fields: [cityId], references: [id])       // 所属城市 Belongs to city
+  District      District?   @relation(fields: [districtId], references: [id])   // 所属区域 Belongs to district  
+  Prefecture    Prefecture? @relation(fields: [prefectureId], references: [id]) // 所属都道府县 Belongs to prefecture
+  Ward          Ward?       @relation(fields: [wardId], references: [id])       // 所属区町 Belongs to ward
+
+  // 数据库索引 Database Indexes (提升查询性能/Improve query performance)
+  @@index([regionId])     // 地方索引 Region index
+  @@index([cityId])       // 城市索引 City index
+  @@index([districtId])   // 区域索引 District index  
+  @@index([prefectureId]) // 都道府县索引 Prefecture index
+  @@index([wardId])       // 区町索引 Ward index
 }
 
-
-
+// 商品模型 - 二手商品信息  
+// Item Model - Second-hand item information
 model Item {
-  id          Int      @id @default(autoincrement())
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
-  title       String
-  description String?
-  price       Float
-  imageUrl    String?
-  sellerId    Int      // Back to Int to match User.id
-  seller      User     @relation(fields: [sellerId], references: [id])
+  // 基础字段 Basic Fields
+  id           Int         @id @default(autoincrement()) // 商品唯一标识 Item unique identifier
+  title        String                                    // 商品标题 Item title
+  description  String?                                   // 商品描述 Item description
+  price        Float                                     // 商品价格 Item price (日元/JPY)
+  imageUrl     String?                                   // 商品图片URL Item image URL
+  
+  // 地理位置信息 Geographic Location Information  
+  region       String?     @default("kansai")            // 地方代码 Region code (默认关西/default Kansai)
+  regionId     Int?                                      // 地方ID Region ID
+  prefectureId Int?                                      // 都道府县ID Prefecture ID
+  cityId       Int?                                      // 城市ID City ID
+  districtId   Int?                                      // 区域ID District ID  
+  wardId       Int?                                      // 区町ID Ward ID
+  
+  // 卖家信息 Seller Information
+  sellerId     Int                                       // 卖家用户ID Seller user ID
+  
+  // 时间戳 Timestamps
+  createdAt    DateTime    @default(now())               // 创建时间 Creation time
+  updatedAt    DateTime    @updatedAt                    // 更新时间 Update time
+  
+  // 关联关系 Relations
+  Region       Region?     @relation(fields: [regionId], references: [id])     // 所在地方 Located in region
+  City         City?       @relation(fields: [cityId], references: [id])       // 所在城市 Located in city
+  District     District?   @relation(fields: [districtId], references: [id])   // 所在区域 Located in district
+  Prefecture   Prefecture? @relation(fields: [prefectureId], references: [id]) // 所在都道府县 Located in prefecture  
+  seller       User        @relation(fields: [sellerId], references: [id])     // 卖家用户 Seller user
+  Ward         Ward?       @relation(fields: [wardId], references: [id])       // 所在区町 Located in ward
+
+  // 数据库索引 Database Indexes (提升查询性能/Improve query performance)
+  @@index([regionId])     // 地方索引 Region index
+  @@index([cityId])       // 城市索引 City index
+  @@index([districtId])   // 区域索引 District index
+  @@index([prefectureId]) // 都道府县索引 Prefecture index  
+  @@index([region])       // 地区索引 Region index
+  @@index([wardId])       // 区町索引 Ward index
 }
 
+// OAuth账户模型 - NextAuth集成
+// Account Model - NextAuth Integration
 model Account {
-  id                String  @id @default(cuid())
-  userId            Int
-  type              String
-  provider          String
-  providerAccountId String
-  refresh_token     String? @db.Text
-  access_token      String? @db.Text
-  expires_at        Int?
-  token_type        String?
-  scope             String?
-  id_token          String? @db.Text
-  session_state     String?
+  // 基础字段 Basic Fields
+  id                String  @id @default(cuid())          // 账户唯一标识 Account unique identifier
+  userId            Int                                    // 关联用户ID Associated user ID
+  type              String                                 // 账户类型 Account type (oauth, etc.)
+  provider          String                                 // OAuth提供商 OAuth provider (google, github, etc.)
+  providerAccountId String                                 // 提供商账户ID Provider account ID
+  
+  // OAuth令牌信息 OAuth Token Information
+  refresh_token     String?                                // 刷新令牌 Refresh token
+  access_token      String?                                // 访问令牌 Access token  
+  expires_at        Int?                                   // 令牌过期时间 Token expiration time
+  token_type        String?                                // 令牌类型 Token type
+  scope             String?                                // 权限范围 Permission scope
+  id_token          String?                                // ID令牌 ID token
+  session_state     String?                                // 会话状态 Session state
+  
+  // 关联关系 Relations  
+  user              User    @relation(fields: [userId], references: [id], onDelete: Cascade) // 关联用户 Associated user
 
-  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
-
-  @@unique([provider, providerAccountId])
+  // 唯一约束 Unique Constraints
+  @@unique([provider, providerAccountId]) // 提供商+账户ID组合唯一 Provider + Account ID combination unique
 }
 
+// 用户会话模型 - NextAuth集成
+// Session Model - NextAuth Integration  
 model Session {
-  id           String   @id @default(cuid())
-  sessionToken String   @unique
-  userId       Int
-  expires      DateTime
-  user         User @relation(fields: [userId], references: [id], onDelete: Cascade)
+  // 基础字段 Basic Fields
+  id           String   @id @default(cuid())              // 会话唯一标识 Session unique identifier
+  sessionToken String   @unique                           // 会话令牌 Session token (唯一/unique)
+  userId       Int                                        // 关联用户ID Associated user ID
+  expires      DateTime                                   // 会话过期时间 Session expiration time
+  
+  // 关联关系 Relations
+  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade) // 关联用户 Associated user
 }
 
+// 验证令牌模型 - NextAuth集成
+// Verification Token Model - NextAuth Integration
 model VerificationToken {
-  identifier String
-  token      String   @unique
-  expires    DateTime
+  // 基础字段 Basic Fields  
+  identifier String                                       // 标识符 Identifier (通常是邮箱/usually email)
+  token      String   @unique                             // 验证令牌 Verification token (唯一/unique)
+  expires    DateTime                                     // 令牌过期时间 Token expiration time
 
-  @@unique([identifier, token])
+  // 唯一约束 Unique Constraints
+  @@unique([identifier, token]) // 标识符+令牌组合唯一 Identifier + Token combination unique
+}
+
+// 城市模型 - 日本三级行政区信息
+// City Model - Japanese third-level administrative division information
+model City {
+  // 基础字段 Basic Fields
+  id           Int        @id @default(autoincrement())   // 城市唯一标识 City unique identifier
+  code         String     @unique                         // 城市代码 City code (政府标准编码/government standard code)
+  
+  // 多语言名称 Multilingual Names
+  nameJa       String                                     // 日文名称 Japanese name
+  nameEn       String                                     // 英文名称 English name  
+  nameZh       String                                     // 中文名称 Chinese name
+  
+  // 城市分类信息 City Classification Information
+  type         String                                     // 城市类型 City type (市/区/町/村等 shi/ku/machi/mura etc.)
+  level        String                                     // 行政级别 Administrative level (city/ward/town/village)
+  prefectureId Int                                        // 所属都道府县ID Prefecture ID it belongs to
+  isCapital    Boolean    @default(false)                 // 是否为省会城市 Whether it's a capital city
+  
+  // 统计信息 Statistical Information
+  population   Int?                                       // 人口数量 Population count
+  area         Float?                                     // 面积(平方公里) Area (square kilometers)
+  
+  // 时间戳 Timestamps
+  createdAt    DateTime   @default(now())                 // 创建时间 Creation time
+  updatedAt    DateTime   @updatedAt                      // 更新时间 Update time
+  
+  // 关联关系 Relations
+  Prefecture   Prefecture @relation(fields: [prefectureId], references: [id]) // 所属都道府县 Belongs to prefecture
+  District     District[]                                 // 下属区域 Subordinate districts
+  Item         Item[]                                     // 城市内商品 Items in city
+  User         User[]                                     // 城市内用户 Users in city  
+  Ward         Ward[]                                     // 下属区町 Subordinate wards
+
+  // 数据库索引 Database Indexes (提升查询性能/Improve query performance)
+  @@index([code])         // 城市代码索引 City code index
+  @@index([level])        // 行政级别索引 Administrative level index
+  @@index([prefectureId]) // 都道府县索引 Prefecture index
+  @@index([type])         // 城市类型索引 City type index
+}
+
+// 区域模型 - 城市下属区域信息（四级行政区）
+// District Model - District information under cities (Fourth-level administrative division)
+model District {
+  // 基础字段 Basic Fields
+  id         Int      @id @default(autoincrement())       // 区域唯一标识 District unique identifier
+  code       String   @unique                             // 区域代码 District code (政府标准编码/government standard code)
+  
+  // 多语言名称 Multilingual Names  
+  nameJa     String                                       // 日文名称 Japanese name
+  nameEn     String                                       // 英文名称 English name
+  nameZh     String                                       // 中文名称 Chinese name
+  
+  // 关联信息 Association Information
+  cityId     Int                                          // 所属城市ID City ID it belongs to
+  
+  // 统计信息 Statistical Information
+  population Int?                                         // 人口数量 Population count
+  area       Float?                                       // 面积(平方公里) Area (square kilometers)
+  
+  // 时间戳 Timestamps
+  createdAt  DateTime @default(now())                     // 创建时间 Creation time
+  updatedAt  DateTime @updatedAt                          // 更新时间 Update time
+  
+  // 关联关系 Relations
+  City       City     @relation(fields: [cityId], references: [id]) // 所属城市 Belongs to city
+  Item       Item[]                                       // 区域内商品 Items in district
+  User       User[]                                       // 区域内用户 Users in district
+  Ward       Ward[]                                       // 下属区町 Subordinate wards
+
+  // 数据库索引 Database Indexes (提升查询性能/Improve query performance)
+  @@index([cityId])   // 城市索引 City index
+  @@index([code])     // 区域代码索引 District code index
+}
+
+// 都道府县模型 - 日本二级行政区信息
+// Prefecture Model - Japanese second-level administrative division information
+model Prefecture {
+  // 基础字段 Basic Fields
+  id         Int      @id @default(autoincrement())       // 都道府县唯一标识 Prefecture unique identifier
+  code       String   @unique                             // 都道府县代码 Prefecture code (政府标准编码/government standard code)
+  
+  // 多语言名称 Multilingual Names
+  nameJa     String                                       // 日文名称 Japanese name (例如: 東京都/Tokyo-to)
+  nameEn     String                                       // 英文名称 English name (例如: Tokyo)
+  nameZh     String                                       // 中文名称 Chinese name (例如: 东京都)
+  
+  // 地理分类信息 Geographic Classification Information
+  regionId   Int                                          // 所属地方ID Region ID it belongs to
+  type       String                                       // 行政类型 Administrative type (都/道/府/県 to/do/fu/ken)
+  
+  // 行政信息 Administrative Information
+  capital    String?                                      // 省会城市 Capital city
+  postalCode String?                                      // 邮政编码 Postal code
+  
+  // 统计信息 Statistical Information  
+  area       Float?                                       // 面积(平方公里) Area (square kilometers)
+  population Int?                                         // 人口数量 Population count
+  
+  // 时间戳 Timestamps
+  createdAt  DateTime @default(now())                     // 创建时间 Creation time
+  updatedAt  DateTime @updatedAt                          // 更新时间 Update time
+  
+  // 关联关系 Relations
+  Region     Region   @relation(fields: [regionId], references: [id]) // 所属地方 Belongs to region
+  City       City[]                                       // 下属城市 Subordinate cities
+  Item       Item[]                                       // 都道府县内商品 Items in prefecture
+  User       User[]                                       // 都道府县内用户 Users in prefecture
+
+  // 数据库索引 Database Indexes (提升查询性能/Improve query performance)
+  @@index([code])       // 都道府县代码索引 Prefecture code index
+  @@index([postalCode]) // 邮政编码索引 Postal code index
+  @@index([regionId])   // 地方索引 Region index
+}
+
+// 地方模型 - 日本地方区划信息（一级行政区域）
+// Region Model - Japanese regional division information (First-level administrative area)
+model Region {
+  // 基础字段 Basic Fields
+  id         Int      @id @default(autoincrement())       // 地方唯一标识 Region unique identifier
+  code       String   @unique                             // 地方代码 Region code (标准编码/standard code)
+  
+  // 多语言名称 Multilingual Names
+  nameJa     String                                       // 日文名称 Japanese name (例如: 九州地方/Kyushu-chiho)
+  nameEn     String                                       // 英文名称 English name (例如: Kyushu)
+  nameZh     String                                       // 中文名称 Chinese name (例如: 九州地方)
+  
+  // 地理信息 Geographic Information
+  description String?                                     // 地方描述 Region description
+  
+  // 统计信息 Statistical Information  
+  area       Float?                                       // 面积(平方公里) Area (square kilometers)
+  population Int?                                         // 人口数量 Population count
+  
+  // 时间戳 Timestamps
+  createdAt  DateTime @default(now())                     // 创建时间 Creation time
+  updatedAt  DateTime @updatedAt                          // 更新时间 Update time
+  
+  // 关联关系 Relations
+  Prefecture Prefecture[]                                 // 下属都道府县 Subordinate prefectures
+  Item       Item[]                                       // 地方内商品 Items in region
+  User       User[]                                       // 地方内用户 Users in region
+
+  // 数据库索引 Database Indexes (提升查询性能/Improve query performance)
+  @@index([code])       // 地方代码索引 Region code index
+}
+
+// 区町模型 - 最小行政区划单位信息
+// Ward Model - Smallest administrative division unit information
+model Ward {
+  // 基础字段 Basic Fields
+  id         Int       @id @default(autoincrement())      // 区町唯一标识 Ward unique identifier
+  code       String?   @unique                            // 区町代码 Ward code (可选/optional, 政府标准编码/government standard code)
+  
+  // 多语言名称 Multilingual Names
+  nameJa     String                                       // 日文名称 Japanese name (例如: 渋谷区/Shibuya-ku)
+  nameEn     String                                       // 英文名称 English name (例如: Shibuya)
+  nameZh     String                                       // 中文名称 Chinese name (例如: 涩谷区)
+  
+  // 行政分类信息 Administrative Classification Information  
+  type       String                                       // 区町类型 Ward type (区/町/丁目等 ku/machi/chome etc.)
+  
+  // 关联信息 Association Information
+  cityId     Int?                                         // 所属城市ID City ID it belongs to (可选/optional)
+  districtId Int?                                         // 所属区域ID District ID it belongs to (可选/optional)
+  
+  // 统计信息 Statistical Information
+  population Int?                                         // 人口数量 Population count
+  area       Float?                                       // 面积(平方公里) Area (square kilometers)
+  postalCode String?                                      // 邮政编码 Postal code
+  
+  // 时间戳 Timestamps
+  createdAt  DateTime  @default(now())                    // 创建时间 Creation time
+  updatedAt  DateTime  @updatedAt                         // 更新时间 Update time
+  
+  // 关联关系 Relations
+  Item       Item[]                                       // 区町内商品 Items in ward
+  User       User[]                                       // 区町内用户 Users in ward
+  City       City?     @relation(fields: [cityId], references: [id])       // 所属城市 Belongs to city (可选/optional)
+  District   District? @relation(fields: [districtId], references: [id])   // 所属区域 Belongs to district (可选/optional)
+
+  // 数据库索引 Database Indexes (提升查询性能/Improve query performance)
+  @@index([cityId])     // 城市索引 City index
+  @@index([districtId]) // 区域索引 District index
 }
