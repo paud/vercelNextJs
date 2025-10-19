@@ -2,20 +2,129 @@
 @tailwind components;
 @tailwind utilities;
 
+/* ========== 强制浅色主题设置 ========== */
+/* 全局设置，不受系统深色/浅色模式影响 */
 :root {
+  color-scheme: light only !important;
   --background: #ffffff;
   --foreground: #171717;
 }
 
+/* 覆盖系统深色模式 */
 @media (prefers-color-scheme: dark) {
   :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
+    color-scheme: light only !important;
+    --background: #ffffff !important;
+    --foreground: #171717 !important;
+  }
+  
+  body, html {
+    background-color: #ffffff !important;
+    color: #111827 !important;
+  }
+  
+  * {
+    color-scheme: light !important;
   }
 }
 
-body {
+/* 明确禁用深色模式 */
+html, body {
+  color-scheme: light only !important;
   color: var(--foreground);
   background: var(--background);
   font-family: Arial, Helvetica, sans-serif;
+}
+
+/* 确保所有元素都使用浅色主题 */
+* {
+  color-scheme: light only !important;
+}
+
+/* ========== 组件固定样式 ========== */
+
+/* Header 组件强制白色背景 */
+.app-header {
+  background-color: #ffffff !important;
+  color: #111827 !important;
+  color-scheme: light only !important;
+}
+
+/* Footer 组件强制白色背景 */
+.app-footer {
+  background-color: #ffffff !important;
+  color: #111827 !important;
+  color-scheme: light only !important;
+}
+
+/* UserHeader 组件强制白色背景 */
+.user-header {
+  background-color: #ffffff !important;
+  color: #111827 !important;
+  color-scheme: light only !important;
+}
+
+/* 主布局容器强制浅色背景 */
+.main-layout {
+  background-color: #ffffff !important;
+  color: #111827 !important;
+  color-scheme: light only !important;
+}
+
+/* 内容区域强制浅色背景 */
+.main-content {
+  background-color: #ffffff !important;
+  color: #111827 !important;
+  color-scheme: light only !important;
+}
+
+/* ========== 消息弹窗动画样式 ========== */
+/* 手机端优化的CSS动画样式 */
+@keyframes slideUp {
+  from { 
+    transform: translateY(100%); 
+  }
+  to { 
+    transform: translateY(0); 
+  }
+}
+
+.animate-slideUp {
+  animation: slideUp 0.3s ease-out;
+}
+
+/* 消息弹窗强制浅色主题 */
+.chat-modal {
+  background-color: #ffffff !important;
+  color: #111827 !important;
+  color-scheme: light only !important;
+}
+
+.chat-modal * {
+  color-scheme: light only !important;
+}
+
+/* 强制固定颜色的通用类 */
+.force-light-theme {
+  background-color: #ffffff !important;
+  color: #111827 !important;
+  color-scheme: light only !important;
+}
+
+.force-light-bg {
+  background-color: #f9fafb !important;
+  color-scheme: light only !important;
+}
+
+.force-dark-text {
+  color: #111827 !important;
+}
+
+.force-gray-text {
+  color: #6b7280 !important;
+}
+
+.force-white-bg {
+  background-color: #ffffff !important;
+  color-scheme: light only !important;
 }

@@ -196,7 +196,7 @@ export default function Footer() {
   }, []);
 
   return (
-    <footer className="fixed bottom-0 left-4 right-4 bg-white border-t border-gray-200 shadow-lg z-50 rounded-t-lg">
+    <footer className="fixed bottom-0 left-4 right-4 bg-white border-t border-gray-200 shadow-lg z-50 rounded-t-lg app-footer">
       <div className="flex items-center justify-around py-2 px-2">
         {/* 主页 */}
         <Link

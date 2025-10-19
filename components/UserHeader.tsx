@@ -64,7 +64,7 @@ export default function UserHeader({
   return (
     <>
       {/* 移动端优化的用户导航栏 */}
-      <div className="bg-white shadow-sm border-b">
+      <div className="bg-white shadow-sm border-b user-header">
         <div className="px-4 py-3">
           {/* 顶部：用户信息栏 */}
           <div className="flex items-center justify-between mb-3">

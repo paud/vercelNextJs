@@ -8,9 +8,9 @@ export default async function LocaleLayout({ children, params }: { children: Rea
   const messages = await getMessages({ locale });
   return (
         <NextIntlClientProvider locale={locale} messages={messages}>
-          <div className="min-h-screen flex flex-col">
+          <div className="min-h-screen flex flex-col main-layout">
             <Header />
-            <main className="flex-1 overflow-auto">{children}</main>
+            <main className="flex-1 overflow-auto main-content">{children}</main>
             <Footer />
           </div>
         </NextIntlClientProvider>

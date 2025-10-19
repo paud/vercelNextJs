@@ -651,7 +651,7 @@ export default function Header() {
   }
 
   return (
-    <div className="w-full bg-white shadow-md py-4 px-4">
+    <div className="w-full bg-white shadow-md py-4 px-4 app-header">
       {/* 第一行：地域、语言、用户 */}
       <div className="flex items-center justify-between w-full mb-3">
         {/* 左侧：地域选择 */}

@@ -6,11 +6,13 @@ export default {
     "./components/**/*.{js,ts,jsx,tsx,mdx}",
     "./app/**/*.{js,ts,jsx,tsx,mdx}",
   ],
+  // 禁用深色模式，只使用浅色主题
+  darkMode: 'media',
   theme: {
     extend: {
       colors: {
-        background: "var(--background)",
-        foreground: "var(--foreground)",
+        background: "#ffffff",
+        foreground: "#171717",
       },
     },
   },

@@ -7,30 +7,6 @@ import Link from 'next/link';
 import { useCurrentUser } from '../../../hooks/useCurrentUser';
 import UserHeader from '../../../components/UserHeader';
 
-// 手机端优化的CSS动画样式
-const styles = `
-  @keyframes slideUp {
-    from { 
-      transform: translateY(100%); 
-    }
-    to { 
-      transform: translateY(0); 
-    }
-  }
-  
-  .animate-slideUp {
-    animation: slideUp 0.3s ease-out;
-  }
-`;
-
-// 将样式插入到文档中
-if (typeof document !== 'undefined' && !document.getElementById('chat-modal-styles')) {
-  const styleSheet = document.createElement('style');
-  styleSheet.id = 'chat-modal-styles';
-  styleSheet.textContent = styles;
-  document.head.appendChild(styleSheet);
-}
-
 interface Message {
   id: number;
   content: string;
@@ -319,10 +295,7 @@ export default function MessagesPage() {
 
         {/* 手机端聊天窗口 - 确保在Footer之上 */}
         {isChatOpen && selectedConversation && (
-          <div 
-            className="fixed inset-0 z-[100] bg-white animate-slideUp"
-            style={{ zIndex: 100 }}
-          >
+          <div className="fixed inset-0 z-[100] bg-white animate-slideUp chat-modal">
             <div className="h-full flex flex-col">
               {/* 聊天窗口头部 */}
               <div className="flex items-center justify-between p-4 border-b border-gray-200 bg-gray-50 flex-shrink-0">
