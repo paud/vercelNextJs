@@ -45,9 +45,9 @@ export default function Header() {
     if (regionData) {
       switch (locale) {
         case 'zh': return regionData.nameZh || regionData.nameEn || regionData.nameJa;
-        case 'en': return regionData.nameEn || regionData.nameJa;
-        case 'ja': return regionData.nameJa;
-        default: return regionData.nameEn || regionData.nameJa;
+        case 'en': return regionData.nameEn || regionData.nameJa || regionData.nameZh;
+        case 'ja': return regionData.nameJa || regionData.nameEn || regionData.nameZh; // 修复：添加回退逻辑
+        default: return regionData.nameEn || regionData.nameJa || regionData.nameZh;
       }
     }
     
@@ -255,9 +255,9 @@ export default function Header() {
   const getLocationName = (item: any) => {
     switch (locale) {
       case 'zh': return item.nameZh || item.nameEn || item.nameJa;
-      case 'en': return item.nameEn || item.nameJa;
-      case 'ja': return item.nameJa;
-      default: return item.nameEn || item.nameJa;
+      case 'en': return item.nameEn || item.nameJa || item.nameZh;
+      case 'ja': return item.nameJa || item.nameEn || item.nameZh; // 修复：添加回退逻辑
+      default: return item.nameEn || item.nameJa || item.nameZh;
     }
   };
 
