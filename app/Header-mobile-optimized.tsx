@@ -6,7 +6,7 @@ import { useRouter, usePathname } from "next/navigation";
 import { useLocale, useTranslations } from 'next-intl';
 import { useCombinedAuth } from '../hooks/useCombinedAuth';
 
-export default function Header() {
+export default function HeaderMobileOptimized() {
   const [search, setSearch] = useState("");
   const router = useRouter();
   const locale = useLocale();

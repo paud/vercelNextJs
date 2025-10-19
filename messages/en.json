@@ -18,7 +18,10 @@
     "welcome": "Welcome",
     "logout": "Logout",
     "profile": "Profile",
-    "my_items": "My Items"
+    "my_items": "My Items",
+    "items": "Items",
+    "post": "Post",
+    "home": "Home"
   },
   "Home": {
     "market_title": "Secondhand Marketplace",
@@ -26,7 +29,7 @@
     "sort_price": "Price",
     "sort_title": "Title",
     "sort_seller": "Seller",
-    "currency": "$",
+    "currency": "￥",
     "seller": "Seller",
     "anonymous": "Anonymous",
     "date_locale": "en-US",

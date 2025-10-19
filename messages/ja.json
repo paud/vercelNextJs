@@ -30,7 +30,10 @@
     "welcome": "ようこそ",
     "logout": "ログアウト",
     "profile": "プロフィール",
-    "my_items": "私の商品"
+    "my_items": "私の商品",
+    "items": "商品",
+    "post": "出品",
+    "home": "ホーム"
   },
   "ItemNew": {
     "page_title": "中古品を出品する",
