@@ -196,8 +196,8 @@ export default function Footer() {
   }, []);
 
   return (
-    <footer className="fixed bottom-0 left-0 right-0 bg-white border-t border-gray-200 shadow-lg z-50">
-      <div className="flex items-center justify-around py-2 px-4">
+    <footer className="fixed bottom-0 left-4 right-4 bg-white border-t border-gray-200 shadow-lg z-50 rounded-t-lg">
+      <div className="flex items-center justify-around py-2 px-2">
         {/* 主页 */}
         <Link
           href={`/${locale}`}
