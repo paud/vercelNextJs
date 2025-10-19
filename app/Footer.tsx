@@ -12,9 +12,22 @@ export default function Footer() {
   const [detectedRegion, setDetectedRegion] = useState<string>('tokyo'); // 默认东京
   const [isDetecting, setIsDetecting] = useState(false);
   const [locationDetected, setLocationDetected] = useState(false);
+  const [availableRegions, setAvailableRegions] = useState<any[]>([]);
 
   // 获取地区显示名称
   const getRegionDisplayName = (region: string) => {
+    // 首先尝试从数据库获取的地区数据中查找
+    const regionData = availableRegions.find(r => r.code === region);
+    if (regionData) {
+      switch (locale) {
+        case 'zh': return regionData.nameZh || regionData.nameEn || regionData.nameJa;
+        case 'en': return regionData.nameEn || regionData.nameJa;
+        case 'ja': return regionData.nameJa;
+        default: return regionData.nameEn || regionData.nameJa;
+      }
+    }
+    
+    // 如果数据库中没有找到，使用翻译文件的备选方案
     switch (region) {
       case 'osaka': return t('region_osaka');
       case 'tokyo': return t('region_tokyo');
@@ -22,6 +35,26 @@ export default function Footer() {
       default: return t('region');
     }
   };
+
+  // 获取可用地区列表
+  useEffect(() => {
+    const fetchRegions = async () => {
+      try {
+        const response = await fetch('/api/regions');
+        if (response.ok) {
+          const data = await response.json();
+          setAvailableRegions(data.regions || []);
+          console.log('获取到地区数据:', data.regions?.length || 0, '个');
+        } else {
+          console.error('获取地区列表失败');
+        }
+      } catch (error) {
+        console.error('获取地区列表错误:', error);
+      }
+    };
+
+    fetchRegions();
+  }, []);
 
   // 地理定位功能
   useEffect(() => {
@@ -59,11 +92,19 @@ export default function Footer() {
                 setLocationDetected(true);
                 console.log('检测到的地区:', data.region);
                 
+                // 如果API返回了地区详细数据，可以使用它
+                if (data.regionData) {
+                  console.log('地区详细信息:', data.regionData);
+                }
+                
                 // 可选：自动跳转到检测到的地区
                 // window.location.href = `/${locale}?region=${data.region}`;
+              } else {
+                console.log('API未返回地区信息，设置默认地区为东京');
+                setDetectedRegion('tokyo');
               }
             } else {
-              console.log('API未返回地区信息，设置默认地区为东京');
+              console.log('API响应错误，设置默认地区为东京');
               setDetectedRegion('tokyo');
             }
           } catch (error) {
@@ -137,7 +178,7 @@ export default function Footer() {
             )}
           </div>
           <span className="text-xs font-medium">
-            {isDetecting ? '定位中...' : (locationDetected ? getRegionDisplayName(detectedRegion) : t('region'))}
+            {isDetecting ? '定位中...' : getRegionDisplayName(detectedRegion)}
           </span>
         </Link>
 
