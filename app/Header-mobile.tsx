@@ -7,8 +7,6 @@ import { useLocale, useTranslations } from 'next-intl';
 import { useCombinedAuth } from '../hooks/useCombinedAuth';
 
 export default function Header() {
-  const [menuOpen, setMenuOpen] = useState(false);
-  const menuRef = useRef<HTMLDivElement>(null);
   const [search, setSearch] = useState("");
   const router = useRouter();
   const locale = useLocale();
@@ -40,21 +38,6 @@ export default function Header() {
     setUserMenuOpen(false);
     router.push(`/${locale}`);
   }
-
-  function handleClickOutside(event: MouseEvent) {
-    if (menuRef.current && !menuRef.current.contains(event.target as Node)) {
-      setMenuOpen(false);
-    }
-  }
-
-  useEffect(() => {
-    if (menuOpen) {
-      document.addEventListener("mousedown", handleClickOutside);
-    }
-    return () => {
-      document.removeEventListener("mousedown", handleClickOutside);
-    };
-  }, [menuOpen]);
 
   // 处理弹出菜单的点击外部关闭
   useEffect(() => {
@@ -340,51 +323,27 @@ export default function Header() {
               {t('login')}
             </Link>
           )}
-                    {t('my_items')}
-                  </Link>
-                  <button
-                    onClick={handleLogout}
-                    className="block w-full text-left px-4 py-2 text-sm hover:bg-gray-50 text-red-600 transition rounded-b-lg"
-                  >
-                    <svg className="w-3 h-3 sm:w-4 sm:h-4 inline mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
-                    </svg>
-                    {t('logout')}
-                  </button>
-                </div>
-              )}
-            </div>
-          ) : (
-            <div className="flex items-center">
-              <Link
-                href={`/${locale}/auth/signin`}
-                className="bg-green-500 text-white px-3 py-2 rounded-lg hover:bg-green-600 transition text-sm font-semibold"
-              >
-                {t('login')}
-              </Link>
-            </div>
-          )}
         </div>
       </div>
 
       {/* 第二行：搜索栏 */}
-      <div className="flex w-full items-center mt-1.5 sm:mt-2">
+      <div className="flex w-full items-center mt-3">
         <input
           type="text"
           placeholder={t('search')}
           value={search}
           onChange={(e) => setSearch(e.target.value)}
           onKeyDown={(e) => e.key === "Enter" && handleSearch()}
-          className="flex-1 px-3 sm:px-4 py-1.5 sm:py-2 border border-gray-300 rounded-l-lg focus:outline-none focus:ring-2 focus:ring-blue-400 focus:border-transparent text-base text-gray-900 placeholder-gray-500"
+          className="flex-1 px-4 py-2 border border-gray-300 rounded-l-lg focus:outline-none focus:ring-2 focus:ring-blue-400 focus:border-transparent text-base text-gray-900 placeholder-gray-500"
         />
         <button
           onClick={handleSearch}
-          className="bg-blue-500 text-white px-3 sm:px-4 py-1.5 sm:py-2 rounded-r-lg hover:bg-blue-600 transition flex items-center text-base"
+          className="bg-blue-500 text-white px-4 py-2 rounded-r-lg hover:bg-blue-600 transition flex items-center text-base"
         >
-          <svg className="w-4 h-4 sm:w-5 sm:h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
           </svg>
-          <span className="hidden sm:inline ml-2">{t('search')}</span>
+          <span className="ml-2">{t('search')}</span>
         </button>
       </div>
     </div>
