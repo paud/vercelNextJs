@@ -301,14 +301,7 @@ export default function Header() {
                 </div>
               )}
             </div>
-          ) : (
-            <Link
-              href={`/${locale}/auth/signin`}
-              className="bg-green-500 text-white px-4 py-2 rounded-lg hover:bg-green-600 transition font-semibold text-sm"
-            >
-              {t('login')}
-            </Link>
-          )}
+          ) : null}
         </div>
       </div>
 

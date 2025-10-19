@@ -34,32 +34,20 @@ export default function Footer() {
           <span className="text-xs font-medium">{t('items')}</span>
         </Link>
 
-        {/* 发布商品 - 仅登录用户可见 */}
-        {currentUser ? (
-          <Link
-            href={`/${locale}/items/new`}
-            className="flex flex-col items-center text-gray-700 hover:text-green-600 transition-colors py-2"
-          >
-            <div className="bg-green-500 rounded-full p-2 mb-1">
-              <svg className="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
-              </svg>
-            </div>
-            <span className="text-xs font-medium text-green-600">{t('post')}</span>
-          </Link>
-        ) : (
-          <Link
-            href={`/${locale}/auth/signin`}
-            className="flex flex-col items-center text-gray-700 hover:text-green-600 transition-colors py-2"
-          >
-            <div className="bg-green-500 rounded-full p-2 mb-1">
-              <svg className="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
-              </svg>
-            </div>
-            <span className="text-xs font-medium text-green-600">{t('login')}</span>
-          </Link>
-        )}
+        {/* 发布商品 - 登录用户可发布，未登录显示登录提示 */}
+        <Link
+          href={currentUser ? `/${locale}/items/new` : `/${locale}/auth/signin`}
+          className="flex flex-col items-center text-gray-700 hover:text-green-600 transition-colors py-2"
+        >
+          <div className="bg-green-500 rounded-full p-2 mb-1">
+            <svg className="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
+            </svg>
+          </div>
+          <span className="text-xs font-medium text-green-600">
+            {currentUser ? t('post') : t('login')}
+          </span>
+        </Link>
 
         {/* 搜索 */}
         <Link
@@ -72,7 +60,7 @@ export default function Footer() {
           <span className="text-xs font-medium">{t('search')}</span>
         </Link>
 
-        {/* 我的 - 个人中心 */}
+        {/* 我的 - 个人中心/登录 */}
         {currentUser ? (
           <Link
             href={`/${locale}/users/profile`}
@@ -86,12 +74,12 @@ export default function Footer() {
         ) : (
           <Link
             href={`/${locale}/auth/signin`}
-            className="flex flex-col items-center text-gray-700 hover:text-blue-600 transition-colors py-2"
+            className="flex flex-col items-center text-gray-700 hover:text-green-600 transition-colors py-2"
           >
             <svg className="w-6 h-6 mb-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 16l-4-4m0 0l4-4m-4 4h14m-5 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h7c2-1 3 3v1" />
             </svg>
-            <span className="text-xs font-medium">{t('login')}</span>
+            <span className="text-xs font-medium text-green-600">{t('login')}</span>
           </Link>
         )}
       </div>
