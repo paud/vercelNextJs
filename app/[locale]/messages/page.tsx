@@ -65,24 +65,44 @@ export default function MessagesPage() {
   const t = useTranslations('Messages');
   const { user: currentUser } = useCurrentUser();
 
+  // 关闭聊天窗口的函数
+  const closeChatWindow = () => {
+    setIsChatOpen(false);
+    // 如果当前历史记录状态是聊天窗口，则回到之前的状态
+    if (window.history.state?.chatOpen) {
+      window.history.back();
+    }
+  };
+
   useEffect(() => {
     if (currentUser) {
       fetchConversations();
     }
   }, [currentUser]);
 
-  // 防止页面滚动
+  // 防止页面滚动和管理浏览器历史记录
   useEffect(() => {
     if (isChatOpen) {
       // 阻止页面滚动
       document.body.style.overflow = 'hidden';
+      
+      // 向历史记录添加一个状态，用于处理返回按钮
+      window.history.pushState({ chatOpen: true }, '');
+      
+      // 监听浏览器返回事件
+      const handlePopState = (event: PopStateEvent) => {
+        setIsChatOpen(false);
+      };
+      
+      window.addEventListener('popstate', handlePopState);
+      
+      return () => {
+        window.removeEventListener('popstate', handlePopState);
+        document.body.style.overflow = 'unset';
+      };
     } else {
       document.body.style.overflow = 'unset';
     }
-
-    return () => {
-      document.body.style.overflow = 'unset';
-    };
   }, [isChatOpen]);
 
   const fetchConversations = async () => {
@@ -307,7 +327,7 @@ export default function MessagesPage() {
               {/* 聊天窗口头部 */}
               <div className="flex items-center justify-between p-4 border-b border-gray-200 bg-gray-50 flex-shrink-0">
                 <button
-                  onClick={() => setIsChatOpen(false)}
+                  onClick={closeChatWindow}
                   className="p-2 hover:bg-gray-200 rounded-full transition-colors"
                 >
                   <svg className="w-6 h-6 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
