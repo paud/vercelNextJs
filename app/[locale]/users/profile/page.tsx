@@ -1,10 +1,10 @@
 "use client";
 
 import { useState, useEffect } from 'react';
-import { useRouter } from 'next/navigation';
 import { useLocale, useTranslations } from 'next-intl';
 import Link from 'next/link';
-import { useCombinedAuth } from '../../../../hooks/useCombinedAuth';
+import { useCurrentUser } from '../../../../hooks/useCurrentUser';
+import UserHeader from '../../../../components/UserHeader';
 
 interface UserInfo {
   id: number;
@@ -25,25 +25,19 @@ export default function ProfilePage() {
   const [message, setMessage] = useState('');
   const [isSuccess, setIsSuccess] = useState(false);
   
-  const router = useRouter();
   const locale = useLocale();
   const t = useTranslations('Profile');
-  const { currentUser, isLoading, logout } = useCombinedAuth();
+  const { user: currentUser } = useCurrentUser();
 
   useEffect(() => {
-    if (isLoading) return; // 等待认证检查完成
-    
-    if (!currentUser) {
-      router.push(`/${locale}/auth/signin`);
-      return;
-    }
+    if (!currentUser) return; // UserHeader 已经处理了认证检查
 
     setEditData({
       name: currentUser.name || '',
       email: currentUser.email || '',
       phone: '', // Google 登录用户可能没有 phone 字段
     });
-  }, [currentUser, isLoading, locale, router]);
+  }, [currentUser]);
 
   const handleEdit = () => {
     setIsEditing(true);
@@ -108,101 +102,40 @@ export default function ProfilePage() {
     }
   };
 
-  // 处理退出登录
-  const handleLogout = async () => {
-    try {
-      await logout();
-      router.push(`/${locale}`);
-    } catch (error) {
-      console.error('退出登录失败:', error);
-    }
-  };
-
-  if (isLoading) {
-    return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
-        <div className="text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-500 mx-auto mb-4"></div>
-          <p className="text-gray-600">{t('loading')}</p>
-        </div>
-      </div>
-    );
-  }
-
-  if (!currentUser) {
-    return null;
-  }
-
   return (
-    <div className="min-h-screen bg-gray-50">
-      {/* 用户导航栏 */}
-      <div className="bg-white shadow-sm border-b">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex justify-between items-center h-16">
-            {/* 按钮：导航菜单 */}
-            <div className="flex items-center space-x-1">
-              <Link
-                href={`/${locale}/items/new`}
-                className="px-3 py-2 rounded-lg text-sm font-medium text-gray-700 hover:bg-gray-100 transition-colors"
-              >
-                <svg className="w-4 h-4 inline mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
-                </svg>
-{t('add_item')}
-              </Link>
-              <Link
-                href={`/${locale}/users/my-items`}
-                className="px-3 py-2 rounded-lg text-sm font-medium text-gray-700 hover:bg-gray-100 transition-colors"
-              >
-                <svg className="w-4 h-4 inline mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2H5a2 2 0 01-2 2v2M7 7h10" />
-                </svg>
-{t('view_my_items')}
-              </Link>
-              <button
-                onClick={handleLogout}
-                className="px-3 py-2 rounded-lg text-sm font-medium text-red-600 hover:bg-red-50 transition-colors"
-              >
-                <svg className="w-4 h-4 inline mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 713-3h4a3 3 0 013 3v1" />
-                </svg>
-{t('logout')}
-              </button>
+    <UserHeader>
+      <div className="min-h-screen bg-gray-50">
+        {/* 主内容区域 */}
+        <div className="py-8">
+          <div className="max-w-2xl mx-auto px-4">
+            {/* 页面标题 */}
+            <div className="mb-8">
+              <h1 className="text-3xl font-bold text-gray-900">{t('title')}</h1>
             </div>
-          </div>
-        </div>
-      </div>
 
-      {/* 主内容区域 */}
-      <div className="py-8">
-        <div className="max-w-2xl mx-auto px-4">
-          {/* 页面标题 */}
-          <div className="mb-8">
-            <h1 className="text-3xl font-bold text-gray-900">{t('title')}</h1>
-          </div>
-
-        {/* 消息提示 */}
-        {message && (
-          <div className={`mb-6 p-4 rounded-lg ${isSuccess ? 'bg-green-50 text-green-700 border border-green-200' : 'bg-red-50 text-red-700 border border-red-200'}`}>
-            {message}
-          </div>
-        )}
-
-        {/* 个人资料卡片 */}
-        <div className="bg-white rounded-lg shadow-md overflow-hidden">
-          {/* 卡片头部 */}
-          <div className="bg-gradient-to-r from-blue-500 to-blue-600 px-6 py-8">
-            <div className="flex items-center">
-              <div className="w-20 h-20 bg-white rounded-full flex items-center justify-center text-blue-600 text-2xl font-bold">
-                {(currentUser.name || currentUser.username || 'U').charAt(0).toUpperCase()}
+            {/* 消息提示 */}
+            {message && (
+              <div className={`mb-6 p-4 rounded-lg ${isSuccess ? 'bg-green-50 text-green-700 border border-green-200' : 'bg-red-50 text-red-700 border border-red-200'}`}>
+                {message}
               </div>
-              <div className="ml-6 text-white">
-                <h2 className="text-2xl font-bold">{currentUser.name || currentUser.username || 'User'}</h2>
-                <p className="text-blue-100">@{currentUser.username || 'user'}</p>
-                <p className="text-blue-100 text-sm">{t('member_since')} {currentUser.createdAt ? new Date(currentUser.createdAt).toLocaleDateString(locale === 'zh' ? 'zh-CN' : locale === 'ja' ? 'ja-JP' : 'en-US') : '--'}</p>
-              </div>
-            </div>
-          </div>
+            )}
+
+            {/* 个人资料卡片 */}
+            {currentUser && (
+              <div className="bg-white rounded-lg shadow-md overflow-hidden">
+                {/* 卡片头部 */}
+                <div className="bg-gradient-to-r from-blue-500 to-blue-600 px-6 py-8">
+                  <div className="flex items-center">
+                    <div className="w-20 h-20 bg-white rounded-full flex items-center justify-center text-blue-600 text-2xl font-bold">
+                      {(currentUser.name || currentUser.username || 'U').charAt(0).toUpperCase()}
+                    </div>
+                    <div className="ml-6 text-white">
+                      <h2 className="text-2xl font-bold">{currentUser.name || currentUser.username || 'User'}</h2>
+                      <p className="text-blue-100">@{currentUser.username || 'user'}</p>
+                      <p className="text-blue-100 text-sm">{t('member_since')} {currentUser.createdAt ? new Date(currentUser.createdAt).toLocaleDateString(locale === 'zh' ? 'zh-CN' : locale === 'ja' ? 'ja-JP' : 'en-US') : '--'}</p>
+                    </div>
+                  </div>
+                </div>
 
           {/* 卡片内容 */}
           <div className="px-6 py-6">
@@ -323,35 +256,12 @@ export default function ProfilePage() {
                 </button>
               </div>
             )}
+            </div>
           </div>
-        </div>
-
-        {/* 其他操作 */}
-        <div className="mt-8 bg-white rounded-lg shadow-md p-6">
-          <h3 className="text-lg font-semibold text-gray-900 mb-4">{t('other_actions')}</h3>
-          <div className="space-y-3">
-            <Link
-              href={`/${locale}/items/new`}
-              className="inline-flex items-center px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition"
-            >
-              <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
-              </svg>
-              {t('add_item')}
-            </Link>
-            <Link
-              href={`/${locale}/users/my-items`}
-              className="inline-flex items-center px-4 py-2 bg-gray-600 text-white rounded-lg hover:bg-gray-700 transition ml-3"
-            >
-              <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10" />
-              </svg>
-              {t('view_my_items')}
-            </Link>
+          )}
           </div>
-        </div>
         </div>
       </div>
-    </div>
+    </UserHeader>
   );
 }

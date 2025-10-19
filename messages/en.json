@@ -221,5 +221,17 @@
     "no_account": "Don't have an account?",
     "create_account": "Sign up now",
     "google_signin_note": "Sign in or register - account will be created automatically if it doesn't exist"
+  },
+  "Messages": {
+    "title": "Messages",
+    "subtitle": "Communicate with other users",
+    "loading": "Loading...",
+    "conversations": "Conversations",
+    "no_conversations": "No conversations yet",
+    "select_conversation": "Select a conversation to start messaging",
+    "about_item": "About item",
+    "type_message": "Type a message...",
+    "send": "Send",
+    "sending": "Sending..."
   }
 }

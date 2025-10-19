@@ -4,7 +4,8 @@ import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { useLocale, useTranslations } from 'next-intl';
 import Link from 'next/link';
-import { useCombinedAuth } from '../../../../hooks/useCombinedAuth';
+import { useCurrentUser } from '../../../../hooks/useCurrentUser';
+import UserHeader from '../../../../components/UserHeader';
 
 interface UserInfo {
   id: number;
@@ -34,7 +35,7 @@ export default function MyItemsPage() {
   const homeT = useTranslations('Home');
   
   // 使用统一的认证 hook
-  const { currentUser, isLoading: isAuthLoading } = useCombinedAuth();
+  const { user: currentUser } = useCurrentUser();
 
   const fetchMyItems = async (userId: string | number) => {
     try {
@@ -78,19 +79,14 @@ export default function MyItemsPage() {
   };
 
   useEffect(() => {
-    if (isAuthLoading) return; // 等待认证检查完成
-    
-    if (!currentUser) {
-      router.push(`/${locale}/auth/signin`);
-      return;
-    }
+    if (!currentUser) return; // UserHeader 已经处理了认证检查
 
     // 获取当前用户的商品
     fetchMyItems(currentUser.id);
     setIsLoadingItems(false);
-  }, [currentUser, isAuthLoading, locale, router]);
+  }, [currentUser]);
 
-  if (isAuthLoading || isLoadingItems) {
+  if (isLoadingItems) {
     return (
       <div className="min-h-screen bg-gray-50 flex items-center justify-center">
         <div className="text-center">
@@ -101,26 +97,11 @@ export default function MyItemsPage() {
     );
   }
 
-  // 如果用户未登录，显示相应信息（防御性编程）
-  if (!currentUser) {
-    return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
-        <div className="text-center">
-          <p className="text-gray-600">请先登录后访问我的商品</p>
-          <Link 
-            href={`/${locale}/auth/signin`}
-            className="mt-4 inline-block bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700"
-          >
-            去登录
-          </Link>
-        </div>
-      </div>
-    );
-  }
-
   return (
-    <div className="min-h-screen bg-gray-50 py-8">
-      <div className="max-w-6xl mx-auto px-4">
+    <UserHeader>
+      <div className="min-h-screen bg-gray-50">
+        <div className="py-8">
+          <div className="max-w-6xl mx-auto px-4">
         {/* 页面标题 */}
         <div className="mb-8">
           <Link
@@ -221,7 +202,9 @@ export default function MyItemsPage() {
             ))}
           </div>
         )}
+          </div>
+        </div>
       </div>
-    </div>
+    </UserHeader>
   );
 }

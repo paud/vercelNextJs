@@ -2,7 +2,10 @@
 
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
+import { useLocale } from 'next-intl';
 import ImageUpload from '@/components/ImageUpload';
+import UserHeader from '../../../../components/UserHeader';
+import { useCurrentUser } from '../../../../hooks/useCurrentUser';
 
 interface FormData {
   title: string;
@@ -13,8 +16,6 @@ interface FormData {
 
 export default function NewItem({ params }: { params: Promise<{ locale: string }> }) {
   const [locale, setLocale] = useState<string>('en');
-  const [currentUser, setCurrentUser] = useState<any>(null);
-  const [loading, setLoading] = useState(true);
   const [submitting, setSubmitting] = useState(false);
   const [formData, setFormData] = useState<FormData>({
     title: '',
@@ -23,34 +24,17 @@ export default function NewItem({ params }: { params: Promise<{ locale: string }
     imageUrl: ''
   });
   const router = useRouter();
+  const localeFromHook = useLocale();
+  const { user: currentUser } = useCurrentUser();
 
   useEffect(() => {
     async function initialize() {
       const resolvedParams = await params;
       setLocale(resolvedParams.locale);
-
-      // Check authentication
-      try {
-        const response = await fetch('/api/auth/check');
-        if (response.ok) {
-          const user = await response.json();
-          setCurrentUser(user);
-        } else {
-          // Redirect to login if not authenticated
-          router.push(`/${resolvedParams.locale}/users/login`);
-          return;
-        }
-      } catch (error) {
-        console.error('Auth check failed:', error);
-        router.push(`/${resolvedParams.locale}/users/login`);
-        return;
-      }
-
-      setLoading(false);
     }
 
     initialize();
-  }, [params, router]);
+  }, [params]);
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     const { name, value } = e.target;
@@ -69,6 +53,17 @@ export default function NewItem({ params }: { params: Promise<{ locale: string }
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    
+    if (!currentUser) {
+      alert('Please login to create items');
+      return;
+    }
+
+    if (!formData.title.trim() || !formData.price.trim() || !formData.imageUrl) {
+      alert('Please fill in all required fields and upload an image');
+      return;
+    }
+
     setSubmitting(true);
 
     try {
@@ -102,23 +97,10 @@ export default function NewItem({ params }: { params: Promise<{ locale: string }
     }
   };
 
-  if (loading) {
-    return (
-      <div className="max-w-2xl mx-auto p-6 mt-12">
-        <div className="animate-pulse">
-          <div className="h-8 bg-gray-300 rounded mb-6"></div>
-          <div className="space-y-4">
-            <div className="h-4 bg-gray-300 rounded"></div>
-            <div className="h-4 bg-gray-300 rounded"></div>
-            <div className="h-4 bg-gray-300 rounded"></div>
-          </div>
-        </div>
-      </div>
-    );
-  }
-
   return (
-    <div className="max-w-2xl mx-auto p-6 bg-white rounded-lg shadow-md mt-12">
+    <UserHeader>
+      <div className="min-h-screen bg-gray-50">
+        <div className="max-w-2xl mx-auto p-6 bg-white rounded-lg shadow-md mt-12">
       <h1 className="text-3xl font-bold mb-6 text-gray-800">Create New Item</h1>
       
       <form onSubmit={handleSubmit} className="space-y-6">
@@ -194,6 +176,8 @@ export default function NewItem({ params }: { params: Promise<{ locale: string }
           {submitting ? 'Creating Item...' : 'Create Item'}
         </button>
       </form>
-    </div>
+        </div>
+      </div>
+    </UserHeader>
   );
 }

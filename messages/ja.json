@@ -221,5 +221,17 @@
     "no_account": "アカウントをお持ちでないですか？",
     "create_account": "今すぐ登録",
     "google_signin_note": "サインインまたは登録 - アカウントが存在しない場合は自動的に作成されます"
+  },
+  "Messages": {
+    "title": "メッセージ",
+    "subtitle": "他のユーザーとコミュニケーション",
+    "loading": "読み込み中...",
+    "conversations": "会話一覧",
+    "no_conversations": "会話がありません",
+    "select_conversation": "会話を選択してメッセージを開始",
+    "about_item": "商品について",
+    "type_message": "メッセージを入力...",
+    "send": "送信",
+    "sending": "送信中..."
   }
 }

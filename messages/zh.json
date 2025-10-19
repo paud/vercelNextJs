@@ -221,5 +221,17 @@
     "no_account": "还没有账户？",
     "create_account": "立即注册",
     "google_signin_note": "登录或注册 - 如果账户不存在会自动创建"
+  },
+  "Messages": {
+    "title": "消息",
+    "subtitle": "与其他用户沟通",
+    "loading": "加载中...",
+    "conversations": "会话列表",
+    "no_conversations": "暂无会话",
+    "select_conversation": "选择一个会话开始聊天",
+    "about_item": "关于商品",
+    "type_message": "输入消息...",
+    "send": "发送",
+    "sending": "发送中..."
   }
 }
