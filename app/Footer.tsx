@@ -3,11 +3,107 @@
 import Link from "next/link";
 import { useLocale, useTranslations } from 'next-intl';
 import { useCombinedAuth } from '../hooks/useCombinedAuth';
+import { useState, useEffect } from 'react';
 
 export default function Footer() {
   const locale = useLocale();
   const t = useTranslations('Header');
   const { currentUser } = useCombinedAuth();
+  const [detectedRegion, setDetectedRegion] = useState<string>('tokyo'); // 默认东京
+  const [isDetecting, setIsDetecting] = useState(false);
+  const [locationDetected, setLocationDetected] = useState(false);
+
+  // 获取地区显示名称
+  const getRegionDisplayName = (region: string) => {
+    switch (region) {
+      case 'osaka': return t('region_osaka');
+      case 'tokyo': return t('region_tokyo');
+      case 'kyoto': return t('region_kyoto');
+      default: return t('region');
+    }
+  };
+
+  // 地理定位功能
+  useEffect(() => {
+    const detectLocation = async () => {
+      setIsDetecting(true);
+      
+      // 检查是否支持地理定位
+      if (!navigator.geolocation) {
+        console.log('浏览器不支持地理定位，设置默认地区为东京');
+        setDetectedRegion('tokyo');
+        setIsDetecting(false);
+        return;
+      }
+
+      // 获取用户位置
+      navigator.geolocation.getCurrentPosition(
+        async (position) => {
+          const { latitude, longitude } = position.coords;
+          console.log('用户位置:', latitude, longitude);
+          
+          try {
+            // 调用后端API进行地区检测
+            const response = await fetch('/api/auto-detect-region', {
+              method: 'POST',
+              headers: {
+                'Content-Type': 'application/json',
+              },
+              body: JSON.stringify({ latitude, longitude }),
+            });
+            
+            if (response.ok) {
+              const data = await response.json();
+              if (data.region) {
+                setDetectedRegion(data.region);
+                setLocationDetected(true);
+                console.log('检测到的地区:', data.region);
+                
+                // 可选：自动跳转到检测到的地区
+                // window.location.href = `/${locale}?region=${data.region}`;
+              }
+            } else {
+              console.log('API未返回地区信息，设置默认地区为东京');
+              setDetectedRegion('tokyo');
+            }
+          } catch (error) {
+            console.error('地区检测API调用失败:', error);
+            console.log('API调用失败，设置默认地区为东京');
+            setDetectedRegion('tokyo');
+          }
+          
+          setIsDetecting(false);
+        },
+        (error) => {
+          console.error('地理定位错误:', error.message);
+          console.log('地理定位失败，设置默认地区为东京');
+          setDetectedRegion('tokyo');
+          setIsDetecting(false);
+          
+          // 根据错误类型给用户提示
+          switch(error.code) {
+            case error.PERMISSION_DENIED:
+              console.log('用户拒绝了地理定位请求，使用默认地区东京');
+              break;
+            case error.POSITION_UNAVAILABLE:
+              console.log('位置信息不可用，使用默认地区东京');
+              break;
+            case error.TIMEOUT:
+              console.log('地理定位请求超时，使用默认地区东京');
+              break;
+          }
+        },
+        {
+          enableHighAccuracy: true,
+          timeout: 10000,
+          maximumAge: 300000 // 5分钟缓存
+        }
+      );
+    };
+
+    // 页面加载时自动检测位置
+    detectLocation();
+  }, [locale]);
 
   return (
     <footer className="fixed bottom-0 left-0 right-0 bg-white border-t border-gray-200 shadow-lg z-50">
@@ -23,18 +119,29 @@ export default function Footer() {
           <span className="text-xs font-medium">{t('home')}</span>
         </Link>
 
-        {/* 商品列表 */}
+        {/* 地区选择 */}
         <Link
-          href={`/${locale}/items`}
+          href={`/${locale}?region=${detectedRegion}`}
           className="flex flex-col items-center text-gray-700 hover:text-blue-600 transition-colors py-2"
         >
-          <svg className="w-6 h-6 mb-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10" />
-          </svg>
-          <span className="text-xs font-medium">{t('items')}</span>
+          <div className="relative">
+            <svg className="w-6 h-6 mb-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
+            </svg>
+            {isDetecting && (
+              <div className="absolute -top-1 -right-1 w-3 h-3 bg-blue-500 rounded-full animate-pulse"></div>
+            )}
+            {locationDetected && !isDetecting && (
+              <div className="absolute -top-1 -right-1 w-3 h-3 bg-green-500 rounded-full"></div>
+            )}
+          </div>
+          <span className="text-xs font-medium">
+            {isDetecting ? '定位中...' : (locationDetected ? getRegionDisplayName(detectedRegion) : t('region'))}
+          </span>
         </Link>
 
-        {/* 发布商品 - 登录用户可发布，未登录显示登录提示 */}
+        {/* 发布商品 - 登录用户可发布，未登录显示发布引导到登录 */}
         <Link
           href={currentUser ? `/${locale}/items/new` : `/${locale}/auth/signin`}
           className="flex flex-col items-center text-gray-700 hover:text-green-600 transition-colors py-2"
@@ -45,19 +152,19 @@ export default function Footer() {
             </svg>
           </div>
           <span className="text-xs font-medium text-green-600">
-            {currentUser ? t('post') : t('login')}
+            {t('post')}
           </span>
         </Link>
 
-        {/* 搜索 */}
+        {/* 消息 */}
         <Link
-          href={`/${locale}/search`}
+          href={`/${locale}/messages`}
           className="flex flex-col items-center text-gray-700 hover:text-blue-600 transition-colors py-2"
         >
           <svg className="w-6 h-6 mb-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" />
           </svg>
-          <span className="text-xs font-medium">{t('search')}</span>
+          <span className="text-xs font-medium">{t('message')}</span>
         </Link>
 
         {/* 我的 - 个人中心/登录 */}
@@ -77,7 +184,7 @@ export default function Footer() {
             className="flex flex-col items-center text-gray-700 hover:text-green-600 transition-colors py-2"
           >
             <svg className="w-6 h-6 mb-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 16l-4-4m0 0l4-4m-4 4h14m-5 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h7c2-1 3 3v1" />
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
             </svg>
             <span className="text-xs font-medium text-green-600">{t('login')}</span>
           </Link>
