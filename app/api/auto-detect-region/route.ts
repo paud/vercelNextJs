@@ -1,102 +1,176 @@
 import { NextRequest, NextResponse } from 'next/server';
-import prisma from '@/lib/prisma';
+
+// 通过 Nominatim API 获取市一级地理信息
+async function getCityLevelInfo(latitude: number, longitude: number, locale?: string) {
+  try {
+    console.log('正在获取市一级位置信息...', '语言:', locale);
+    
+    // 根据用户语言设置Accept-Language头
+    let acceptLanguage = 'en'; // 默认英文
+    if (locale === 'zh') {
+      acceptLanguage = 'zh-CN,zh,en';
+    } else if (locale === 'ja') {
+      acceptLanguage = 'ja,en';
+    } else if (locale === 'en') {
+      acceptLanguage = 'en';
+    }
+    
+    console.log('使用语言参数:', acceptLanguage);
+    
+    const response = await fetch(
+      `https://nominatim.openstreetmap.org/reverse?format=json&lat=${latitude}&lon=${longitude}&addressdetails=1&accept-language=${acceptLanguage}`,
+      {
+        headers: {
+          'User-Agent': 'Marketplace-App/1.0 (marketplace@example.com)'
+        }
+      }
+    );
+    
+    if (!response.ok) {
+      console.error('Nominatim API 调用失败:', response.status);
+      return null;
+    }
+    
+    const data = await response.json();
+    const address = data.address || {};
+    
+    // 直接使用Nominatim API返回的对应语言的地址信息
+    const state = address.state || address.region || address.province || '';
+    const city = address.city || address.town || address.village || address.municipality || '';
+    const country = address.country || '';
+    const countryCode = address.country_code || '';
+    
+    // 只显示市一级信息，不显示县/省级信息
+    let fullCityAddress = '';
+    if (city) {
+      fullCityAddress = city;  // 只显示城市名
+    } else if (state) {
+      fullCityAddress = state;  // 如果没有城市，显示州/省
+    } else {
+      // 默认值根据语言返回
+      if (locale === 'en') {
+        fullCityAddress = 'Tokyo';
+      } else if (locale === 'ja') {
+        fullCityAddress = '東京都';
+      } else {
+        fullCityAddress = '东京都';
+      }
+    }
+    
+    const cityInfo = {
+      fullCityAddress,
+      city,
+      state,
+      country,
+      countryCode,
+      coordinates: { latitude, longitude },
+      rawAddress: data.display_name || '',
+      addressDetails: {
+        city: address.city,
+        town: address.town,
+        village: address.village,
+        municipality: address.municipality,
+        county: address.county,
+        state: address.state,
+        region: address.region,
+        province: address.province,
+        country: address.country,
+        postcode: address.postcode
+      }
+    };
+    
+    console.log('市一级位置信息:', cityInfo);
+    return cityInfo;
+    
+  } catch (error) {
+    console.error('获取市一级位置信息失败:', error);
+    return null;
+  }
+}
+
+
 
 export async function POST(request: NextRequest) {
   try {
-    const { latitude, longitude } = await request.json();
+    const { latitude, longitude, locale } = await request.json();
 
     if (!latitude || !longitude) {
       return NextResponse.json({ error: '缺少位置信息' }, { status: 400 });
     }
 
-    console.log('收到地理位置:', latitude, longitude);
+    console.log('收到地理位置:', latitude, longitude, '语言:', locale);
 
-    // 从数据库获取所有地区及其对应的Prefecture数据
-    const regions = await prisma.region.findMany({
-      include: {
-        Prefecture: {
-          include: {
-            City: true
-          }
-        }
-      }
-    });
+    // 获取市一级地理信息
+    const cityInfo = await getCityLevelInfo(latitude, longitude, locale);
 
-    // 预定义主要城市的大致坐标范围（这些可以存储在数据库中）
-    const locationRanges = [
-      {
-        code: 'tokyo',
-        lat: { min: 35.5, max: 35.8 },
-        lng: { min: 139.5, max: 139.9 }
-      },
-      {
-        code: 'osaka', 
-        lat: { min: 34.5, max: 34.8 },
-        lng: { min: 135.3, max: 135.7 }
-      },
-      {
-        code: 'kyoto',
-        lat: { min: 34.9, max: 35.1 },
-        lng: { min: 135.6, max: 135.9 }
-      }
-    ];
-
-    // 检查用户位置是否在某个地区范围内
-    for (const range of locationRanges) {
-      if (
-        latitude >= range.lat.min && latitude <= range.lat.max &&
-        longitude >= range.lng.min && longitude <= range.lng.max
-      ) {
-        // 从数据库中找到对应的地区
-        const detectedRegion = regions.find(r => r.code === range.code);
-        if (detectedRegion) {
-          console.log('检测到地区:', detectedRegion.code);
-          return NextResponse.json({ 
-            region: detectedRegion.code,
-            regionData: {
-              id: detectedRegion.id,
-              code: detectedRegion.code,
-              nameJa: detectedRegion.nameJa,
-              nameEn: detectedRegion.nameEn,
-              nameZh: detectedRegion.nameZh
-            },
-            coordinates: { latitude, longitude },
-            detected: true
-          });
-        }
-      }
-    }
-
-    // 如果不在预定义范围内，返回默认地区（东京）
-    const defaultRegion = regions.find(r => r.code === 'tokyo');
-    if (defaultRegion) {
-      console.log('未在预定义范围内，返回默认地区:', defaultRegion.code);
+    if (cityInfo) {
       return NextResponse.json({ 
-        region: defaultRegion.code,
-        regionData: {
-          id: defaultRegion.id,
-          code: defaultRegion.code,
-          nameJa: defaultRegion.nameJa,
-          nameEn: defaultRegion.nameEn,
-          nameZh: defaultRegion.nameZh
+        success: true,
+        cityInfo,
+        message: '成功获取市一级地理信息'
+      });
+    } else {
+      // 返回默认信息（根据语言）
+      let defaultCity = '';
+      if (locale === 'en') {
+        defaultCity = 'Tokyo';
+      } else if (locale === 'ja') {
+        defaultCity = '東京都';
+      } else {
+        defaultCity = '东京都';
+      }
+      
+      return NextResponse.json({ 
+        success: false,
+        cityInfo: {
+          fullCityAddress: defaultCity,
+          city: '',
+          state: defaultCity,
+          country: locale === 'en' ? 'Japan' : '日本',
+          countryCode: 'jp',
+          coordinates: { latitude, longitude },
+          rawAddress: '默认地区',
+          addressDetails: {}
         },
-        coordinates: { latitude, longitude },
-        detected: false,
-        nearest: true
+        message: '无法获取位置信息，返回默认地区'
       });
     }
 
-    // 如果数据库中没有找到默认地区，返回错误
-    return NextResponse.json({ 
-      error: '未找到合适的地区',
-      region: 'tokyo' // 兜底方案
-    }, { status: 404 });
-
   } catch (error) {
-    console.error('地区检测错误:', error);
+    console.error('地理位置检测错误:', error);
+    
+    // 从请求中获取locale，或者使用默认值
+    let requestLocale = 'zh'; // 默认中文
+    try {
+      const body = await request.json();
+      requestLocale = body.locale || 'zh';
+    } catch {
+      // 如果无法解析body，使用默认值
+    }
+    
+    let defaultCity = '';
+    if (requestLocale === 'en') {
+      defaultCity = 'Tokyo';
+    } else if (requestLocale === 'ja') {
+      defaultCity = '東京都';
+    } else {
+      defaultCity = '东京都';
+    }
+    
     return NextResponse.json({ 
-      error: '地区检测失败',
-      region: 'tokyo' // 默认返回东京
+      success: false,
+      error: '地理位置检测失败',
+      cityInfo: {
+        fullCityAddress: defaultCity,
+        city: '',
+        state: defaultCity,
+        country: requestLocale === 'en' ? 'Japan' : '日本',
+        countryCode: 'jp',
+        coordinates: { latitude: 0, longitude: 0 },
+        rawAddress: '错误默认地区',
+        addressDetails: {}
+      },
+      message: error instanceof Error ? error.message : '未知错误'
     }, { status: 500 });
   }
 }
@@ -106,99 +180,80 @@ export async function GET(request: NextRequest) {
     const { searchParams } = new URL(request.url);
     const latitude = parseFloat(searchParams.get('lat') || '0');
     const longitude = parseFloat(searchParams.get('lng') || '0');
+    const locale = searchParams.get('locale') || 'en';
 
     if (!latitude || !longitude) {
       return NextResponse.json({ error: '缺少位置信息' }, { status: 400 });
     }
 
-    console.log('收到地理位置 (GET):', latitude, longitude);
+    console.log('收到地理位置 (GET):', latitude, longitude, '语言:', locale);
 
-    // 从数据库获取所有地区及其对应的Prefecture数据
-    const regions = await prisma.region.findMany({
-      include: {
-        Prefecture: {
-          include: {
-            City: true
-          }
-        }
-      }
-    });
+    // 获取市一级地理信息
+    const cityInfo = await getCityLevelInfo(latitude, longitude, locale);
 
-    // 预定义主要城市的大致坐标范围（这些可以存储在数据库中）
-    const locationRanges = [
-      {
-        code: 'tokyo',
-        lat: { min: 35.5, max: 35.8 },
-        lng: { min: 139.5, max: 139.9 }
-      },
-      {
-        code: 'osaka', 
-        lat: { min: 34.5, max: 34.8 },
-        lng: { min: 135.3, max: 135.7 }
-      },
-      {
-        code: 'kyoto',
-        lat: { min: 34.9, max: 35.1 },
-        lng: { min: 135.6, max: 135.9 }
-      }
-    ];
-
-    // 检查用户位置是否在某个地区范围内
-    for (const range of locationRanges) {
-      if (
-        latitude >= range.lat.min && latitude <= range.lat.max &&
-        longitude >= range.lng.min && longitude <= range.lng.max
-      ) {
-        // 从数据库中找到对应的地区
-        const detectedRegion = regions.find(r => r.code === range.code);
-        if (detectedRegion) {
-          console.log('检测到地区:', detectedRegion.code);
-          return NextResponse.json({ 
-            region: detectedRegion.code,
-            regionData: {
-              id: detectedRegion.id,
-              code: detectedRegion.code,
-              nameJa: detectedRegion.nameJa,
-              nameEn: detectedRegion.nameEn,
-              nameZh: detectedRegion.nameZh
-            },
-            coordinates: { latitude, longitude },
-            detected: true
-          });
-        }
-      }
-    }
-
-    // 如果不在预定义范围内，返回默认地区（东京）
-    const defaultRegion = regions.find(r => r.code === 'tokyo');
-    if (defaultRegion) {
-      console.log('未在预定义范围内，返回默认地区:', defaultRegion.code);
+    if (cityInfo) {
       return NextResponse.json({ 
-        region: defaultRegion.code,
-        regionData: {
-          id: defaultRegion.id,
-          code: defaultRegion.code,
-          nameJa: defaultRegion.nameJa,
-          nameEn: defaultRegion.nameEn,
-          nameZh: defaultRegion.nameZh
+        success: true,
+        cityInfo,
+        message: '成功获取市一级地理信息 (GET)'
+      });
+    } else {
+      // 返回默认信息（根据当前语言）
+      let defaultCity = '';
+      if (locale === 'en') {
+        defaultCity = 'Tokyo';
+      } else if (locale === 'ja') {
+        defaultCity = '東京都';
+      } else {
+        defaultCity = '东京都';
+      }
+      
+      return NextResponse.json({ 
+        success: false,
+        cityInfo: {
+          fullCityAddress: defaultCity,
+          city: '',
+          state: defaultCity,
+          country: locale === 'en' ? 'Japan' : '日本',
+          countryCode: 'jp',
+          coordinates: { latitude, longitude },
+          rawAddress: '默认地区 (GET)',
+          addressDetails: {}
         },
-        coordinates: { latitude, longitude },
-        detected: false,
-        nearest: true
+        message: '无法获取位置信息，返回默认地区 (GET)'
       });
     }
 
-    // 如果数据库中没有找到默认地区，返回错误
-    return NextResponse.json({ 
-      error: '未找到合适的地区',
-      region: 'tokyo' // 兜底方案
-    }, { status: 404 });
-
   } catch (error) {
-    console.error('地区检测错误:', error);
+    console.error('地理位置检测错误 (GET):', error);
+    
+    // 从请求参数中获取locale，或者使用默认值
+    const { searchParams } = new URL(request.url);
+    const locale = searchParams.get('locale') || 'zh';
+    
+    let defaultCity = '';
+    if (locale === 'en') {
+      defaultCity = 'Tokyo';
+    } else if (locale === 'ja') {
+      defaultCity = '東京都';
+    } else {
+      defaultCity = '东京都';
+    }
+    
     return NextResponse.json({ 
-      error: '地区检测失败',
-      region: 'tokyo' // 默认返回东京
+      success: false,
+      error: '地理位置检测失败 (GET)',
+      cityInfo: {
+        fullCityAddress: defaultCity,
+        city: '',
+        state: defaultCity,
+        country: locale === 'en' ? 'Japan' : '日本',
+        countryCode: 'jp',
+        coordinates: { latitude: 0, longitude: 0 },
+        rawAddress: '错误默认地区 (GET)',
+        addressDetails: {}
+      },
+      message: error instanceof Error ? error.message : '未知错误'
     }, { status: 500 });
   }
 }
