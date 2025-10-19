@@ -142,8 +142,9 @@
     "email_exists_error": "Email address is already used by another user",
     "email_format_error": "Invalid email format",
     "other_actions": "Other Actions",
-    "add_item": "Add Item",
-    "view_my_items": "My Items"
+    "add_item": "Sell",
+    "view_my_items": "My Items",
+    "logout": "Logout"
   },
   "MyItems": {
     "title": "My Items",

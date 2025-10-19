@@ -17,7 +17,7 @@ export default function Header() {
   const [isClient, setIsClient] = useState(false);
   const [regionMenuOpen, setRegionMenuOpen] = useState(false);
   const [langMenuOpen, setLangMenuOpen] = useState(false);
-  const [userMenuOpen, setUserMenuOpen] = useState(false);
+
   const [availableRegions, setAvailableRegions] = useState<any[]>([]);
   const [regionsLoading, setRegionsLoading] = useState(false);
   const [treeData, setTreeData] = useState<any[]>([]);
@@ -31,7 +31,6 @@ export default function Header() {
   const [selectedCity, setSelectedCity] = useState<any>(null);
   const regionMenuRef = useRef<HTMLDivElement>(null);
   const langMenuRef = useRef<HTMLDivElement>(null);
-  const userMenuRef = useRef<HTMLDivElement>(null);
 
   // 使用认证 hooks
   const { currentUser, isLoading, logout } = useCombinedAuth();
@@ -575,11 +574,6 @@ export default function Header() {
     };
   }, [userSelectedRegion]);
 
-  function handleLogout() {
-    logout();
-    setUserMenuOpen(false);
-    router.push(`/${locale}`);
-  }
 
   // 处理弹出菜单的点击外部关闭
   useEffect(() => {
@@ -590,18 +584,15 @@ export default function Header() {
       if (langMenuRef.current && !langMenuRef.current.contains(event.target as Node)) {
         setLangMenuOpen(false);
       }
-      if (userMenuRef.current && !userMenuRef.current.contains(event.target as Node)) {
-        setUserMenuOpen(false);
-      }
     }
 
-    if (regionMenuOpen || langMenuOpen || userMenuOpen) {
+    if (regionMenuOpen || langMenuOpen) {
       document.addEventListener("mousedown", handleClickOutsideMenus);
     }
     return () => {
       document.removeEventListener("mousedown", handleClickOutsideMenus);
     };
-  }, [regionMenuOpen, langMenuOpen, userMenuOpen]);
+  }, [regionMenuOpen, langMenuOpen]);
 
   function handleSearch() {
     if (search.trim()) {
@@ -939,70 +930,6 @@ export default function Header() {
             )}
           </div>
 
-          {/* 用户功能区域 */}
-          {isLoading ? (
-            <div className="w-6 h-6 border-2 border-gray-300 border-t-blue-600 rounded-full animate-spin"></div>
-          ) : currentUser ? (
-            <div className="relative" ref={userMenuRef}>
-              <button
-                onClick={() => setUserMenuOpen(!userMenuOpen)}
-                className="flex items-center px-3 py-2 rounded-lg hover:bg-gray-100 transition"
-              >
-                <svg className="w-5 h-5 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
-                </svg>
-                <span className="ml-2 text-gray-700 truncate text-sm flex-1">
-                  {currentUser.name || currentUser.username}
-                </span>
-                <svg className="w-4 h-4 ml-1 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
-                </svg>
-              </button>
-              {userMenuOpen && (
-                <div className="absolute top-full right-0 mt-1 bg-white border rounded-lg shadow-lg z-50 min-w-[160px]">
-                  <Link
-                    href={`/${locale}/users/profile`}
-                    className="block w-full text-left px-4 py-3 text-sm hover:bg-gray-50 text-gray-700 rounded-t-lg"
-                    onClick={() => setUserMenuOpen(false)}
-                  >
-                    <svg className="w-4 h-4 inline mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
-                    </svg>
-                    {t('profile')}
-                  </Link>
-                  <Link
-                    href={`/${locale}/items/new`}
-                    className="block w-full text-left px-4 py-3 text-sm hover:bg-gray-50 text-gray-700"
-                    onClick={() => setUserMenuOpen(false)}
-                  >
-                    <svg className="w-4 h-4 inline mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
-                    </svg>
-                    {t('items_new')}
-                  </Link>
-                  <Link
-                    href={`/${locale}/users/my-items`}
-                    className="block w-full text-left px-4 py-3 text-sm hover:bg-gray-50 text-gray-700"
-                    onClick={() => setUserMenuOpen(false)}
-                  >
-                    <svg className="w-4 h-4 inline mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2H5a2 2 0 01-2 2v2M7 7h10" />
-                    </svg>
-                    {t('my_items')}
-                  </Link>
-                  <button
-                    onClick={handleLogout}
-                    className="block w-full text-left px-4 py-3 text-sm hover:bg-gray-50 text-red-600 transition rounded-b-lg"
-                  >
-                    <svg className="w-4 h-4 inline mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
-                    </svg>
-                    {t('logout')}
-                  </button>
-                </div>
-              )}
-            </div>
-          ) : null}
         </div>
       </div>
 

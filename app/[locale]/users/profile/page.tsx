@@ -28,7 +28,7 @@ export default function ProfilePage() {
   const router = useRouter();
   const locale = useLocale();
   const t = useTranslations('Profile');
-  const { currentUser, isLoading } = useCombinedAuth();
+  const { currentUser, isLoading, logout } = useCombinedAuth();
 
   useEffect(() => {
     if (isLoading) return; // 等待认证检查完成
@@ -108,6 +108,16 @@ export default function ProfilePage() {
     }
   };
 
+  // 处理退出登录
+  const handleLogout = async () => {
+    try {
+      await logout();
+      router.push(`/${locale}`);
+    } catch (error) {
+      console.error('退出登录失败:', error);
+    }
+  };
+
   if (isLoading) {
     return (
       <div className="min-h-screen bg-gray-50 flex items-center justify-center">
@@ -124,21 +134,52 @@ export default function ProfilePage() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50 py-8">
-      <div className="max-w-2xl mx-auto px-4">
-        {/* 页面标题 */}
-        <div className="mb-8">
-          <Link
-            href={`/${locale}`}
-            className="inline-flex items-center text-blue-600 hover:text-blue-800 mb-4"
-          >
-            <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 19l-7-7m0 0l7-7m0 7h18" />
-            </svg>
-            {t('back_home')}
-          </Link>
-          <h1 className="text-3xl font-bold text-gray-900">{t('title')}</h1>
+    <div className="min-h-screen bg-gray-50">
+      {/* 用户导航栏 */}
+      <div className="bg-white shadow-sm border-b">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="flex justify-between items-center h-16">
+            {/* 按钮：导航菜单 */}
+            <div className="flex items-center space-x-1">
+              <Link
+                href={`/${locale}/items/new`}
+                className="px-3 py-2 rounded-lg text-sm font-medium text-gray-700 hover:bg-gray-100 transition-colors"
+              >
+                <svg className="w-4 h-4 inline mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
+                </svg>
+{t('add_item')}
+              </Link>
+              <Link
+                href={`/${locale}/users/my-items`}
+                className="px-3 py-2 rounded-lg text-sm font-medium text-gray-700 hover:bg-gray-100 transition-colors"
+              >
+                <svg className="w-4 h-4 inline mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2H5a2 2 0 01-2 2v2M7 7h10" />
+                </svg>
+{t('view_my_items')}
+              </Link>
+              <button
+                onClick={handleLogout}
+                className="px-3 py-2 rounded-lg text-sm font-medium text-red-600 hover:bg-red-50 transition-colors"
+              >
+                <svg className="w-4 h-4 inline mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 713-3h4a3 3 0 013 3v1" />
+                </svg>
+{t('logout')}
+              </button>
+            </div>
+          </div>
         </div>
+      </div>
+
+      {/* 主内容区域 */}
+      <div className="py-8">
+        <div className="max-w-2xl mx-auto px-4">
+          {/* 页面标题 */}
+          <div className="mb-8">
+            <h1 className="text-3xl font-bold text-gray-900">{t('title')}</h1>
+          </div>
 
         {/* 消息提示 */}
         {message && (
@@ -188,7 +229,7 @@ export default function ProfilePage() {
                 </label>
                 <div className="flex items-center p-3 bg-gray-50 rounded-lg">
                   <svg className="w-5 h-5 text-gray-400 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 818 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
                   </svg>
                   <span className="text-gray-900">{currentUser.username || 'user'}</span>
                   <span className="ml-auto text-xs text-gray-500">{t('username_readonly')}</span>
@@ -308,6 +349,7 @@ export default function ProfilePage() {
               {t('view_my_items')}
             </Link>
           </div>
+        </div>
         </div>
       </div>
     </div>
