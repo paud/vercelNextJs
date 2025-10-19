@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
-import { useLocale } from 'next-intl';
+import { useLocale, useTranslations } from 'next-intl';
 import ImageUpload from '@/components/ImageUpload';
 import UserHeader from '../../../../components/UserHeader';
 import { useCurrentUser } from '../../../../hooks/useCurrentUser';
@@ -25,6 +25,7 @@ export default function NewItem({ params }: { params: Promise<{ locale: string }
   });
   const router = useRouter();
   const localeFromHook = useLocale();
+  const t = useTranslations('ItemNew');
   const { user: currentUser } = useCurrentUser();
 
   useEffect(() => {
@@ -55,12 +56,12 @@ export default function NewItem({ params }: { params: Promise<{ locale: string }
     e.preventDefault();
     
     if (!currentUser) {
-      alert('Please login to create items');
+      alert(t('login_required'));
       return;
     }
 
     if (!formData.title.trim() || !formData.price.trim() || !formData.imageUrl) {
-      alert('Please fill in all required fields and upload an image');
+      alert(t('form_incomplete'));
       return;
     }
 
@@ -87,11 +88,11 @@ export default function NewItem({ params }: { params: Promise<{ locale: string }
       } else {
         const error = await response.json();
         console.error('Failed to create item:', error);
-        alert(`Failed to create item: ${error.message || error.error || 'Unknown error'}`);
+        alert(`${t('submit_fail')}: ${error.message || error.error || 'Unknown error'}`);
       }
     } catch (error) {
       console.error('Error creating item:', error);
-      alert('Error creating item. Please try again.');
+      alert(t('submit_fail'));
     } finally {
       setSubmitting(false);
     }
@@ -101,12 +102,12 @@ export default function NewItem({ params }: { params: Promise<{ locale: string }
     <UserHeader>
       <div className="min-h-screen bg-gray-50">
         <div className="max-w-2xl mx-auto p-6 bg-white rounded-lg shadow-md mt-12">
-      <h1 className="text-3xl font-bold mb-6 text-gray-800">Create New Item</h1>
+      <h1 className="text-3xl font-bold mb-6 text-gray-800">{t('page_title')}</h1>
       
       <form onSubmit={handleSubmit} className="space-y-6">
         <div>
           <label htmlFor="title" className="block text-lg font-medium mb-2 text-gray-700">
-            Title *
+            {t('title')} *
           </label>
           <input
             type="text"
@@ -115,14 +116,14 @@ export default function NewItem({ params }: { params: Promise<{ locale: string }
             value={formData.title}
             onChange={handleInputChange}
             required
-            placeholder="Enter item title"
+            placeholder={t('title')}
             className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-400 focus:border-transparent"
           />
         </div>
         
         <div>
           <label htmlFor="description" className="block text-lg font-medium mb-2 text-gray-700">
-            Description
+            {t('description')}
           </label>
           <textarea
             id="description"
@@ -130,14 +131,14 @@ export default function NewItem({ params }: { params: Promise<{ locale: string }
             value={formData.description}
             onChange={handleInputChange}
             rows={4}
-            placeholder="Describe your item"
+            placeholder={t('description')}
             className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-400 focus:border-transparent"
           />
         </div>
         
         <div>
           <label htmlFor="price" className="block text-lg font-medium mb-2 text-gray-700">
-            Price *
+            {t('price')} *
           </label>
           <input
             type="number"
@@ -155,7 +156,7 @@ export default function NewItem({ params }: { params: Promise<{ locale: string }
         
         <div>
           <label className="block text-lg font-medium mb-2 text-gray-700">
-            Item Image
+            {t('item_image')}
           </label>
           <ImageUpload
             onImageUploaded={handleImageUploaded}
@@ -163,7 +164,7 @@ export default function NewItem({ params }: { params: Promise<{ locale: string }
           />
           {formData.imageUrl && (
             <p className="mt-2 text-sm text-green-600">
-              ✅ Image uploaded successfully
+              ✅ {t('upload_success')}
             </p>
           )}
         </div>
@@ -173,7 +174,7 @@ export default function NewItem({ params }: { params: Promise<{ locale: string }
           disabled={submitting}
           className="w-full bg-blue-500 text-white py-3 rounded-lg hover:bg-blue-600 transition-colors duration-200 font-semibold disabled:opacity-50 disabled:cursor-not-allowed"
         >
-          {submitting ? 'Creating Item...' : 'Create Item'}
+          {submitting ? t('uploading') : t('submit')}
         </button>
       </form>
         </div>

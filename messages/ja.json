@@ -58,6 +58,7 @@
     "population": "人口",
     "capital": "都市",
     "viewSubLevel": "下位レベルを表示",
+    "selectThis": "これを選択",
     "autoDetectLocation": "位置を自動検出"
   },
   "ItemNew": {
@@ -65,7 +66,9 @@
     "title": "タイトル",
     "description": "説明",
     "price": "価格",
+    "item_image": "商品画像",
     "uploading": "画像アップロード中...",
+    "upload_success": "画像アップロード成功",
     "upload_fail": "画像のアップロードに失敗しました",
     "form_incomplete": "すべての項目を入力し、画像をアップロードしてください",
     "submit_fail": "出品に失敗しました",
