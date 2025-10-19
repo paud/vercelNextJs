@@ -1,6 +1,7 @@
 import { NextIntlClientProvider } from 'next-intl';
 import { getMessages } from 'next-intl/server';
 import Header from '../Header';
+import Footer from '../Footer';
 
 export default async function LocaleLayout({ children, params }: { children: React.ReactNode; params: Promise<{ locale: string }> }) {
   const { locale } = await params;
@@ -9,7 +10,8 @@ export default async function LocaleLayout({ children, params }: { children: Rea
         <NextIntlClientProvider locale={locale} messages={messages}>
           <div className="min-h-screen flex flex-col">
             <Header />
-            <main className="flex-1 overflow-auto">{children}</main>
+            <main className="flex-1 overflow-auto pb-20">{children}</main>
+            <Footer />
           </div>
         </NextIntlClientProvider>
   );
