@@ -1,19 +1,29 @@
 @echo off
 echo ===================================================
-echo 🚀 Next.js 全自动部署脚本 (多域名 + Git 分支 + Google 登录 + 自动打开浏览器)
+echo 🚀 Next.js Windows 全自动部署脚本 (自动读取 .env.local)
+echo ✅ 多域名 + Git 分支 + Google 登录 + 自动打开浏览器
 echo ===================================================
+
+:: -------------------------
+:: 0️⃣ 加载 .env.local 环境变量
+:: -------------------------
+if exist ".env.local" (
+    echo 🔹 加载 .env.local ...
+    for /f "usebackq tokens=1,2* delims==" %%a in (`type .env.local ^| findstr /v "^#"` ) do (
+        set "%%a=%%b"
+    )
+) else (
+    echo ⚠️ 未找到 .env.local 文件
+)
 
 :: -------------------------
 :: 1️⃣ 配置域名映射
 :: -------------------------
-:: Production 分支
 set BRANCH_PROD=main
-set DOMAIN_PROD1=https://example.com
-set DOMAIN_PROD2=https://www.example.com
-
-:: Preview 分支
+set DOMAIN_PROD1=https://2.zzzz.tech
+set DOMAIN_PROD2=https://next.zzzz.tech
 set BRANCH_PREVIEW=develop
-set DOMAIN_PREVIEW=https://preview.example.com
+set DOMAIN_PREVIEW=https://preview.zzzz.tech
 
 :: 默认使用 DOMAIN_PROD1
 set NEXTAUTH_URL_CURRENT=%DOMAIN_PROD1%
@@ -87,7 +97,7 @@ if "%NEXTAUTH_SECRET%"=="" (
 )
 if %MISSING_VARS%==1 (
     echo.
-    echo ❌ 部署中断，请先在 Vercel Dashboard 配置缺失的环境变量
+    echo ❌ 部署中断，请先在 .env.local 或 Vercel Dashboard 配置缺失的环境变量
     pause
     exit /b 1
 )
@@ -124,9 +134,9 @@ echo 🔹 复制部署域名到剪贴板...
 echo %NEXTAUTH_URL_CURRENT% | clip
 
 :: -------------------------
-:: 12️⃣ 自动在浏览器打开域名
+:: 12️⃣ 自动在默认浏览器打开域名
 :: -------------------------
-echo 🔹 在默认浏览器中打开 %NEXTAUTH_URL_CURRENT% ...
+echo 🔹 在默认浏览器打开 %NEXTAUTH_URL_CURRENT% ...
 start "" "%NEXTAUTH_URL_CURRENT%"
 
 :: -------------------------
@@ -135,6 +145,6 @@ start "" "%NEXTAUTH_URL_CURRENT%"
 echo ===================================================
 echo ✅ %DEPLOY_ENV% 部署完成！
 echo ✅ 当前部署域名已复制到剪贴板：%NEXTAUTH_URL_CURRENT%
-echo ✅ 已在默认浏览器打开
+echo ✅ 默认浏览器已打开
 echo ===================================================
 pause
