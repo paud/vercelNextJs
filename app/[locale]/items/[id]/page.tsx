@@ -17,7 +17,7 @@ export default async function ItemDetailPage({ params }: { params: Promise<{ id:
   }
 
   return (
-    <div className="max-w-xl mx-auto p-6 bg-white rounded-lg shadow mt-8">
+    <div className="max-w-xl mx-auto p-6 bg-white rounded-lg shadow mt-8 mb-24">
       {item.imageUrl && (
         <img
           src={item.imageUrl}

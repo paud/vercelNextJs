@@ -191,8 +191,10 @@
     "cancel": "キャンセル"
   },
   "Search": {
+    "page_title": "商品検索",
     "searching": "検索中...",
     "search_results": "検索結果",
+    "search_results_for": "検索結果",
     "found_results": "検索結果が見つかりました",
     "no_results": "検索結果が見つかりませんでした",
     "no_query_title": "検索キーワードを入力してください",

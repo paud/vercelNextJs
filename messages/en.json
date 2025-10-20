@@ -190,8 +190,10 @@
     "cancel": "Cancel"
   },
   "Search": {
+    "page_title": "Search Products",
     "searching": "Searching...",
     "search_results": "Search Results",
+    "search_results_for": "Search Results",
     "found_results": "Found results",
     "no_results": "No results found",
     "no_query_title": "Please enter search keywords",

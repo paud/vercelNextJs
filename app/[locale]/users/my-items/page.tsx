@@ -99,8 +99,8 @@ export default function MyItemsPage() {
 
   return (
     <UserHeader>
-      <div className="min-h-screen bg-gray-50">
-        <div className="py-8">
+      <div className="min-h-screen bg-gray-50 pb-24">
+        <div className="py-8 mb-8">
           <div className="max-w-6xl mx-auto px-4">
         {/* 页面标题 */}
         <div className="mb-8">

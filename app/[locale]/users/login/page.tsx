@@ -76,7 +76,7 @@ export default async function LoginUser({ params }: { params: Promise<{ locale: 
   }
 
   return (
-    <div className="max-w-md mx-auto p-6 bg-white rounded-lg shadow-md mt-12">
+    <div className="max-w-md mx-auto p-6 bg-white rounded-lg shadow-md mt-12 mb-24">
       <h1 className="text-3xl font-bold mb-6 text-gray-800 text-center">{t('title')}</h1>
       
       <Form action={loginUser} className="space-y-6">

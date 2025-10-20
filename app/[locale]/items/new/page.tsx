@@ -100,8 +100,8 @@ export default function NewItem({ params }: { params: Promise<{ locale: string }
 
   return (
     <UserHeader>
-      <div className="min-h-screen bg-gray-50">
-        <div className="max-w-2xl mx-auto p-6 bg-white rounded-lg shadow-md mt-12">
+      <div className="min-h-screen bg-gray-50 pb-24">
+        <div className="max-w-2xl mx-auto p-6 bg-white rounded-lg shadow-md mt-12 mb-8">
       <h1 className="text-3xl font-bold mb-6 text-gray-800">{t('page_title')}</h1>
       
       <form onSubmit={handleSubmit} className="space-y-6">

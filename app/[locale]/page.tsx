@@ -53,7 +53,7 @@ function HomeContent() {
   ];
 
   return (
-    <div className="min-h-screen bg-gray-50 flex flex-col items-center p-4">
+    <div className="min-h-screen bg-gray-50 flex flex-col items-center p-4 pb-24">
       <div className="mb-4 w-full max-w-6xl flex flex-wrap items-center justify-between">
         <h1 className="text-xl font-bold text-[#333333] whitespace-nowrap mr-4">
           {t('market_title')}
@@ -79,7 +79,7 @@ function HomeContent() {
           ))}
         </div>
       </div>
-      <div className="grid gap-6 grid-cols-2 md:grid-cols-2 lg:grid-cols-3 w-full max-w-6xl">
+      <div className="grid gap-6 grid-cols-2 md:grid-cols-2 lg:grid-cols-3 w-full max-w-6xl mb-8">
         {items.map((item) => (
           <Link key={item.id} href={`/items/${item.id}`} className="group">
             <div className="border rounded-lg shadow-md bg-white p-4 hover:shadow-lg transition-shadow duration-300 flex flex-col">

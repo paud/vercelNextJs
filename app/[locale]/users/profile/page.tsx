@@ -104,9 +104,9 @@ export default function ProfilePage() {
 
   return (
     <UserHeader>
-      <div className="min-h-screen bg-gray-50">
+      <div className="min-h-screen bg-gray-50 pb-24">
         {/* 主内容区域 */}
-        <div className="py-8">
+        <div className="py-8 mb-8">
           <div className="max-w-2xl mx-auto px-4">
             {/* 页面标题 */}
             <div className="mb-8">

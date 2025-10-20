@@ -190,8 +190,10 @@
     "cancel": "取消"
   },
   "Search": {
+    "page_title": "搜索商品",
     "searching": "搜索中...",
     "search_results": "搜索结果",
+    "search_results_for": "搜索结果",
     "found_results": "找到相关商品",
     "no_results": "没有找到相关商品",
     "no_query_title": "请输入搜索关键词",
