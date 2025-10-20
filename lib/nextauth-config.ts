@@ -1,10 +1,7 @@
 import { NextAuthOptions } from "next-auth"
 import GoogleProvider from "next-auth/providers/google"
-import { PrismaAdapter } from "@auth/prisma-adapter"
-import prisma from "@/lib/prisma"
 
 export const authOptions: NextAuthOptions = {
-  adapter: PrismaAdapter(prisma),
   secret: process.env.NEXTAUTH_SECRET,
   providers: [
     GoogleProvider({
@@ -38,10 +35,10 @@ export const authOptions: NextAuthOptions = {
       
       return true;
     },
-    async session({ session, token, user }) {
-      // 确保 session 中包含数据库用户的 ID（数字类型）
-      if (session?.user && user?.id) {
-        session.user.id = user.id; // 使用数据库中的数字 ID
+    async session({ session, token }) {
+      // 将用户ID写入 session（JWT 模式下从 token 读取，确保为字符串）
+      if (session?.user && token?.uid) {
+        session.user.id = String(token.uid);
       }
       return session;
     },
@@ -53,7 +50,7 @@ export const authOptions: NextAuthOptions = {
     },
   },
   session: {
-    strategy: "database",
+    strategy: "jwt",
   },
   pages: {
     signIn: "/en/auth/signin", // 使用默认语言的路径

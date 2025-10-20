@@ -12,7 +12,6 @@
   },
   "dependencies": {
     "@auth/prisma-adapter": "^2.11.0",
-    "@prisma/client": "latest",
     "@prisma/extension-accelerate": "latest",
     "@vercel/blob": "^2.0.0",
     "next": "latest",
@@ -23,7 +22,8 @@
     "react-dom": "^19.0.0"
   },
   "devDependencies": {
-    "@types/node": "^20",
+    "@prisma/client": "^6.17.1",
+    "@types/node": "^20.19.22",
     "@types/react": "^19",
     "@types/react-dom": "^19",
     "postcss": "^8",
