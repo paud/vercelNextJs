@@ -237,5 +237,8 @@
     "type_message": "Type a message...",
     "send": "Send",
     "sending": "Sending..."
+  },
+  "PWA": {
+    "installApp": "Install App"
   }
 }

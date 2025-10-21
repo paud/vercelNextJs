@@ -127,6 +127,13 @@ if "%DEPLOY_ENV%"=="Production" (
 )
 
 :: -------------------------
+:: 8️⃣ 设置临时 NEXTAUTH_URL
+:: -------------------------
+setx NEXTAUTH_URL ""
+set NEXTAUTH_URL_CURRENT=""
+echo 🔹 NEXTAUTH_URL 设置清空
+
+:: -------------------------
 :: 11️⃣ 复制域名到剪贴板
 :: -------------------------
 echo.

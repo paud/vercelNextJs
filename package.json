@@ -12,11 +12,13 @@
   },
   "dependencies": {
     "@auth/prisma-adapter": "^2.11.0",
+    "@khmyznikov/pwa-install": "^0.5.8",
     "@prisma/extension-accelerate": "latest",
     "@vercel/blob": "^2.0.0",
     "next": "latest",
     "next-auth": "^4.24.11",
     "next-intl": "^4.3.12",
+    "next-pwa": "^5.6.0",
     "node-fetch": "^3.3.2",
     "react": "^19.0.0",
     "react-dom": "^19.0.0"

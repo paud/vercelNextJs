@@ -238,5 +238,8 @@
     "type_message": "メッセージを入力...",
     "send": "送信",
     "sending": "送信中..."
+  },
+  "PWA": {
+    "installApp": "アプリをインストール"
   }
 }

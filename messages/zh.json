@@ -237,5 +237,8 @@
     "type_message": "输入消息...",
     "send": "发送",
     "sending": "发送中..."
+  },
+  "PWA": {
+    "installApp": "安装应用"
   }
 }

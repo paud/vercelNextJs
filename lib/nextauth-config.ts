@@ -1,5 +1,6 @@
 import { NextAuthOptions } from "next-auth"
 import GoogleProvider from "next-auth/providers/google"
+import prisma from "@/lib/prisma";
 
 export const authOptions: NextAuthOptions = {
   secret: process.env.NEXTAUTH_SECRET,
@@ -33,6 +34,22 @@ export const authOptions: NextAuthOptions = {
         });
       }
       
+      // 自动查找或创建本地用户，并将本地 user.id 写入 user.id
+      if (account?.provider === 'google' && profile?.email) {
+        let dbUser = await prisma.user.findUnique({ where: { email: profile.email } });
+        if (!dbUser) {
+          dbUser = await prisma.user.create({
+            data: {
+              email: profile.email,
+              name: profile.name || null,
+              username: profile.email.split('@')[0],
+              // 可根据 schema 增加更多字段
+            }
+          });
+        }
+        user.id = String(dbUser.id); // 用本地数据库ID覆盖 user.id，确保为字符串
+      }
+      
       return true;
     },
     async session({ session, token }) {
@@ -43,6 +60,7 @@ export const authOptions: NextAuthOptions = {
       return session;
     },
     async jwt({ user, token }) {
+      // 用本地 user.id 写入 token.uid
       if (user) {
         token.uid = user.id;
       }

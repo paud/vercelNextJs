@@ -3,8 +3,8 @@
 import { useState, useRef, useEffect } from "react";
 import { useRouter, usePathname } from "next/navigation";
 import { useLocale, useTranslations } from 'next-intl';
-import Link from 'next/link';
 import { useCombinedAuth } from '../hooks/useCombinedAuth';
+import InstallPWAButton from "@/components/InstallPWAButton";
 
 export default function Header() {
   const [search, setSearch] = useState("");
@@ -645,7 +645,7 @@ export default function Header() {
   if (!isClient) {
     return (
       <header className="w-full bg-white shadow-md py-4 px-4">
-        <div className="text-center text-gray-500">加载中...</div>
+        <div className="text-center text-gray-500">loading...</div>
       </header>
     );
   }
@@ -929,7 +929,9 @@ export default function Header() {
               </div>
             )}
           </div>
-
+          <div className="border-l border-gray-300 flex items-center pl-4 transition-all duration-200">
+            <InstallPWAButton />
+          </div> 
         </div>
       </div>
 
