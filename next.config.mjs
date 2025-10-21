@@ -18,17 +18,21 @@ const nextConfig = withNextIntl(
       return [
         // 允许带语言前缀的静态资源访问
         {
-          source: '/:locale/manifest.json',
+          source: '/manifest.json',
           destination: '/manifest.json',
         },
-        /*{
+        {
+          source: '/service-worker.js',
+          destination: '/service-worker.js',
+        },
+        {
           // 多语言静态文件映射，排除 .js 和 sw.js
-          source: '/:locale/:file((?!sw\\.js$).*)',
+          //source: '/:locale/:file((?!sw\\.js$).*)',
           //source: '/:locale/:file((?!.*\\.js$)(?!sw\\.js$).*)',
           //source: '/:locale/:file*((?!sw\\.js$)(?!.*\\.js$)(?!/api/).*)',
-          //source: '/:locale/:file*)',
+          source: '/:locale/:file.:ext(png|jpg|jpeg|gif|webp|html|htm)',
           destination: '/:file',
-        },*/
+        },
       ];
     },
   })

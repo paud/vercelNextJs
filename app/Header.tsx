@@ -6,6 +6,7 @@ import { useLocale, useTranslations } from 'next-intl';
 import { useCombinedAuth } from '../hooks/useCombinedAuth';
 import InstallPWAButton from "@/components/InstallPWAButton";
 
+
 export default function Header() {
   const [search, setSearch] = useState("");
   const router = useRouter();
@@ -50,7 +51,7 @@ export default function Header() {
         default: return regionData.nameEn || regionData.nameJa || regionData.nameZh;
       }
     }
-    
+
     // 如果数据库中没有找到，使用翻译文件的备选方案，默认显示东京
     switch (regionCode) {
       case 'osaka': return t('region_osaka');
@@ -73,7 +74,7 @@ export default function Header() {
   // 地理定位功能
   const detectLocation = async () => {
     setIsDetectingLocation(true);
-    
+
     // 检查是否支持地理定位
     if (!navigator.geolocation) {
       console.log('Header: 浏览器不支持地理定位，设置默认地区为东京');
@@ -88,7 +89,7 @@ export default function Header() {
       async (position) => {
         const { latitude, longitude } = position.coords;
         console.log('Header: 用户位置:', latitude, longitude);
-        
+
         try {
           // 调用后端API进行地区检测
           const response = await fetch('/api/auto-detect-region', {
@@ -98,26 +99,26 @@ export default function Header() {
             },
             body: JSON.stringify({ latitude, longitude, locale }),
           });
-          
+
           if (response.ok) {
             const data = await response.json();
             console.log('Header: API返回数据:', data);              // 使用简化的API响应
             if (data.cityInfo) {
               const cityInfo = data.cityInfo;
               setLocationDetected(true);
-              
+
               // 直接使用API返回的对应语言的地址信息
               const fullAddress = cityInfo.fullCityAddress || t('region_tokyo');
-              
+
               // 提取最终的地区名称
               const finalLocationName = extractFinalLocationName(fullAddress);
-              
+
               console.log('Header: 检测到的完整地址:', fullAddress);
               console.log('Header: 提取的最终地区名称:', finalLocationName);
-              
+
               // 保存最终地区名称
               setDetectedCity(finalLocationName);
-              
+
               // 如果仍有地区代码，保留原有逻辑
               if (data.region) {
                 setRegion(data.region);
@@ -144,7 +145,7 @@ export default function Header() {
           setRegion('tokyo');
           setDetectedCity(t('region_tokyo'));
         }
-        
+
         setIsDetectingLocation(false);
       },
       (error) => {
@@ -153,9 +154,9 @@ export default function Header() {
         setRegion('tokyo');
         setDetectedCity(t('region_tokyo'));
         setIsDetectingLocation(false);
-        
+
         // 根据错误类型给用户提示
-        switch(error.code) {
+        switch (error.code) {
           case error.PERMISSION_DENIED:
             console.log('Header: 用户拒绝了地理定位请求，使用默认地区东京');
             break;
@@ -179,7 +180,7 @@ export default function Header() {
   useEffect(() => {
     const searchParams = new URLSearchParams(window.location.search);
     const urlRegion = searchParams.get('region');
-    
+
     if (urlRegion) {
       console.log('Header: 从URL获取地区:', urlRegion);
       setRegion(urlRegion);
@@ -233,7 +234,7 @@ export default function Header() {
   // 加载树形地区数据
   const loadTreeData = async () => {
     if (treeData.length > 0) return; // 避免重复加载
-    
+
     setRegionsLoading(true);
     try {
       const response = await fetch('/api/regions/tree');
@@ -264,19 +265,19 @@ export default function Header() {
   // 构建选择路径显示
   const getSelectionPath = () => {
     const pathParts = [];
-    
+
     if (selectedRegion) {
       pathParts.push(getLocationName(selectedRegion));
     }
-    
+
     if (selectedPrefecture) {
       pathParts.push(getLocationName(selectedPrefecture));
     }
-    
+
     if (selectedCity) {
       pathParts.push(getLocationName(selectedCity));
     }
-    
+
     return pathParts.join(' - ');
   };
 
@@ -306,7 +307,7 @@ export default function Header() {
   // 处理地区选择
   const handleLocationSelect = (item: any, level: string) => {
     console.log('选择位置:', item, '级别:', level);
-    
+
     if (level === 'region') {
       setSelectedRegion(item);
       setSelectedPrefecture(null);
@@ -328,7 +329,7 @@ export default function Header() {
       const locationName = getLocationName(item);
       setDetectedCity(locationName);
       setRegionMenuOpen(false);
-      
+
       // 更新URL参数（使用选择的最具体位置）
       const currentUrl = new URL(window.location.href);
       currentUrl.searchParams.set('location', fullPath.join('-'));
@@ -340,7 +341,7 @@ export default function Header() {
   const handleCurrentLevelSelection = () => {
     let selectedItem = null;
     let finalLocationName = ''; // 用于Header左上角显示的最终地区名称
-    
+
     // 根据当前级别选择最合适的项目
     if (currentLevel === 'region') {
       // 在地区级别，必须先选择一个地区
@@ -399,12 +400,12 @@ export default function Header() {
         finalLocationName = getLocationName(selectedCity);
       }
     }
-    
+
     if (selectedItem) {
       // 设置选中的地区显示名称（只显示最终地区名称）
       console.log('Header: 设置地区显示名称:', finalLocationName, 'selectedItem:', selectedItem);
       console.log('Header: 当前detectedCity状态:', detectedCity);
-      
+
       if (finalLocationName) {
         setDetectedCity(finalLocationName);
         console.log('Header: 成功设置detectedCity为:', finalLocationName);
@@ -414,29 +415,29 @@ export default function Header() {
         setDetectedCity(fallbackName);
         console.log('Header: 使用fallback设置detectedCity为:', fallbackName);
       }
-      
+
       // 设置地区代码（优先使用 code，回退到 id）
       setRegion(selectedItem.code || selectedItem.id || 'tokyo');
-      
+
       // 标记用户已手动选择地区
       setUserSelectedRegion(true);
-      
+
       // 关闭弹窗
       setRegionMenuOpen(false);
-      
+
       // 重置选择状态
       setCurrentLevel('region');
       setSelectedRegion(null);
       setSelectedPrefecture(null);
       setSelectedCity(null);
       setSelectedPath([]);
-      
+
       // 更新URL参数
       const searchParams = new URLSearchParams(window.location.search);
       searchParams.set('region', selectedItem.code || selectedItem.id);
       const newUrl = `${window.location.pathname}?${searchParams.toString()}`;
       window.history.pushState({}, '', newUrl);
-      
+
       console.log('选择了地区:', finalLocationName, selectedItem);
     }
   };
@@ -446,7 +447,7 @@ export default function Header() {
     // 根据当前级别构建地区路径
     let fullPath = '';
     let displayName = '';
-    
+
     if (currentLevel === 'region') {
       // 选择了地区
       fullPath = getLocationName(item);
@@ -464,21 +465,21 @@ export default function Header() {
       fullPath = `${selectedRegion ? getLocationName(selectedRegion) + '-' : ''}${selectedPrefecture ? getLocationName(selectedPrefecture) + '-' : ''}${selectedCity ? getLocationName(selectedCity) + '-' : ''}${getLocationName(item)}`;
       displayName = getLocationName(item);
     }
-    
+
     // 更新显示的地区名称
     setRegion(item.code || 'tokyo');
     setDetectedCity(displayName);
-    
+
     // 关闭弹窗
     setRegionMenuOpen(false);
-    
+
     // 重置选择状态
     setCurrentLevel('region');
     setSelectedRegion(null);
     setSelectedPrefecture(null);
     setSelectedCity(null);
     setSelectedPath([]);
-    
+
     // 更新URL参数
     const searchParams = new URLSearchParams(window.location.search);
     searchParams.set('region', item.code || item.id || 'tokyo');
@@ -532,7 +533,7 @@ export default function Header() {
   };
 
   // 定位结果回调函数
-  const handleLocationUpdate = (locationData: {city: string, region: string, timestamp: number}) => {
+  const handleLocationUpdate = (locationData: { city: string, region: string, timestamp: number }) => {
     if (!userSelectedRegion) {
       console.log('Header: 接收到Footer的定位结果（回调）:', locationData);
       setDetectedCity(locationData.city);
@@ -546,7 +547,7 @@ export default function Header() {
   useEffect(() => {
     // 将回调函数挂载到window对象上，供Footer调用
     (window as any).headerLocationCallback = handleLocationUpdate;
-    
+
     // 页面加载时检查localStorage中是否有定位结果
     const checkStoredLocation = () => {
       try {
@@ -623,10 +624,10 @@ export default function Header() {
     setUserSelectedRegion(false);
     setLocationDetected(false);
     setRegionMenuOpen(false);
-    
+
     // 清除存储的定位结果
     localStorage.removeItem('detectedLocation');
-    
+
     // 重置到默认状态
     setCurrentLevel('region');
     setSelectedRegion(null);
@@ -635,7 +636,7 @@ export default function Header() {
     setSelectedPath([]);
     setDetectedCity('');
     setRegion('tokyo');
-    
+
     // 调用Footer的重新定位函数
     if ((window as any).footerReLocationCallback) {
       (window as any).footerReLocationCallback();
@@ -694,11 +695,11 @@ export default function Header() {
             </svg>
           </button>
           {regionMenuOpen && (
-            <div 
+            <div
               className="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-start justify-center p-4"
               onClick={() => setRegionMenuOpen(false)}
             >
-              <div 
+              <div
                 className="bg-white w-full max-h-[90vh] rounded-2xl shadow-2xl overflow-hidden flex flex-col"
                 onClick={(e) => e.stopPropagation()}
               >
@@ -733,7 +734,7 @@ export default function Header() {
                       </svg>
                     </button>
                   </div>
-                  
+
                   {/* 选择路径显示 */}
                   {getSelectionPath() && (
                     <div className="px-4 pb-3">
@@ -782,7 +783,7 @@ export default function Header() {
                                 </div>
                               )}
                             </div>
-                            
+
                             <div className="flex items-center">
                               {hasSubLevels(item) && (
                                 <svg className="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -833,7 +834,7 @@ export default function Header() {
                   >
                     {t('select')}
                   </button>
-                  
+
                   {/* 重新定位按钮 */}
                   <button
                     onClick={handleReEnableLocation}
@@ -929,9 +930,7 @@ export default function Header() {
               </div>
             )}
           </div>
-          <div className="border-l border-gray-300 flex items-center pl-4 transition-all duration-200">
-            <InstallPWAButton />
-          </div> 
+          <InstallPWAButton />
         </div>
       </div>
 
