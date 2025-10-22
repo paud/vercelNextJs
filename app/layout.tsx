@@ -3,7 +3,7 @@ import "./globals.css";
 import Providers from "./providers";
 
 export const metadata = {
-  title: "AI_UI",
+  title: "2.zzzz.tech",
   description: "A blog app using Next.js and Prisma",
 };
 
@@ -14,6 +14,9 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en" className="h-full force-light-theme">
+      <head>
+        <link rel="manifest" href="/manifest.json" />
+      </head>
       <body className="bg-white text-gray-900 force-light-theme">
         <Providers>
           {children}

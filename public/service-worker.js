@@ -1,5 +1,5 @@
-var cacheName = "PWAinstallDemo-9.9.2025/14:41:53"
-  , filesToCache = ["/pwa-install/", "manifest.json"];
+var cacheName = "PWAinstall-22.10.2025/14:41:53"
+  , filesToCache = ["/", "/manifest.json"];
 function sendMessage(e, n) {
     return new Promise((function(t, s) {
         var a = new MessageChannel;

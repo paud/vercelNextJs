@@ -11,7 +11,7 @@ export default async function LocaleLayout({ children, params }: { children: Rea
           <div className="min-h-screen flex flex-col main-layout">
             <Header />
             <main className="flex-1 overflow-auto main-content">{children}</main>
-            <Footer />
+            <Footer /> 
           </div>
         </NextIntlClientProvider>
   );
