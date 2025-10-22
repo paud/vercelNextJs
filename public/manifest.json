@@ -4,7 +4,7 @@
     "start_url": "/",
     "display": "standalone",
     "background_color": "#fff",
-    "theme_color": "#82307b",
+    "theme_color": "#faf7fb",
     "description": "This is a 2nd hand trade platform Progressive Web Application.",
     "icons": [
         {
