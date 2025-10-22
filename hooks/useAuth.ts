@@ -71,13 +71,9 @@ export function useAuth() {
     window.addEventListener('storage', handleStorageChange);
     window.addEventListener('focus', handleFocus);
     
-    // 每隔5秒检查一次cookie状态（用于调试）
-    const interval = setInterval(checkUserLogin, 5000);
-    
     return () => {
       window.removeEventListener('storage', handleStorageChange);
       window.removeEventListener('focus', handleFocus);
-      clearInterval(interval);
     };
   }, []);
 

@@ -156,7 +156,7 @@ export default function MyItemsPage() {
             </Link>
           </div>
         ) : (
-          <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+          <div className="grid gap-6 grid-cols-2 md:grid-cols-2 lg:grid-cols-3">
             {items.map((item) => (
               <div key={item.id} className="bg-white rounded-lg shadow-md overflow-hidden hover:shadow-lg transition-shadow duration-300">
                 {item.imageUrl && (

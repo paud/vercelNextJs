@@ -64,6 +64,9 @@ export async function PUT(request: NextRequest) {
       }
     }
 
+    // 更新用户信息前打印日志
+    console.log('即将更新用户:', { userId: userIdNum, updateData });
+
     // 更新用户信息
     const updatedUser = await prisma.user.update({
       where: { id: userIdNum },

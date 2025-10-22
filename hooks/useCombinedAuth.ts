@@ -68,6 +68,7 @@ export function useCombinedAuth() {
   return {
     currentUser,
     isLoading,
-    logout
+    logout,
+    setCurrentUser // 暴露 setCurrentUser
   };
 }

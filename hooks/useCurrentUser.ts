@@ -7,11 +7,12 @@ import { useCombinedAuth } from './useCombinedAuth';
  * 这个 hook 假设用户已经通过 UserHeader 的认证检查
  */
 export function useCurrentUser() {
-  const { currentUser } = useCombinedAuth();
+  const { currentUser, setCurrentUser } = useCombinedAuth();
   
   // 这里可以添加更多的用户相关逻辑
   return {
     user: currentUser,
     isLoggedIn: !!currentUser,
+    setCurrentUser,
   };
 }

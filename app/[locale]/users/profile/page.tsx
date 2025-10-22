@@ -27,7 +27,7 @@ export default function ProfilePage() {
   
   const locale = useLocale();
   const t = useTranslations('Profile');
-  const { user: currentUser } = useCurrentUser();
+  const { user: currentUser, setCurrentUser } = useCurrentUser();
 
   useEffect(() => {
     if (!currentUser) return; // UserHeader 已经处理了认证检查
@@ -73,17 +73,14 @@ export default function ProfilePage() {
 
       if (response.ok) {
         const updatedUser = await response.json();
-        
-        // 不再需要手动更新cookie，useCombinedAuth会处理session状态
-        // 只需要刷新页面或触发重新获取用户信息
-        
+        setCurrentUser && setCurrentUser(updatedUser); // 立即同步前端 currentUser
+        // 同步 userInfo cookie
+        document.cookie = `userInfo=${encodeURIComponent(JSON.stringify(updatedUser))}; path=/;`;
         setIsEditing(false);
         setMessage(t('update_success'));
         setIsSuccess(true);
-        
         setTimeout(() => setMessage(''), 3000);
-        // 可以选择重新加载页面以获取最新用户信息
-        setTimeout(() => window.location.reload(), 1000);
+        // 去掉页面自动刷新
       } else {
         const errorData = await response.json();
         if (response.status === 409) {
