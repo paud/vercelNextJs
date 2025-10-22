@@ -1,6 +1,6 @@
 {
     "name": "中古品",
-    "short_name": "zzzz",
+    "short_name": "中古品",
     "start_url": "/",
     "display": "standalone",
     "background_color": "#fff",
