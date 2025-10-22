@@ -10,7 +10,6 @@ const nextConfig = withNextIntl(
     register: true,       // 自动注册
     skipWaiting: true,    // 立即接管新 SW
     disable: process.env.NODE_ENV === 'development', // 本地禁用PWA
-    reactStrictMode: true,
     //sw: 'service-worker.js', // 自定义 SW 文件名
   })({
     reactStrictMode: true,
