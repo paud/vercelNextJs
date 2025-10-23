@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { useLocale, useTranslations } from 'next-intl';
@@ -22,6 +22,8 @@ export default function UserHeader({
   const t = useTranslations('Profile');
   const headerT = useTranslations('Header');
   const { currentUser, isLoading, logout } = useCombinedAuth();
+  const [unreadMsg, setUnreadMsg] = useState(0);
+  const [unreadSys, setUnreadSys] = useState(0);
 
   // 认证检查和重定向逻辑
   useEffect(() => {
@@ -33,6 +35,28 @@ export default function UserHeader({
       return;
     }
   }, [currentUser, isLoading, locale, router, requireAuth, redirectTo]);
+
+  // 获取未读消息和通知数
+  useEffect(() => {
+    // 获取未读私信数
+    fetch('/api/messages/unread')
+      .then(res => res.ok ? res.json() : [])
+      .then(data => {
+        if (Array.isArray(data)) {
+          setUnreadMsg(data.reduce((sum, u) => sum + (u._count?._all || 0), 0));
+        }
+      })
+      .catch(() => {});
+    // 获取未读系统通知数
+    fetch('/api/system-notifications')
+      .then(res => res.ok ? res.json() : [])
+      .then(data => {
+        if (Array.isArray(data)) {
+          setUnreadSys(data.filter((n: any) => !n.read).length);
+        }
+      })
+      .catch(() => {});
+  }, []);
 
   // 处理退出登录
   const handleLogout = async () => {
@@ -117,12 +141,31 @@ export default function UserHeader({
             </Link>
             <Link
               href={`/${locale}/messages`}
-              className="flex items-center justify-center py-3 px-4 text-gray-700 border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors"
+              className="flex items-center justify-center py-3 px-4 text-gray-700 border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors relative"
               title={headerT('message')}
             >
               <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" />
               </svg>
+              {unreadMsg > 0 && (
+                <span className="absolute -top-1 -right-1 min-w-[20px] h-5 bg-red-500 text-white text-xs font-bold rounded-full flex items-center justify-center px-1 shadow-md select-none transition-all" style={{zIndex:2}}>
+                  {unreadMsg > 99 ? '99+' : unreadMsg}
+                </span>
+              )}
+            </Link>
+            <Link
+              href={`/${locale}/system-notifications`}
+              className="flex items-center justify-center py-3 px-4 text-gray-700 border border-gray-300 rounded-lg hover:bg-orange-50 transition-colors relative"
+              title={headerT('system_notification', { defaultValue: '通知' })}
+            >
+              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M12 20c4.418 0 8-3.582 8-8s-3.582-8-8-8-8 3.582-8 8 3.582 8 8 8z" />
+              </svg>
+              {unreadSys > 0 && (
+                <span className="absolute -top-1 -right-1 min-w-[20px] h-5 bg-red-500 text-white text-xs font-bold rounded-full flex items-center justify-center px-1 shadow-md select-none transition-all" style={{zIndex:2}}>
+                  {unreadSys > 99 ? '99+' : unreadSys}
+                </span>
+              )}
             </Link>
           </div>
         </div>

@@ -274,7 +274,7 @@ export default function Footer() {
         </Link>
 
         {/* 我的 - 个人中心/登录 */}
-        {currentUser ? (
+       
           <Link
             href={`/${locale}/users/profile`}
             className="flex flex-col items-center flex-1 text-gray-700 hover:text-blue-600 transition-colors py-1 min-w-0"
@@ -285,23 +285,7 @@ export default function Footer() {
             </svg>
             <span className="text-[11px] font-medium truncate w-full text-center">{t('profile')}</span>
           </Link>
-        ) : (
-          <Link
-            href={`/${locale}/auth/signin`}
-            className="flex flex-col items-center flex-1 text-gray-700 hover:text-green-600 transition-colors py-1 min-w-0"
-            style={{ minWidth: 0 }}
-            onClick={() => {
-              if (typeof window !== 'undefined') {
-                localStorage.setItem('redirectAfterLogin', window.location.pathname + window.location.search);
-              }
-            }}
-          >
-            <svg className="w-6 h-6 mb-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
-            </svg>
-            <span className="text-[11px] font-medium text-green-600 truncate w-full text-center">{t('login')}</span>
-          </Link>
-        )}
+
       </div>
     </footer>
   );

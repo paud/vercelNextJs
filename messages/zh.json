@@ -58,7 +58,8 @@
     "population": "人口",
     "capital": "首府",
     "viewSubLevel": "查看下级",
-    "autoDetectLocation": "自动定位"
+    "autoDetectLocation": "自动定位",
+    "system_notification": "通知"
   },
   "ItemNew": {
     "page_title": "发布二手物品",
@@ -237,6 +238,25 @@
     "type_message": "输入消息...",
     "send": "发送",
     "sending": "发送中..."
+  },
+  "Message": {
+    "conversations": "消息会话",
+    "no_conversation": "暂无会话",
+    "no_message": "暂无消息",
+    "input_placeholder": "输入消息...",
+    "send": "发送",
+    "loading": "加载中..."
+  },
+  "SystemNotification": {
+    "title": "系统通知",
+    "no_notification": "暂无通知",
+    "loading": "加载中...",
+    "mark_read": "标记为已读",
+    "delete": "删除",
+    "mark_all_read": "全部标记为已读",
+    "read": "已读",
+    "prev": "上一页",
+    "next": "下一页"
   },
   "PWA": {
     "installApp": "固定到桌面"

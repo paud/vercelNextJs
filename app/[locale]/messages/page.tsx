@@ -35,6 +35,7 @@ export default function MessagesPage() {
   const [isLoading, setIsLoading] = useState(true);
   const [isSending, setIsSending] = useState(false);
   const [isChatOpen, setIsChatOpen] = useState(false);
+  const [unreadTotal, setUnreadTotal] = useState(0);
   
   const locale = useLocale();
   const router = useRouter();
@@ -84,73 +85,22 @@ export default function MessagesPage() {
   const fetchConversations = async () => {
     try {
       setIsLoading(true);
-      // 这里模拟获取会话列表的 API 调用
-      // const response = await fetch(`/api/users/${currentUser.id}/conversations`);
-      // const data = await response.json();
-      
-      // 模拟数据
-      const mockConversations: Conversation[] = [
-        {
-          userId: 2,
-          userName: "张三",
-          lastMessage: "这个商品还在吗？",
-          lastMessageTime: "2024-01-15T10:30:00Z",
-          unreadCount: 2,
-          messages: [
-            {
-              id: 1,
-              content: "你好，我想询问一下这个商品",
-              senderName: "张三",
-              senderId: 2,
-              receiverId: Number(currentUser?.id) || 1,
-              createdAt: "2024-01-15T10:00:00Z",
-              isRead: true,
-              itemTitle: "二手自行车",
-              itemId: 1
-            },
-            {
-              id: 2,
-              content: "这个商品还在吗？",
-              senderName: "张三",
-              senderId: 2,
-              receiverId: Number(currentUser?.id) || 1,
-              createdAt: "2024-01-15T10:30:00Z",
-              isRead: false
-            }
-          ]
-        },
-        {
-          userId: 3,
-          userName: "李四",
-          lastMessage: "好的，谢谢！",
-          lastMessageTime: "2024-01-14T16:20:00Z",
-          unreadCount: 0,
-          messages: [
-            {
-              id: 3,
-              content: "这个价格可以商量吗？",
-              senderName: "李四",
-              senderId: 3,
-              receiverId: Number(currentUser?.id) || 1,
-              createdAt: "2024-01-14T16:00:00Z",
-              isRead: true,
-              itemTitle: "笔记本电脑",
-              itemId: 2
-            },
-            {
-              id: 4,
-              content: "好的，谢谢！",
-              senderName: "李四",
-              senderId: 3,
-              receiverId: Number(currentUser?.id) || 1,
-              createdAt: "2024-01-14T16:20:00Z",
-              isRead: true
-            }
-          ]
-        }
-      ];
-      
-      setConversations(mockConversations);
+      const response = await fetch('/api/messages/conversations');
+      const data = await response.json();
+      // data: [{ userId, lastMessage, unread }]
+      const conversations: Conversation[] = await Promise.all(
+        data.map(async (item: any) => {
+          return {
+            userId: item.userId,
+            userName: item.userName, // 使用后端返回的用户名
+            lastMessage: item.lastMessage.content || '',
+            lastMessageTime: item.lastMessage.createdAt,
+            unreadCount: item.unread,
+            messages: [item.lastMessage], // 只放最后一条消息，点开后再请求全部消息
+          };
+        })
+      );
+      setConversations(conversations);
     } catch (error) {
       console.error('获取会话失败:', error);
     } finally {
@@ -158,38 +108,79 @@ export default function MessagesPage() {
     }
   };
 
+  // 获取所有未读消息总数
+  const fetchUnreadTotal = async () => {
+    try {
+      const res = await fetch('/api/messages/unread');
+      const data = await res.json();
+      // unread.ts 返回的是 [{ senderId, _count: { _all: number } }, ...]
+      const total = Array.isArray(data) ? data.reduce((sum, u) => sum + (u._count?._all || 0), 0) : 0;
+      setUnreadTotal(total);
+    } catch {
+      setUnreadTotal(0);
+    }
+  };
+
+  // 拉取完整消息历史
+  const fetchMessagesWithUser = async (userId: number) => {
+    try {
+      const res = await fetch(`/api/messages?with=${userId}`);
+      const data = await res.json();
+      return data;
+    } catch {
+      return [];
+    }
+  };
+
+  // 标记消息为已读
+  const markAsRead = async (userId: number) => {
+    try {
+      await fetch('/api/messages/read', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ withUserId: userId })
+      });
+    } catch {}
+  };
+
+  // 页面加载时获取未读总数
+  useEffect(() => {
+    fetchUnreadTotal();
+  }, []);
+
+  // 打开会话时拉取历史并标记为已读
+  const handleOpenConversation = async (conversation: Conversation) => {
+    setSelectedConversation(conversation);
+    const messages = await fetchMessagesWithUser(conversation.userId);
+    setSelectedConversation(prev => prev ? { ...prev, messages } : null);
+    await markAsRead(conversation.userId);
+    fetchUnreadTotal(); // 刷新未读总数
+    fetchConversations(); // 刷新会话列表未读数
+    setIsChatOpen(true);
+  };
+
   const sendMessage = async () => {
     if (!newMessage.trim() || !selectedConversation || !currentUser) return;
 
     try {
       setIsSending(true);
-      
-      // 这里应该调用发送消息的 API
-      // const response = await fetch('/api/messages', {
-      //   method: 'POST',
-      //   headers: { 'Content-Type': 'application/json' },
-      //   body: JSON.stringify({
-      //     content: newMessage,
-      //     receiverId: selectedConversation.userId
-      //   })
-      // });
 
-      // 模拟发送消息
-      const newMsg: Message = {
-        id: Date.now(),
-        content: newMessage,
-        senderName: currentUser.username || 'You',
-        senderId: Number(currentUser.id),
-        receiverId: selectedConversation.userId,
-        createdAt: new Date().toISOString(),
-        isRead: false
-      };
+      const response = await fetch('/api/messages', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          content: newMessage,
+          receiverId: selectedConversation.userId
+        })
+      });
 
-      // 更新本地状态
+      if (!response.ok) throw new Error('发送失败');
+      const newMsg = await response.json();
+
       setSelectedConversation(prev => ({
         ...prev!,
         messages: [...prev!.messages, newMsg],
-        lastMessage: newMessage,
+        lastMessage: newMsg.content,
         lastMessageTime: newMsg.createdAt
       }));
 
@@ -235,7 +226,11 @@ export default function MessagesPage() {
         <div className="mx-auto px-2 sm:px-4 py-4 sm:py-6">
           {/* 页面标题 */}
           <div className="mb-4 sm:mb-8">
-            <h1 className="text-xl sm:text-3xl font-bold text-gray-900 text-center">{t('title')}</h1>
+            <h1 className="text-xl sm:text-3xl font-bold text-gray-900 text-center">{t('title')}
+              {unreadTotal > 0 && (
+                <span className="ml-2 text-base text-red-500 align-middle">({unreadTotal})</span>
+              )}
+            </h1>
             <p className="text-gray-600 mt-1 sm:mt-2 text-base sm:text-lg text-center">{t('subtitle')}</p>
           </div>
 
@@ -257,16 +252,13 @@ export default function MessagesPage() {
                   <div
                     key={conversation.userId}
                     className="px-4 sm:px-5 py-3 sm:py-4 active:bg-gray-100 transition-colors"
-                    onClick={() => {
-                      setSelectedConversation(conversation);
-                      setIsChatOpen(true);
-                    }}
+                    onClick={() => handleOpenConversation(conversation)}
                   >
                     <div className="flex items-center space-x-3 sm:space-x-4">
                       {/* 用户头像 */}
                       <div className="w-10 h-10 sm:w-12 sm:h-12 bg-gradient-to-br from-blue-500 to-purple-600 rounded-full flex items-center justify-center flex-shrink-0">
                         <span className="text-white text-base sm:text-lg font-bold">
-                          {conversation.userName.charAt(0)}
+                          {conversation.userName ? conversation.userName.charAt(0) : '?'}
                         </span>
                       </div>
                       {/* 消息内容 */}
@@ -309,7 +301,7 @@ export default function MessagesPage() {
                 <div className="flex items-center flex-1 ml-2">
                   <div className="w-8 h-8 bg-blue-500 rounded-full flex items-center justify-center mr-3">
                     <span className="text-white text-sm font-semibold">
-                      {selectedConversation.userName.charAt(0)}
+                      {selectedConversation.userName ? selectedConversation.userName.charAt(0) : '?'}
                     </span>
                   </div>
                   <h3 className="font-semibold text-gray-900">{selectedConversation.userName}</h3>

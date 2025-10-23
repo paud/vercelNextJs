@@ -27,11 +27,14 @@ model User {
   accounts      Account[]
   item          Item[]
   sessions      Session[]
+  sentMessages     Message[] @relation("SentMessages")
+  receivedMessages Message[] @relation("ReceivedMessages")
   City          City?       @relation(fields: [cityId], references: [id])
   District      District?   @relation(fields: [districtId], references: [id])
   Prefecture    Prefecture? @relation(fields: [prefectureId], references: [id])
   Region        Region?     @relation(fields: [regionId], references: [id])
   Ward          Ward?       @relation(fields: [wardId], references: [id])
+  systemNotifications SystemNotification[]
 
   @@index([regionId])
   @@index([cityId])
@@ -213,4 +216,36 @@ model Ward {
 
   @@index([cityId])
   @@index([districtId])
+}
+
+model Message {
+  id          Int      @id @default(autoincrement())
+  senderId    Int
+  receiverId  Int
+  content     String
+  createdAt   DateTime @default(now())
+  read        Boolean  @default(false)
+  readAt      DateTime?
+
+  sender      User     @relation("SentMessages", fields: [senderId], references: [id])
+  receiver    User     @relation("ReceivedMessages", fields: [receiverId], references: [id])
+
+  @@index([senderId])
+  @@index([receiverId])
+  @@index([createdAt])
+}
+
+model SystemNotification {
+  id        Int      @id @default(autoincrement())
+  userId    Int?     // null 表示全员通知
+  title     String
+  content   String
+  type      String?  // 可选：如 announcement, alert, etc.
+  read      Boolean  @default(false)
+  createdAt DateTime @default(now())
+  user      User?    @relation(fields: [userId], references: [id])
+
+  @@index([userId])
+  @@index([read])
+  @@index([createdAt])
 }

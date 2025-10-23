@@ -59,7 +59,8 @@
     "capital": "都市",
     "viewSubLevel": "下位レベルを表示",
     "selectThis": "これを選択",
-    "autoDetectLocation": "位置を自動検出"
+    "autoDetectLocation": "位置を自動検出",
+    "system_notification": "通知"
   },
   "ItemNew": {
     "page_title": "中古品を出品する",
@@ -238,6 +239,25 @@
     "type_message": "メッセージを入力...",
     "send": "送信",
     "sending": "送信中..."
+  },
+  "Message": {
+    "conversations": "会話一覧",
+    "no_conversation": "会話がありません",
+    "no_message": "メッセージがありません",
+    "input_placeholder": "メッセージを入力...",
+    "send": "送信",
+    "loading": "読み込み中..."
+  },
+  "SystemNotification": {
+    "title": "システム通知",
+    "no_notification": "通知はありません",
+    "loading": "読み込み中...",
+    "mark_read": "既読にする",
+    "delete": "削除",
+    "mark_all_read": "すべて既読にする",
+    "read": "既読",
+    "prev": "前へ",
+    "next": "次へ"
   },
   "PWA": {
     "installApp": "アプリをインストール"

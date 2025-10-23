@@ -46,7 +46,8 @@
     "population": "Population",
     "capital": "Capital",
     "viewSubLevel": "View Sub Level",
-    "autoDetectLocation": "Auto Locate"
+    "autoDetectLocation": "Auto Locate",
+    "system_notification": "Notifications"
   },
   "Home": {
     "market_title": "Secondhand Marketplace",
@@ -237,6 +238,25 @@
     "type_message": "Type a message...",
     "send": "Send",
     "sending": "Sending..."
+  },
+  "Message": {
+    "conversations": "Conversations",
+    "no_conversation": "No conversations",
+    "no_message": "No messages",
+    "input_placeholder": "Type a message...",
+    "send": "Send",
+    "loading": "Loading..."
+  },
+  "SystemNotification": {
+    "title": "System Notifications",
+    "no_notification": "No notifications",
+    "loading": "Loading...",
+    "mark_read": "Mark as read",
+    "delete": "Delete",
+    "mark_all_read": "Mark all as read",
+    "read": "Read",
+    "prev": "Prev",
+    "next": "Next"
   },
   "PWA": {
     "installApp": "Install App"

@@ -118,15 +118,7 @@ export default function MyItemsPage() {
               <h1 className="text-2xl sm:text-3xl font-bold text-gray-900">{t('title')}</h1>
               <p className="text-gray-600 mt-1 sm:mt-2">{t('subtitle')} ({items.length} {t('items_count')})</p>
             </div>
-            <Link
-              href={`/${locale}/items/new`}
-              className="inline-flex items-center px-3 py-2 sm:px-4 sm:py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition text-sm sm:text-base mt-2 sm:mt-0"
-            >
-              <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
-              </svg>
-              {t('add_new_item')}
-            </Link>
+          
           </div>
         </div>
 
