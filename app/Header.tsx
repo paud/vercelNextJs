@@ -355,7 +355,7 @@ export default function Header() {
     // 更新显示的地区名称
     setRegion(item.code || 'tokyo');
     setDetectedCity(displayName);
-
+    setUserSelectedRegion(true);
     // 关闭弹窗
     setRegionMenuOpen(false);
 
