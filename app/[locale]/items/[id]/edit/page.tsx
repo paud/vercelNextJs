@@ -198,12 +198,12 @@ export default function EditItemPage({ params }: { params: Promise<{ id: string;
     }
 
     return (
-        <div className="min-h-screen bg-gray-50 py-8 pb-24">
-            <div className="max-w-2xl mx-auto px-4">
+        <div className="min-h-screen bg-gray-50 pt-2 pb-16">
+            <div className="max-w-sm w-full mx-auto px-2 sm:px-4">
                 {/* 返回链接 */}
                 <Link
                     href={`/${resolvedParams?.locale}/users/my-items`}
-                    className="inline-flex items-center text-blue-600 hover:text-blue-800 mb-6"
+                    className="inline-flex items-center text-blue-600 hover:text-blue-800 mb-3 sm:mb-6"
                 >
                     <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 19l-7-7m0 0l7-7m0 7h18" />
@@ -211,12 +211,11 @@ export default function EditItemPage({ params }: { params: Promise<{ id: string;
                     {t('back_to_items')}
                 </Link>
 
-                <div className="bg-white rounded-lg shadow-md p-6">
-                    <h1 className="text-2xl font-bold mb-6">{t('page_title')}</h1>
-                    
-                    <form onSubmit={handleSubmit} className="space-y-6">
+                <div className="bg-white rounded-lg shadow-md p-3 sm:p-6">
+                    <h1 className="text-xl sm:text-2xl font-bold mb-4 sm:mb-6">{t('page_title')}</h1>
+                    <form onSubmit={handleSubmit} className="space-y-4 sm:space-y-6">
                         <div>
-                            <label className="block text-sm font-medium text-gray-700 mb-2">
+                            <label className="block text-sm font-medium text-gray-700 mb-1 sm:mb-2">
                                 {t('title')} *
                             </label>
                             <input
@@ -227,9 +226,8 @@ export default function EditItemPage({ params }: { params: Promise<{ id: string;
                                 required
                             />
                         </div>
-
                         <div>
-                            <label className="block text-sm font-medium text-gray-700 mb-2">
+                            <label className="block text-sm font-medium text-gray-700 mb-1 sm:mb-2">
                                 {t('description')}
                             </label>
                             <textarea
@@ -239,9 +237,8 @@ export default function EditItemPage({ params }: { params: Promise<{ id: string;
                                 rows={4}
                             />
                         </div>
-
                         <div>
-                            <label className="block text-sm font-medium text-gray-700 mb-2">
+                            <label className="block text-sm font-medium text-gray-700 mb-1 sm:mb-2">
                                 {t('price')} *
                             </label>
                             <input
@@ -254,9 +251,8 @@ export default function EditItemPage({ params }: { params: Promise<{ id: string;
                                 required
                             />
                         </div>
-
                         <div>
-                            <label className="block text-sm font-medium text-gray-700 mb-2">
+                            <label className="block text-sm font-medium text-gray-700 mb-1 sm:mb-2">
                                 {t('image')}
                             </label>
                             <input
@@ -272,27 +268,26 @@ export default function EditItemPage({ params }: { params: Promise<{ id: string;
                                 </div>
                             )}
                             {imageUrl && (
-                                <div className="mt-4">
+                                <div className="mt-3 sm:mt-4">
                                     <img 
                                         src={imageUrl} 
                                         alt={t('preview_alt')} 
-                                        className="w-full max-w-md h-48 object-cover rounded-lg border"
+                                        className="w-full max-w-md h-32 sm:h-48 object-cover rounded-lg border"
                                     />
                                 </div>
                             )}
                         </div>
-
-                        <div className="flex space-x-4 pt-4">
+                        <div className="flex space-x-2 sm:space-x-4 pt-3 sm:pt-4">
                             <button
                                 type="submit"
-                                className="flex-1 bg-blue-600 text-white px-6 py-3 rounded-lg font-medium hover:bg-blue-700 transition disabled:opacity-50"
+                                className="flex-1 bg-blue-600 text-white px-3 sm:px-6 py-2.5 sm:py-3 rounded-lg font-medium hover:bg-blue-700 transition disabled:opacity-50"
                                 disabled={uploading}
                             >
                                 {t('save_changes')}
                             </button>
                             <Link
                                 href={`/${resolvedParams?.locale}/users/my-items`}
-                                className="px-6 py-3 border border-gray-300 text-gray-700 rounded-lg font-medium hover:bg-gray-50 transition text-center"
+                                className="px-3 sm:px-6 py-2.5 sm:py-3 border border-gray-300 text-gray-700 rounded-lg font-medium hover:bg-gray-50 transition text-center"
                             >
                                 {t('cancel')}
                             </Link>

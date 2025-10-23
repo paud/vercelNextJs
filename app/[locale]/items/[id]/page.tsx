@@ -17,22 +17,22 @@ export default async function ItemDetailPage({ params }: { params: Promise<{ id:
   }
 
   return (
-    <div className="max-w-xl mx-auto p-6 bg-white rounded-lg shadow mt-8 mb-24">
+    <div className="max-w-sm w-full mx-auto p-3 sm:p-6 bg-white rounded-lg shadow mt-2 mb-16 min-h-screen flex flex-col justify-start">
       {item.imageUrl && (
         <img
           src={item.imageUrl}
           alt={item.title}
-          className="w-full h-64 object-cover rounded mb-4"
+          className="w-full h-40 sm:h-64 object-cover rounded mb-3 sm:mb-4"
         />
       )}
-      <h1 className="text-2xl font-bold mb-2">{item.title}</h1>
+      <h1 className="text-xl sm:text-2xl font-bold mb-2">{item.title}</h1>
       <p className="text-lg text-blue-600 font-semibold mb-2">{homeT('currency')}{item.price}</p>
-      <p className="text-gray-700 mb-4">{item.description || homeT('no_description')}</p>
+      <p className="text-gray-700 mb-3 sm:mb-4">{item.description || homeT('no_description')}</p>
       <div className="text-sm text-gray-500">
         {t('seller')}：{item.seller?.name || t('anonymous')} <br />
         {t('contact')}：{item.seller?.email || t('no_contact')}
       </div>
-      <div className="text-xs text-gray-400 mt-4">
+      <div className="text-xs text-gray-400 mt-3 sm:mt-4">
         {t('published_at')}：{new Date(item.createdAt).toLocaleString(homeT('date_locale'))}
       </div>
     </div>

@@ -195,38 +195,52 @@ export default function Footer() {
     };
   }, []);
 
+  useEffect(() => {
+    // 调试 currentUser 变化
+    console.log('Footer: currentUser 变化', currentUser);
+  }, [currentUser]);
+
   return (
-    <footer className="fixed bottom-0 left-4 right-4 bg-white border-t border-gray-200 shadow-lg z-50 rounded-t-lg app-footer">
-      <div className="flex items-center justify-around py-2 px-2">
+    <footer className="fixed bottom-0 left-0 right-0 bg-white border-t border-gray-200 shadow-md z-50 rounded-t-xl app-footer px-1 sm:px-4 max-w-md mx-auto"
+      style={{
+        maxWidth: '100vw',
+        minHeight: '56px',
+        boxShadow: '0 -2px 12px 0 rgba(0,0,0,0.06)',
+        WebkitTapHighlightColor: 'transparent',
+      }}
+    >
+      <div className="flex items-center justify-between py-1 px-1 gap-1">
         {/* 主页 */}
         <Link
           href={`/${locale}`}
-          className="flex flex-col items-center text-gray-700 hover:text-blue-600 transition-colors py-2"
+          className="flex flex-col items-center flex-1 text-gray-700 hover:text-blue-600 transition-colors py-1 min-w-0"
+          style={{ minWidth: 0 }}
         >
-          <svg className="w-6 h-6 mb-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <svg className="w-6 h-6 mb-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" />
           </svg>
-          <span className="text-xs font-medium">{t('home')}</span>
+          <span className="text-[11px] font-medium truncate w-full text-center">{t('home')}</span>
         </Link>
 
         {/* 地区选择 */}
         <Link
           href={`/${locale}?region=${detectedRegion}`}
-          className="flex flex-col items-center text-gray-700 hover:text-blue-600 transition-colors py-2"
+          className="flex flex-col items-center flex-1 text-gray-700 hover:text-blue-600 transition-colors py-1 min-w-0"
+          style={{ minWidth: 0 }}
         >
           <div className="relative">
-            <svg className="w-6 h-6 mb-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <svg className="w-6 h-6 mb-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
             </svg>
             {isDetecting && (
-              <div className="absolute -top-1 -right-1 w-3 h-3 bg-blue-500 rounded-full animate-pulse"></div>
+              <div className="absolute -top-1 -right-1 w-2.5 h-2.5 bg-blue-500 rounded-full animate-pulse"></div>
             )}
             {locationDetected && !isDetecting && (
-              <div className="absolute -top-1 -right-1 w-3 h-3 bg-green-500 rounded-full"></div>
+              <div className="absolute -top-1 -right-1 w-2.5 h-2.5 bg-green-500 rounded-full"></div>
             )}
           </div>
-          <span className="text-xs font-medium">
+          <span className="text-[11px] font-medium truncate w-full text-center">
             {isDetecting ? t('locating') : (detectedCity || getRegionDisplayName(detectedRegion))}
           </span>
         </Link>
@@ -234,14 +248,15 @@ export default function Footer() {
         {/* 发布商品 - 登录用户可发布，未登录显示发布引导到登录 */}
         <Link
           href={currentUser ? `/${locale}/items/new` : `/${locale}/auth/signin`}
-          className="flex flex-col items-center text-gray-700 hover:text-green-600 transition-colors py-2"
+          className="flex flex-col items-center flex-1 text-gray-700 hover:text-green-600 transition-colors py-1 min-w-0"
+          style={{ minWidth: 0 }}
         >
-          <div className="bg-green-500 rounded-full p-2 mb-1">
+          <div className="bg-green-500 rounded-full p-1.5 mb-0.5 flex items-center justify-center" style={{ boxShadow: '0 2px 8px 0 rgba(16,185,129,0.10)' }}>
             <svg className="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
             </svg>
           </div>
-          <span className="text-xs font-medium text-green-600">
+          <span className="text-[11px] font-medium text-green-600 truncate w-full text-center">
             {t('post')}
           </span>
         </Link>
@@ -249,34 +264,42 @@ export default function Footer() {
         {/* 消息 */}
         <Link
           href={`/${locale}/messages`}
-          className="flex flex-col items-center text-gray-700 hover:text-blue-600 transition-colors py-2"
+          className="flex flex-col items-center flex-1 text-gray-700 hover:text-blue-600 transition-colors py-1 min-w-0"
+          style={{ minWidth: 0 }}
         >
-          <svg className="w-6 h-6 mb-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <svg className="w-6 h-6 mb-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" />
           </svg>
-          <span className="text-xs font-medium">{t('message')}</span>
+          <span className="text-[11px] font-medium truncate w-full text-center">{t('message')}</span>
         </Link>
 
         {/* 我的 - 个人中心/登录 */}
         {currentUser ? (
           <Link
             href={`/${locale}/users/profile`}
-            className="flex flex-col items-center text-gray-700 hover:text-blue-600 transition-colors py-2"
+            className="flex flex-col items-center flex-1 text-gray-700 hover:text-blue-600 transition-colors py-1 min-w-0"
+            style={{ minWidth: 0 }}
           >
-            <svg className="w-6 h-6 mb-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <svg className="w-6 h-6 mb-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
             </svg>
-            <span className="text-xs font-medium">{t('profile')}</span>
+            <span className="text-[11px] font-medium truncate w-full text-center">{t('profile')}</span>
           </Link>
         ) : (
           <Link
             href={`/${locale}/auth/signin`}
-            className="flex flex-col items-center text-gray-700 hover:text-green-600 transition-colors py-2"
+            className="flex flex-col items-center flex-1 text-gray-700 hover:text-green-600 transition-colors py-1 min-w-0"
+            style={{ minWidth: 0 }}
+            onClick={() => {
+              if (typeof window !== 'undefined') {
+                localStorage.setItem('redirectAfterLogin', window.location.pathname + window.location.search);
+              }
+            }}
           >
-            <svg className="w-6 h-6 mb-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <svg className="w-6 h-6 mb-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
             </svg>
-            <span className="text-xs font-medium text-green-600">{t('login')}</span>
+            <span className="text-[11px] font-medium text-green-600 truncate w-full text-center">{t('login')}</span>
           </Link>
         )}
       </div>

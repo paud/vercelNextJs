@@ -101,18 +101,18 @@ export default function ProfilePage() {
 
   return (
     <UserHeader>
-      <div className="min-h-screen bg-gray-50 pb-24">
+      <div className="min-h-screen bg-gray-50 pb-16 pt-2">
         {/* 主内容区域 */}
-        <div className="py-8 mb-8">
-          <div className="max-w-2xl mx-auto px-4">
+        <div className="py-4 mb-6">
+          <div className="max-w-sm w-full mx-auto px-2 sm:px-4">
             {/* 页面标题 */}
-            <div className="mb-8">
-              <h1 className="text-3xl font-bold text-gray-900">{t('title')}</h1>
+            <div className="mb-4 sm:mb-8">
+              <h1 className="text-2xl sm:text-3xl font-bold text-gray-900 text-center">{t('title')}</h1>
             </div>
 
             {/* 消息提示 */}
             {message && (
-              <div className={`mb-6 p-4 rounded-lg ${isSuccess ? 'bg-green-50 text-green-700 border border-green-200' : 'bg-red-50 text-red-700 border border-red-200'}`}>
+              <div className={`mb-4 sm:mb-6 p-4 rounded-lg ${isSuccess ? 'bg-green-50 text-green-700 border border-green-200' : 'bg-red-50 text-red-700 border border-red-200'}`}>
                 {message}
               </div>
             )}
@@ -121,27 +121,27 @@ export default function ProfilePage() {
             {currentUser && (
               <div className="bg-white rounded-lg shadow-md overflow-hidden">
                 {/* 卡片头部 */}
-                <div className="bg-gradient-to-r from-blue-500 to-blue-600 px-6 py-8">
+                <div className="bg-gradient-to-r from-blue-500 to-blue-600 px-4 py-6">
                   <div className="flex items-center">
-                    <div className="w-20 h-20 bg-white rounded-full flex items-center justify-center text-blue-600 text-2xl font-bold">
+                    <div className="w-16 h-16 bg-white rounded-full flex items-center justify-center text-blue-600 text-xl font-bold">
                       {(currentUser.name || currentUser.username || 'U').charAt(0).toUpperCase()}
                     </div>
-                    <div className="ml-6 text-white">
-                      <h2 className="text-2xl font-bold">{currentUser.name || currentUser.username || 'User'}</h2>
-                      <p className="text-blue-100">@{currentUser.username || 'user'}</p>
-                      <p className="text-blue-100 text-sm">{t('member_since')} {currentUser.createdAt ? new Date(currentUser.createdAt).toLocaleDateString(locale === 'zh' ? 'zh-CN' : locale === 'ja' ? 'ja-JP' : 'en-US') : '--'}</p>
+                    <div className="ml-4 text-white">
+                      <h2 className="text-lg sm:text-2xl font-bold">{currentUser.name || currentUser.username || 'User'}</h2>
+                      <p className="text-blue-100 text-sm">@{currentUser.username || 'user'}</p>
+                      <p className="text-blue-100 text-xs sm:text-sm">{t('member_since')} {currentUser.createdAt ? new Date(currentUser.createdAt).toLocaleDateString(locale === 'zh' ? 'zh-CN' : locale === 'ja' ? 'ja-JP' : 'en-US') : '--'}</p>
                     </div>
                   </div>
                 </div>
 
           {/* 卡片内容 */}
-          <div className="px-6 py-6">
-            <div className="flex justify-between items-center mb-6">
-              <h3 className="text-lg font-semibold text-gray-900">{t('basic_info')}</h3>
+          <div className="px-4 py-4 sm:px-6 sm:py-6">
+            <div className="flex justify-between items-center mb-4 sm:mb-6">
+              <h3 className="text-base sm:text-lg font-semibold text-gray-900">{t('basic_info')}</h3>
               {!isEditing && (
                 <button
                   onClick={handleEdit}
-                  className="inline-flex items-center px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition"
+                  className="inline-flex items-center px-3 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition text-sm sm:text-base"
                 >
                   <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
@@ -151,7 +151,7 @@ export default function ProfilePage() {
               )}
             </div>
 
-            <div className="space-y-6">
+            <div className="space-y-4 sm:space-y-6">
               {/* 用户名 */}
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-2">

@@ -71,111 +71,6 @@ export default function Header() {
     }
   };
 
-  // 地理定位功能
-  const detectLocation = async () => {
-    setIsDetectingLocation(true);
-
-    // 检查是否支持地理定位
-    if (!navigator.geolocation) {
-      console.log('Header: 浏览器不支持地理定位，设置默认地区为东京');
-      setRegion('tokyo');
-      setDetectedCity(t('region_tokyo'));
-      setIsDetectingLocation(false);
-      return;
-    }
-
-    // 获取用户位置
-    navigator.geolocation.getCurrentPosition(
-      async (position) => {
-        const { latitude, longitude } = position.coords;
-        console.log('Header: 用户位置:', latitude, longitude);
-
-        try {
-          // 调用后端API进行地区检测
-          const response = await fetch('/api/auto-detect-region', {
-            method: 'POST',
-            headers: {
-              'Content-Type': 'application/json',
-            },
-            body: JSON.stringify({ latitude, longitude, locale }),
-          });
-
-          if (response.ok) {
-            const data = await response.json();
-            console.log('Header: API返回数据:', data);              // 使用简化的API响应
-            if (data.cityInfo) {
-              const cityInfo = data.cityInfo;
-              setLocationDetected(true);
-
-              // 直接使用API返回的对应语言的地址信息
-              const fullAddress = cityInfo.fullCityAddress || t('region_tokyo');
-
-              // 提取最终的地区名称
-              const finalLocationName = extractFinalLocationName(fullAddress);
-
-              console.log('Header: 检测到的完整地址:', fullAddress);
-              console.log('Header: 提取的最终地区名称:', finalLocationName);
-
-              // 保存最终地区名称
-              setDetectedCity(finalLocationName);
-
-              // 如果仍有地区代码，保留原有逻辑
-              if (data.region) {
-                setRegion(data.region);
-                // 更新URL参数
-                const currentUrl = new URL(window.location.href);
-                currentUrl.searchParams.set('region', data.region);
-                window.history.replaceState({}, '', currentUrl.toString());
-              } else {
-                setRegion('tokyo'); // 默认设置
-              }
-            } else {
-              console.log('Header: API未返回市级信息，设置默认地区为东京');
-              setRegion('tokyo');
-              setDetectedCity(t('region_tokyo'));
-            }
-          } else {
-            console.log('Header: API响应错误，设置默认地区为东京');
-            setRegion('tokyo');
-            setDetectedCity(t('region_tokyo'));
-          }
-        } catch (error) {
-          console.error('Header: 地区检测API调用失败:', error);
-          console.log('Header: API调用失败，设置默认地区为东京');
-          setRegion('tokyo');
-          setDetectedCity(t('region_tokyo'));
-        }
-
-        setIsDetectingLocation(false);
-      },
-      (error) => {
-        console.error('Header: 地理定位错误:', error.message);
-        console.log('Header: 地理定位失败，设置默认地区为东京');
-        setRegion('tokyo');
-        setDetectedCity(t('region_tokyo'));
-        setIsDetectingLocation(false);
-
-        // 根据错误类型给用户提示
-        switch (error.code) {
-          case error.PERMISSION_DENIED:
-            console.log('Header: 用户拒绝了地理定位请求，使用默认地区东京');
-            break;
-          case error.POSITION_UNAVAILABLE:
-            console.log('Header: 位置信息不可用，使用默认地区东京');
-            break;
-          case error.TIMEOUT:
-            console.log('Header: 地理定位请求超时，使用默认地区东京');
-            break;
-        }
-      },
-      {
-        enableHighAccuracy: true,
-        timeout: 10000,
-        maximumAge: 300000 // 5分钟缓存
-      }
-    );
-  };
-
   // 从URL参数读取地区设置，如果没有则进行地理定位
   useEffect(() => {
     const searchParams = new URLSearchParams(window.location.search);
@@ -279,15 +174,6 @@ export default function Header() {
     }
 
     return pathParts.join(' - ');
-  };
-
-  // 提取最终地区名称（去除上级地区信息）
-  const extractFinalLocationName = (fullAddress: string) => {
-    // 如果地址包含分隔符，提取最后一部分
-    const parts = fullAddress.split(/[-·\s]/);
-    // 返回最后一个非空部分
-    const finalPart = parts.filter(part => part.trim()).pop();
-    return finalPart || fullAddress;
   };
 
   // 检查是否有子级别

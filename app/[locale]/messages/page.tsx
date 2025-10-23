@@ -231,59 +231,58 @@ export default function MessagesPage() {
 
   return (
     <UserHeader>
-      <div className="min-h-screen bg-gray-50">
-        <div className="mx-auto px-4 py-6">
+      <div className="min-h-screen bg-gray-50 pt-2 pb-16">
+        <div className="mx-auto px-2 sm:px-4 py-4 sm:py-6">
           {/* 页面标题 */}
-          <div className="mb-8">
-            <h1 className="text-3xl font-bold text-gray-900">{t('title')}</h1>
-            <p className="text-gray-600 mt-2 text-lg">{t('subtitle')}</p>
+          <div className="mb-4 sm:mb-8">
+            <h1 className="text-xl sm:text-3xl font-bold text-gray-900 text-center">{t('title')}</h1>
+            <p className="text-gray-600 mt-1 sm:mt-2 text-base sm:text-lg text-center">{t('subtitle')}</p>
           </div>
 
           {/* 手机端会话列表 */}
           <div className="bg-white rounded-xl shadow-lg overflow-hidden">
-            <div className="px-5 py-4 border-b border-gray-100">
-              <h2 className="text-xl font-bold text-gray-900">{t('conversations')}</h2>
+            <div className="px-4 sm:px-5 py-3 sm:py-4 border-b border-gray-100">
+              <h2 className="text-lg sm:text-xl font-bold text-gray-900">{t('conversations')}</h2>
             </div>
             <div className="divide-y divide-gray-50">
               {conversations.length === 0 ? (
-                <div className="p-12 text-center text-gray-500">
-                  <svg className="w-20 h-20 mx-auto mb-6 text-gray-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <div className="p-8 sm:p-12 text-center text-gray-500">
+                  <svg className="w-14 h-14 sm:w-20 sm:h-20 mx-auto mb-4 sm:mb-6 text-gray-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1} d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" />
                   </svg>
-                  <p className="text-lg">{t('no_conversations')}</p>
+                  <p className="text-base sm:text-lg">{t('no_conversations')}</p>
                 </div>
               ) : (
                 conversations.map((conversation) => (
                   <div
                     key={conversation.userId}
-                    className="px-5 py-4 active:bg-gray-100 transition-colors"
+                    className="px-4 sm:px-5 py-3 sm:py-4 active:bg-gray-100 transition-colors"
                     onClick={() => {
                       setSelectedConversation(conversation);
                       setIsChatOpen(true);
                     }}
                   >
-                    <div className="flex items-center space-x-4">
+                    <div className="flex items-center space-x-3 sm:space-x-4">
                       {/* 用户头像 */}
-                      <div className="w-12 h-12 bg-gradient-to-br from-blue-500 to-purple-600 rounded-full flex items-center justify-center flex-shrink-0">
-                        <span className="text-white text-lg font-bold">
+                      <div className="w-10 h-10 sm:w-12 sm:h-12 bg-gradient-to-br from-blue-500 to-purple-600 rounded-full flex items-center justify-center flex-shrink-0">
+                        <span className="text-white text-base sm:text-lg font-bold">
                           {conversation.userName.charAt(0)}
                         </span>
                       </div>
-                      
                       {/* 消息内容 */}
                       <div className="flex-1 min-w-0">
                         <div className="flex items-center justify-between mb-1">
-                          <h3 className="font-semibold text-gray-900 truncate">{conversation.userName}</h3>
+                          <h3 className="font-semibold text-gray-900 truncate text-sm sm:text-base">{conversation.userName}</h3>
                           <div className="flex items-center space-x-2 flex-shrink-0">
                             {conversation.unreadCount > 0 && (
                               <span className="bg-red-500 text-white text-xs rounded-full px-2 py-1 min-w-[20px] text-center font-medium">
                                 {conversation.unreadCount}
                               </span>
                             )}
-                            <span className="text-sm text-gray-400">{formatTime(conversation.lastMessageTime)}</span>
+                            <span className="text-xs sm:text-sm text-gray-400">{formatTime(conversation.lastMessageTime)}</span>
                           </div>
                         </div>
-                        <p className="text-gray-600 truncate text-base">{conversation.lastMessage}</p>
+                        <p className="text-gray-600 truncate text-xs sm:text-base">{conversation.lastMessage}</p>
                       </div>
                     </div>
                   </div>

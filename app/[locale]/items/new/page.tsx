@@ -100,13 +100,12 @@ export default function NewItem({ params }: { params: Promise<{ locale: string }
 
   return (
     <UserHeader>
-      <div className="min-h-screen bg-gray-50 pb-24">
-        <div className="max-w-2xl mx-auto p-6 bg-white rounded-lg shadow-md mt-12 mb-8">
-      <h1 className="text-3xl font-bold mb-6 text-gray-800">{t('page_title')}</h1>
-      
-      <form onSubmit={handleSubmit} className="space-y-6">
+      <div className="min-h-screen bg-gray-50 pt-2 pb-16">
+        <div className="max-w-sm w-full mx-auto p-3 sm:p-6 bg-white rounded-lg shadow-md mt-2 mb-8 flex flex-col justify-start">
+      <h1 className="text-xl sm:text-2xl font-bold mb-4 sm:mb-6 text-gray-800 text-center">{t('page_title')}</h1>
+      <form onSubmit={handleSubmit} className="space-y-4 sm:space-y-6">
         <div>
-          <label htmlFor="title" className="block text-lg font-medium mb-2 text-gray-700">
+          <label htmlFor="title" className="block text-base sm:text-lg font-medium mb-1 sm:mb-2 text-gray-700">
             {t('title')} *
           </label>
           <input
@@ -117,12 +116,11 @@ export default function NewItem({ params }: { params: Promise<{ locale: string }
             onChange={handleInputChange}
             required
             placeholder={t('title')}
-            className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-400 focus:border-transparent"
+            className="w-full px-3 py-2 sm:px-4 sm:py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-400 focus:border-transparent"
           />
         </div>
-        
         <div>
-          <label htmlFor="description" className="block text-lg font-medium mb-2 text-gray-700">
+          <label htmlFor="description" className="block text-base sm:text-lg font-medium mb-1 sm:mb-2 text-gray-700">
             {t('description')}
           </label>
           <textarea
@@ -132,12 +130,11 @@ export default function NewItem({ params }: { params: Promise<{ locale: string }
             onChange={handleInputChange}
             rows={4}
             placeholder={t('description')}
-            className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-400 focus:border-transparent"
+            className="w-full px-3 py-2 sm:px-4 sm:py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-400 focus:border-transparent"
           />
         </div>
-        
         <div>
-          <label htmlFor="price" className="block text-lg font-medium mb-2 text-gray-700">
+          <label htmlFor="price" className="block text-base sm:text-lg font-medium mb-1 sm:mb-2 text-gray-700">
             {t('price')} *
           </label>
           <input
@@ -150,12 +147,11 @@ export default function NewItem({ params }: { params: Promise<{ locale: string }
             min="0"
             required
             placeholder="0.00"
-            className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-400 focus:border-transparent"
+            className="w-full px-3 py-2 sm:px-4 sm:py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-400 focus:border-transparent"
           />
         </div>
-        
         <div>
-          <label className="block text-lg font-medium mb-2 text-gray-700">
+          <label className="block text-base sm:text-lg font-medium mb-1 sm:mb-2 text-gray-700">
             {t('item_image')}
           </label>
           <ImageUpload
@@ -168,11 +164,10 @@ export default function NewItem({ params }: { params: Promise<{ locale: string }
             </p>
           )}
         </div>
-        
         <button
           type="submit"
           disabled={submitting}
-          className="w-full bg-blue-500 text-white py-3 rounded-lg hover:bg-blue-600 transition-colors duration-200 font-semibold disabled:opacity-50 disabled:cursor-not-allowed"
+          className="w-full bg-blue-500 text-white py-2.5 sm:py-3 rounded-lg hover:bg-blue-600 transition-colors duration-200 font-semibold disabled:opacity-50 disabled:cursor-not-allowed"
         >
           {submitting ? t('uploading') : t('submit')}
         </button>
