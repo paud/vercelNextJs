@@ -9,7 +9,7 @@ import { useState, useEffect } from 'react';
 export default function Footer() {
   const locale = useLocale();
   const t = useTranslations('Header');
-  const { user: currentUser } = useCombinedAuth();
+  const { currentUser } = useCombinedAuth();
   const { isLoggedIn } = useCurrentUser();
   const [detectedRegion, setDetectedRegion] = useState<string>('tokyo'); // 默认东京
   const [detectedCity, setDetectedCity] = useState<string>(''); // 市级位置信息
