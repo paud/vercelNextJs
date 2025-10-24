@@ -10,6 +10,7 @@ interface ChatModalProps {
   itemTitle?: string;
   imageUrl?: string;
   messagesTObj?: Record<string, string>;
+  sellerName?: string;
 }
 
 interface Message {
@@ -23,7 +24,7 @@ interface Message {
   imageUrl?: string;
 }
 
-export default function ChatModal({ open, onClose, sellerId, itemId, itemTitle, imageUrl, messagesTObj }: ChatModalProps) {
+export default function ChatModal({ open, onClose, sellerId, itemId, itemTitle, imageUrl, messagesTObj, sellerName }: ChatModalProps) {
   // 优先用 props 里的多语言对象
   const t = messagesTObj ? (key: string) => messagesTObj[key] || key : useTranslations('Messages');
   const locale = useLocale();
@@ -79,13 +80,22 @@ export default function ChatModal({ open, onClose, sellerId, itemId, itemTitle, 
   let displayItemId = itemId;
   let displayItemTitle = itemTitle;
   let displayImageUrl = imageUrl;
-  if (!itemId && messages && messages.length > 0) {
-    // 查找最新一条带 itemId 的消息
+  // 优先用 props 传入，其次查找 messages 里最新一条有商品信息的消息（不区分谁发的）
+  if ((!displayItemId || !displayItemTitle || !displayImageUrl) && messages && messages.length > 0) {
     const latestMsgWithItem = [...messages].reverse().find(m => m.itemId && m.itemTitle && m.imageUrl);
     if (latestMsgWithItem) {
       displayItemId = latestMsgWithItem.itemId;
       displayItemTitle = latestMsgWithItem.itemTitle;
       displayImageUrl = latestMsgWithItem.imageUrl;
+    }
+  }
+
+  // 获取对方昵称，优先用 props 传入的 sellerName，否则用消息中最新一条对方的名字
+  let displayName = sellerName;
+  if (!displayName && messages && messages.length > 0) {
+    const latestMsgFromSeller = [...messages].reverse().find(m => m.senderId === sellerId);
+    if (latestMsgFromSeller && (latestMsgFromSeller as any).senderName) {
+      displayName = (latestMsgFromSeller as any).senderName;
     }
   }
 
@@ -125,7 +135,7 @@ export default function ChatModal({ open, onClose, sellerId, itemId, itemTitle, 
               <div className="w-8 h-8 bg-blue-500 rounded-full flex items-center justify-center mr-3">
                 <span className="text-white text-sm font-semibold">S</span>
               </div>
-              <h3 className="font-semibold text-gray-900">{t('chat_with_seller')}</h3>
+              <h3 className="font-semibold text-gray-900">{displayName || t('chat_with_seller')}</h3>
             </div>
             <button onClick={handleClose} className="p-2 hover:bg-gray-200 rounded-full transition-colors">
               <svg className="w-6 h-6 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">

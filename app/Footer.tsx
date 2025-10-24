@@ -3,17 +3,20 @@
 import Link from "next/link";
 import { useLocale, useTranslations } from 'next-intl';
 import { useCombinedAuth } from '../hooks/useCombinedAuth';
+import { useCurrentUser } from '../hooks/useCurrentUser';
 import { useState, useEffect } from 'react';
 
 export default function Footer() {
   const locale = useLocale();
   const t = useTranslations('Header');
-  const { currentUser } = useCombinedAuth();
+  const { user: currentUser } = useCombinedAuth();
+  const { isLoggedIn } = useCurrentUser();
   const [detectedRegion, setDetectedRegion] = useState<string>('tokyo'); // 默认东京
   const [detectedCity, setDetectedCity] = useState<string>(''); // 市级位置信息
   const [isDetecting, setIsDetecting] = useState(false);
   const [locationDetected, setLocationDetected] = useState(false);
   const [availableRegions, setAvailableRegions] = useState<any[]>([]);
+  const [unreadCount, setUnreadCount] = useState(0);
 
   // 获取地区显示名称
   const getRegionDisplayName = (region: string) => {
@@ -195,6 +198,26 @@ export default function Footer() {
     };
   }, []);
 
+  // 获取未读消息数
+  useEffect(() => {
+    if (!isLoggedIn) return;
+    const fetchUnread = async () => {
+      try {
+        const res = await fetch('/api/messages/unread');
+        const data = await res.json();
+        // unread.ts 返回的是 [{ senderId, _count: { _all: number } }, ...]
+        const total = Array.isArray(data) ? data.reduce((sum, u) => sum + (u._count?._all || 0), 0) : 0;
+        setUnreadCount(total);
+      } catch {
+        setUnreadCount(0);
+      }
+    };
+    fetchUnread();
+    // 可选：定时轮询
+    const timer = setInterval(fetchUnread, 60000);
+    return () => clearInterval(timer);
+  }, [isLoggedIn]);
+
   useEffect(() => {
     // 调试 currentUser 变化
     console.log('Footer: currentUser 变化', currentUser);
@@ -264,12 +287,19 @@ export default function Footer() {
         {/* 消息 */}
         <Link
           href={`/${locale}/messages`}
-          className="flex flex-col items-center flex-1 text-gray-700 hover:text-blue-600 transition-colors py-1 min-w-0"
+          className="flex flex-col items-center flex-1 text-gray-700 hover:text-blue-600 transition-colors py-1 min-w-0 relative"
           style={{ minWidth: 0 }}
         >
-          <svg className="w-6 h-6 mb-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" />
-          </svg>
+          <div className="relative">
+            <svg className="w-6 h-6 mb-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" />
+            </svg>
+            {isLoggedIn && unreadCount > 0 && (
+              <span className="absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full px-1.5 min-w-[18px] h-5 flex items-center justify-center font-bold border border-white shadow">
+                {unreadCount > 99 ? '99+' : unreadCount}
+              </span>
+            )}
+          </div>
           <span className="text-[11px] font-medium truncate w-full text-center">{t('message')}</span>
         </Link>
 

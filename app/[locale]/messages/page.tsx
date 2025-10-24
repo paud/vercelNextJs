@@ -323,6 +323,7 @@ export default function MessagesPage() {
             itemId={selectedConversation.messages[0]?.itemId}
             itemTitle={selectedConversation.messages[0]?.itemTitle}
             imageUrl={searchParams.get('imageUrl') ? decodeURIComponent(searchParams.get('imageUrl')!) : undefined}
+            sellerName={selectedConversation.userName}
           />
         )}
       </div>

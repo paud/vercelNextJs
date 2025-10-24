@@ -48,6 +48,7 @@ export default function ItemDetailClient({ item, tObj, homeTObj, messagesTObj }:
           itemTitle={item.title}
           imageUrl={item.imageUrl || undefined}
           messagesTObj={messagesTObj}
+          sellerName={item.seller?.name || undefined}
         />
       )}
       <p className="text-gray-700 mb-3 sm:mb-4">{item.description || homeT('no_description')}</p>
