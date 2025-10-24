@@ -4,7 +4,7 @@ import Providers from "./providers";
 
 export const metadata = {
   title: "2.zzzz.tech",
-  description: "A blog app using Next.js and Prisma",
+  description: "A 2nd hand trade platform",
 };
 
 export default function RootLayout({
