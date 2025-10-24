@@ -5,11 +5,12 @@ import { useCurrentUser } from "@/hooks/useCurrentUser";
 
 export default function ItemDetailClient({ item, tObj, homeTObj, messagesTObj }: { item: any, tObj: Record<string, string>, homeTObj: Record<string, string>, messagesTObj: Record<string, string> }) {
   const [showChat, setShowChat] = useState(false);
-  const { isLoggedIn } = useCurrentUser();
+  const { isLoggedIn, isLoading } = useCurrentUser();
   // 简单 t 函数
   const t = (k: string) => tObj[k] || k;
   const homeT = (k: string) => homeTObj[k] || k;
   const handleContactClick = () => {
+    if (isLoading) return; // 用户信息未加载完成时不响应点击
     if (!isLoggedIn) {
       window.location.href = '/users/profile';
     } else {
@@ -31,11 +32,12 @@ export default function ItemDetailClient({ item, tObj, homeTObj, messagesTObj }:
         className="w-full mb-2 py-2 bg-yellow-400 text-gray-900 rounded-lg font-semibold hover:bg-yellow-500 transition-colors flex items-center justify-center gap-2 shadow-md border border-yellow-300 hover:shadow-lg focus:outline-none focus:ring-2 focus:ring-yellow-500 focus:ring-offset-2"
         style={{ fontSize: '1.1rem', letterSpacing: '0.02em' }}
         onClick={handleContactClick}
+        disabled={isLoading}
       >
         <svg className="w-5 h-5" fill="none" stroke="currentColor" strokeWidth={2} viewBox="0 0 24 24">
           <path strokeLinecap="round" strokeLinejoin="round" d="M8 10h.01M12 10h.01M16 10h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" />
         </svg>
-        {t('contact_seller')}
+        {isLoading ? '...' : t('contact_seller')}
       </button>
       {isLoggedIn && (
         <ChatModal
