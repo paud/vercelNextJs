@@ -1,8 +1,8 @@
 import { NextResponse } from 'next/server';
 import type { NextRequest } from 'next/server';
 
-const SUPPORTED_LOCALES = ['zh', 'en', 'ja'];
-const DEFAULT_LOCALE = 'zh';
+const SUPPORTED_LOCALES = ['zh', 'en', 'ja', 'vi', 'ne'];
+const DEFAULT_LOCALE = 'en';
 
 export function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl;

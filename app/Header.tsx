@@ -489,13 +489,15 @@ export default function Header() {
 
   function handleLocaleChange(newLocale: string) {
     setLangMenuOpen(false);
+    const supportedLocales = ["zh", "en", "ja", "vi", "ne"];
     const segments = pathname.split('/').filter(Boolean);
-    if (["zh", "en", "ja"].includes(segments[0])) {
-      segments[0] = newLocale;
-    } else {
-      segments.unshift(newLocale);
+    // 移除所有前缀中的语言代码，只保留第一个非语言段
+    let firstNonLocaleIdx = 0;
+    while (firstNonLocaleIdx < segments.length && supportedLocales.includes(segments[firstNonLocaleIdx])) {
+      firstNonLocaleIdx++;
     }
-    router.push("/" + segments.join("/"));
+    const newSegments = [newLocale, ...segments.slice(firstNonLocaleIdx)];
+    router.push("/" + newSegments.join("/"));
   }
 
   function handleRegionChange(newRegion: string) {
@@ -551,7 +553,8 @@ export default function Header() {
                 setSelectedPath([]); // 清空选择路径
               }
               setRegionMenuOpen(!regionMenuOpen);
-            }}
+            }
+            }
             className="flex items-center p-2 rounded-lg hover:bg-gray-100 text-sm"
             disabled={regionsLoading || isDetectingLocation}
           >
@@ -776,12 +779,31 @@ export default function Header() {
                   日本語
                 </>
               )}
+              {locale === 'vi' && (
+                <>
+                  <svg className="w-4 h-4 mr-1" viewBox="0 0 24 24" fill="none">
+                    <rect x="2" y="4" width="20" height="16" rx="2" fill="#da251d" />
+                    <polygon points="12,9 13,13 17,13 14,15 15,19 12,17 9,19 10,15 7,13 11,13" fill="#ff0" />
+                  </svg>
+                  Tiếng Việt
+                </>
+              )}
+              {locale === 'ne' && (
+                <>
+                  <svg className="w-4 h-4 mr-1" viewBox="0 0 24 24" fill="none">
+                    <rect x="2" y="4" width="20" height="16" rx="2" fill="#DC143C" />
+                    <polygon points="6,6 12,18 18,6" fill="#fff" />
+                    <circle cx="9" cy="10" r="1" fill="#fff" />
+                  </svg>
+                  नेपाली
+                </>
+              )}
               <svg className="w-4 h-4 ml-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
               </svg>
             </button>
             {langMenuOpen && (
-              <div className="absolute top-full right-0 mt-1 bg-white border rounded-lg shadow-lg z-50 min-w-[120px]">
+              <div className="absolute top-full right-0 mt-1 bg-white border rounded-lg shadow-lg z-[9999] min-w-[120px]">
                 <button
                   onClick={() => handleLocaleChange('ja')}
                   className="flex items-center w-full text-left px-4 py-3 text-sm hover:bg-gray-50 rounded-b-lg"
@@ -812,6 +834,27 @@ export default function Header() {
                     <circle cx="8" cy="8" r="1.5" fill="yellow" />
                   </svg>
                   中文
+                </button>
+                <button
+                  onClick={() => handleLocaleChange('vi')}
+                  className="flex items-center w-full text-left px-4 py-3 text-sm hover:bg-gray-50"
+                >
+                  <svg className="w-4 h-4 mr-2" viewBox="0 0 24 24" fill="none">
+                    <rect x="2" y="4" width="20" height="16" rx="2" fill="#da251d" />
+                    <polygon points="12,9 13,13 17,13 14,15 15,19 12,17 9,19 10,15 7,13 11,13" fill="#ff0" />
+                  </svg>
+                  Tiếng Việt
+                </button>
+                <button
+                  onClick={() => handleLocaleChange('ne')}
+                  className="flex items-center w-full text-left px-4 py-3 text-sm hover:bg-gray-50"
+                >
+                  <svg className="w-4 h-4 mr-2" viewBox="0 0 24 24" fill="none">
+                    <rect x="2" y="4" width="20" height="16" rx="2" fill="#DC143C" />
+                    <polygon points="6,6 12,18 18,6" fill="#fff" />
+                    <circle cx="9" cy="10" r="1" fill="#fff" />
+                  </svg>
+                  नेपाली
                 </button>
               </div>
             )}
