@@ -86,7 +86,9 @@
     "contact": "联系方式",
     "anonymous": "匿名",
     "no_contact": "无",
-    "published_at": "发布时间"
+    "published_at": "发布时间",
+    "contact_seller": "联系卖家",
+    "contact_seller_message": "打开消息框联系卖家。"
   },
   "ItemsList": {
     "page_title": "全部商品",
@@ -118,6 +120,9 @@
     "password": "密码",
     "password_placeholder": "请输入密码...",
     "submit": "登录",
+    "submitting": "正在登录...",
+    "error_invalid_credentials": "账号或密码错误。",
+    "error_unknown": "未知错误，请重试。",
     "no_account": "还没有账号？",
     "register_link": "立即注册"
   },
@@ -237,7 +242,8 @@
     "about_item": "关于商品",
     "type_message": "输入消息...",
     "send": "发送",
-    "sending": "发送中..."
+    "sending": "发送中...",
+    "chat_with_seller": "联系卖家"
   },
   "Message": {
     "conversations": "消息会话",

@@ -1,11 +1,13 @@
 import prisma from "@/lib/prisma";
 import { notFound } from "next/navigation";
 import { getTranslations } from 'next-intl/server';
+import ItemDetailClient from "@/components/ItemDetailClient";
 
 export default async function ItemDetailPage({ params }: { params: Promise<{ id: string; locale: string }> }) {
   const { id, locale } = await params;
   const t = await getTranslations({ locale, namespace: 'ItemDetail' });
   const homeT = await getTranslations({ locale, namespace: 'Home' });
+  const messagesT = await getTranslations({ locale, namespace: 'Messages' });
   
   const item = await prisma.item.findUnique({
     where: { id: Number(id) },
@@ -16,25 +18,29 @@ export default async function ItemDetailPage({ params }: { params: Promise<{ id:
     return <div className="p-8 text-center text-red-500">{t('not_found')}</div>;
   }
 
-  return (
-    <div className="max-w-sm w-full mx-auto p-3 sm:p-6 bg-white rounded-lg shadow mt-2 mb-16 min-h-screen flex flex-col justify-start">
-      {item.imageUrl && (
-        <img
-          src={item.imageUrl}
-          alt={item.title}
-          className="w-full h-40 sm:h-64 object-cover rounded mb-3 sm:mb-4"
-        />
-      )}
-      <h1 className="text-xl sm:text-2xl font-bold mb-2">{item.title}</h1>
-      <p className="text-lg text-blue-600 font-semibold mb-2">{homeT('currency')}{item.price}</p>
-      <p className="text-gray-700 mb-3 sm:mb-4">{item.description || homeT('no_description')}</p>
-      <div className="text-sm text-gray-500">
-        {t('seller')}：{item.seller?.name || t('anonymous')} <br />
-        {t('contact')}：{item.seller?.email || t('no_contact')}
-      </div>
-      <div className="text-xs text-gray-400 mt-3 sm:mt-4">
-        {t('published_at')}：{new Date(item.createdAt).toLocaleString(homeT('date_locale'))}
-      </div>
-    </div>
-  );
+  // 多语言对象
+  const tObj = {
+    contact_seller: t('contact_seller'),
+    seller: t('seller'),
+    anonymous: t('anonymous'),
+    contact: t('contact'),
+    no_contact: t('no_contact'),
+    published_at: t('published_at'),
+    not_found: t('not_found'),
+  };
+  const homeTObj = {
+    currency: String(homeT('currency')),
+    date_locale: String(homeT('date_locale')),
+    no_description: String(homeT('no_description')),
+  };
+  const messagesTObj = {
+    chat_with_seller: messagesT('chat_with_seller'),
+    about_item: messagesT('about_item'),
+    type_message: messagesT('type_message'),
+    loading: messagesT('loading'),
+    no_conversations: messagesT('no_conversations'),
+    // 可按需补充更多 key
+  };
+
+  return <ItemDetailClient item={item} tObj={tObj} homeTObj={homeTObj} messagesTObj={messagesTObj} />;
 }

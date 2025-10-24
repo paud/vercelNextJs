@@ -5,6 +5,7 @@ import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { useLocale, useTranslations } from 'next-intl';
 import { useCombinedAuth } from '../hooks/useCombinedAuth';
+import { getSession } from "next-auth/react";
 
 interface UserHeaderProps {
   children?: React.ReactNode;
@@ -56,6 +57,13 @@ export default function UserHeader({
         }
       })
       .catch(() => {});
+  }, []);
+
+  // 调试：登录后打印 session 信息
+  useEffect(() => {
+    getSession().then(session => {
+      console.log("[UserHeader] 当前 session:", session);
+    });
   }, []);
 
   // 处理退出登录

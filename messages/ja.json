@@ -87,7 +87,9 @@
     "contact": "連絡先",
     "anonymous": "匿名",
     "no_contact": "なし",
-    "published_at": "出品日時"
+    "published_at": "出品日時",
+    "contact_seller": "出品者に連絡",
+    "contact_seller_message": "メッセージボックスを開いて出品者に連絡します。"
   },
   "ItemsList": {
     "page_title": "全ての商品",
@@ -119,6 +121,9 @@
     "password": "パスワード",
     "password_placeholder": "パスワードを入力してください...",
     "submit": "ログイン",
+    "submitting": "ログイン中...",
+    "error_invalid_credentials": "ユーザー名またはパスワードが正しくありません。",
+    "error_unknown": "不明なエラーが発生しました。もう一度お試しください。",
     "no_account": "アカウントをお持ちでない方は",
     "register_link": "今すぐ登録"
   },
@@ -238,7 +243,8 @@
     "about_item": "商品について",
     "type_message": "メッセージを入力...",
     "send": "送信",
-    "sending": "送信中..."
+    "sending": "送信中...",
+    "chat_with_seller": "出品者とチャット"
   },
   "Message": {
     "conversations": "会話一覧",

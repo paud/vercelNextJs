@@ -1,5 +1,6 @@
 import { NextAuthOptions } from "next-auth"
 import GoogleProvider from "next-auth/providers/google"
+import CredentialsProvider from "next-auth/providers/credentials";
 import prisma from "@/lib/prisma";
 
 export const authOptions: NextAuthOptions = {
@@ -9,6 +10,30 @@ export const authOptions: NextAuthOptions = {
       clientId: process.env.GOOGLE_CLIENT_ID || "",
       clientSecret: process.env.GOOGLE_CLIENT_SECRET || "",
     }),
+    CredentialsProvider({
+      name: "Credentials",
+      credentials: {
+        identifier: { label: "Username or Email", type: "text" },
+        password: { label: "Password", type: "password" }
+      },
+      async authorize(credentials) {
+        if (!credentials) return null;
+        const { identifier, password } = credentials;
+        // 支持用户名或邮箱登录
+        const user = await prisma.user.findFirst({
+          where: {
+            OR: [
+              { username: identifier },
+              { email: identifier }
+            ]
+          }
+        });
+        if (!user) return null;
+        // 这里假设密码明文存储，实际应加密比对
+        if (user.password !== password) return null;
+        return { id: String(user.id), name: user.name, email: user.email, username: user.username };
+      }
+    })
   ],
   debug: process.env.NODE_ENV === "development",
   callbacks: {

@@ -15,11 +15,13 @@ export async function GET(req: NextRequest) {
   const take = Number(searchParams.get('take') || 30);
   const skip = Number(searchParams.get('skip') || 0);
 
+  console.log('API /api/messages GET:', { userId, withUserId });
+
   if (!withUserId) {
     return NextResponse.json({ error: 'Missing with param' }, { status: 400 });
   }
 
-  // 查询双方的消息
+  // 查询双方的消息，带上商品信息字段
   const messages = await prisma.message.findMany({
     where: {
       OR: [
@@ -30,7 +32,20 @@ export async function GET(req: NextRequest) {
     orderBy: { createdAt: 'asc' },
     skip,
     take,
+    select: {
+      id: true,
+      senderId: true,
+      receiverId: true,
+      content: true,
+      createdAt: true,
+      read: true,
+      readAt: true,
+      itemId: true,
+      itemTitle: true,
+      imageUrl: true,
+    },
   });
+  console.log('API /api/messages GET: messages.length =', messages.length);
   return NextResponse.json(messages);
 }
 
@@ -42,15 +57,27 @@ export async function POST(req: NextRequest) {
   }
   const userId = Number(session.user.id);
   const body = await req.json();
-  const { receiverId, content } = body;
+  const { receiverId, content, itemId } = body;
   if (!receiverId || !content) {
     return NextResponse.json({ error: 'Missing receiverId or content' }, { status: 400 });
+  }
+  let itemTitle = undefined;
+  let imageUrl = undefined;
+  if (itemId) {
+    const item = await prisma.item.findUnique({ where: { id: Number(itemId) }, select: { title: true, imageUrl: true } });
+    if (item) {
+      itemTitle = item.title;
+      imageUrl = item.imageUrl;
+    }
   }
   const message = await prisma.message.create({
     data: {
       senderId: userId,
       receiverId: Number(receiverId),
       content,
+      itemId: itemId ? Number(itemId) : undefined,
+      itemTitle,
+      imageUrl,
     },
   });
   return NextResponse.json(message);

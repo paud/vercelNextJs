@@ -52,7 +52,7 @@ export async function GET(req: NextRequest) {
   const result = conversations.map(msg => {
     const otherId = msg.senderId === userId ? msg.receiverId : msg.senderId;
     const user = userMap.get(otherId);
-    let userName = user?.username || user?.name || user?.email || '未知用户';
+    let userName = user?.name || user?.username || user?.email || '未知用户';
     return {
       userId: otherId,
       userName,

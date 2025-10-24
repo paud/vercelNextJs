@@ -86,7 +86,9 @@
     "contact": "Contact",
     "anonymous": "Anonymous",
     "no_contact": "No contact info",
-    "published_at": "Published at"
+    "published_at": "Published at",
+    "contact_seller": "Contact Seller",
+    "contact_seller_message": "Open the message box to contact the seller."
   },
   "ItemsList": {
     "page_title": "All Items",
@@ -118,6 +120,9 @@
     "password": "Password",
     "password_placeholder": "Enter your password...",
     "submit": "Login",
+    "submitting": "Logging in...",
+    "error_invalid_credentials": "Invalid username or password.",
+    "error_unknown": "Unknown error, please try again.",
     "no_account": "Don't have an account?",
     "register_link": "Register now"
   },
@@ -237,7 +242,8 @@
     "about_item": "About item",
     "type_message": "Type a message...",
     "send": "Send",
-    "sending": "Sending..."
+    "sending": "Sending...",
+    "chat_with_seller": "Chat with Seller"
   },
   "Message": {
     "conversations": "Conversations",

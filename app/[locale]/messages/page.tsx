@@ -1,11 +1,12 @@
 "use client";
 
-import { useState, useEffect } from 'react';
-import { useRouter } from 'next/navigation';
+import { useState, useEffect, useRef } from 'react';
+import { useRouter, useSearchParams } from 'next/navigation';
 import { useLocale, useTranslations } from 'next-intl';
 import Link from 'next/link';
 import { useCurrentUser } from '../../../hooks/useCurrentUser';
 import UserHeader from '../../../components/UserHeader';
+import ChatModal from '../../../components/ChatModal';
 
 interface Message {
   id: number;
@@ -41,6 +42,8 @@ export default function MessagesPage() {
   const router = useRouter();
   const t = useTranslations('Messages');
   const { user: currentUser } = useCurrentUser();
+  const searchParams = useSearchParams();
+  const hasAutoOpened = useRef(false);
 
   // 关闭聊天窗口的函数
   const closeChatWindow = () => {
@@ -123,6 +126,7 @@ export default function MessagesPage() {
 
   // 拉取完整消息历史
   const fetchMessagesWithUser = async (userId: number) => {
+    console.log('fetchMessagesWithUser userId:', userId);
     try {
       const res = await fetch(`/api/messages?with=${userId}`);
       const data = await res.json();
@@ -207,6 +211,32 @@ export default function MessagesPage() {
     }
   };
 
+  // 自动根据 URL 参数打开会话窗口，并预填商品信息到输入框
+  useEffect(() => {
+    if (hasAutoOpened.current) return;
+    const withId = searchParams.get('with');
+    const itemId = searchParams.get('itemId');
+    const itemTitle = searchParams.get('itemTitle');
+    if (withId && conversations.length > 0) {
+      const target = conversations.find(c => String(c.userId) === String(withId));
+      if (target) {
+        handleOpenConversation({
+          ...target,
+          messages: itemId && itemTitle ? [{
+            ...target.messages[0],
+            itemId: Number(itemId),
+            itemTitle: decodeURIComponent(itemTitle)
+          }] : target.messages
+        });
+        // 预填商品信息到输入框
+        if (itemTitle) {
+          setNewMessage(`${t('about_item')}: ${decodeURIComponent(itemTitle)} `);
+        }
+        hasAutoOpened.current = true;
+      }
+    }
+  }, [searchParams, conversations]);
+
   if (isLoading) {
     return (
       <UserHeader>
@@ -286,87 +316,14 @@ export default function MessagesPage() {
 
         {/* 手机端聊天窗口 - 确保在Footer之上 */}
         {isChatOpen && selectedConversation && (
-          <div className="fixed inset-0 z-[100] bg-white animate-slideUp chat-modal">
-            <div className="h-full flex flex-col">
-              {/* 聊天窗口头部 */}
-              <div className="flex items-center justify-between p-4 border-b border-gray-200 bg-gray-50 flex-shrink-0">
-                <button
-                  onClick={closeChatWindow}
-                  className="p-2 hover:bg-gray-200 rounded-full transition-colors"
-                >
-                  <svg className="w-6 h-6 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
-                  </svg>
-                </button>
-                <div className="flex items-center flex-1 ml-2">
-                  <div className="w-8 h-8 bg-blue-500 rounded-full flex items-center justify-center mr-3">
-                    <span className="text-white text-sm font-semibold">
-                      {selectedConversation.userName ? selectedConversation.userName.charAt(0) : '?'}
-                    </span>
-                  </div>
-                  <h3 className="font-semibold text-gray-900">{selectedConversation.userName}</h3>
-                </div>
-              </div>
-
-              {/* 消息列表 */}
-              <div className="flex-1 px-3 py-4 overflow-y-auto space-y-3">
-                {selectedConversation.messages.map((message) => (
-                  <div
-                    key={message.id}
-                    className={`flex ${message.senderId === Number(currentUser?.id) ? 'justify-end' : 'justify-start'}`}
-                  >
-                    <div
-                      className={`max-w-[85%] px-3 py-2 rounded-2xl ${
-                        message.senderId === Number(currentUser?.id)
-                          ? 'bg-blue-500 text-white rounded-br-md'
-                          : 'bg-gray-200 text-gray-900 rounded-bl-md'
-                      }`}
-                    >
-                      {message.itemTitle && (
-                        <p className="text-xs opacity-75 mb-1">
-                          {t('about_item')}: {message.itemTitle}
-                        </p>
-                      )}
-                      <p className="text-base leading-relaxed">{message.content}</p>
-                      <p className={`text-xs mt-1 ${
-                        message.senderId === Number(currentUser?.id) ? 'text-blue-100' : 'text-gray-500'
-                      }`}>
-                        {formatTime(message.createdAt)}
-                      </p>
-                    </div>
-                  </div>
-                ))}
-              </div>
-
-              {/* 手机端消息输入框 */}
-              <div className="p-4 border-t border-gray-200 bg-white" style={{ paddingBottom: 'env(safe-area-inset-bottom, 1rem)' }}>
-                <div className="flex items-end space-x-3">
-                  <input
-                    type="text"
-                    value={newMessage}
-                    onChange={(e) => setNewMessage(e.target.value)}
-                    placeholder={t('type_message')}
-                    className="flex-1 px-4 py-3 border border-gray-300 rounded-full focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent text-base"
-                    onKeyPress={(e) => e.key === 'Enter' && sendMessage()}
-                    disabled={isSending}
-                  />
-                  <button
-                    onClick={sendMessage}
-                    disabled={!newMessage.trim() || isSending}
-                    className="w-12 h-12 bg-blue-500 text-white rounded-full hover:bg-blue-600 disabled:opacity-50 disabled:cursor-not-allowed transition-colors flex items-center justify-center"
-                  >
-                    {isSending ? (
-                      <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
-                    ) : (
-                      <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8" />
-                      </svg>
-                    )}
-                  </button>
-                </div>
-              </div>
-            </div>
-          </div>
+          <ChatModal
+            open={isChatOpen}
+            onClose={closeChatWindow}
+            sellerId={selectedConversation.userId}
+            itemId={selectedConversation.messages[0]?.itemId}
+            itemTitle={selectedConversation.messages[0]?.itemTitle}
+            imageUrl={searchParams.get('imageUrl') ? decodeURIComponent(searchParams.get('imageUrl')!) : undefined}
+          />
         )}
       </div>
     </UserHeader>

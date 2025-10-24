@@ -226,6 +226,9 @@ model Message {
   createdAt   DateTime @default(now())
   read        Boolean  @default(false)
   readAt      DateTime?
+  itemId      Int?
+  itemTitle   String?
+  imageUrl    String?
 
   sender      User     @relation("SentMessages", fields: [senderId], references: [id])
   receiver    User     @relation("ReceivedMessages", fields: [receiverId], references: [id])
@@ -233,6 +236,7 @@ model Message {
   @@index([senderId])
   @@index([receiverId])
   @@index([createdAt])
+  @@index([itemId])
 }
 
 model SystemNotification {

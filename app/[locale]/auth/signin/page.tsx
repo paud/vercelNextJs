@@ -70,16 +70,18 @@ export default function SignIn() {
             <>
               {providers && Object.values(providers).length > 0 ? (
                 <div className="flex flex-col gap-3 sm:gap-4">
-                  {Object.values(providers).map((provider) => (
-                    <button
-                      key={provider.id}
-                      onClick={() => signIn(provider.id, { callbackUrl: `/${locale}` })}
-                      className={`flex items-center justify-center py-2.5 px-3 sm:py-3 sm:px-4 rounded-lg font-semibold transition text-base shadow-sm border border-gray-200 hover:shadow-md focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-400 bg-white text-gray-800 hover:bg-gray-50 ${provider.id}`}
-                    >
-                      {providerIcons[provider.id]}
-                      {t('signin_with')} {provider.id === 'twitter' ? 'X' : provider.name}
-                    </button>
-                  ))}
+                  {Object.values(providers)
+                    .filter((provider) => provider.id !== "credentials")
+                    .map((provider) => (
+                      <button
+                        key={provider.id}
+                        onClick={() => signIn(provider.id, { callbackUrl: `/${locale}` })}
+                        className={`flex items-center justify-center py-2.5 px-3 sm:py-3 sm:px-4 rounded-lg font-semibold transition text-base shadow-sm border border-gray-200 hover:shadow-md focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-400 bg-white text-gray-800 hover:bg-gray-50 ${provider.id}`}
+                      >
+                        {providerIcons[provider.id]}
+                        {t('signin_with')} {provider.id === 'twitter' ? 'X' : provider.name}
+                      </button>
+                    ))}
                 </div>
               ) : (
                 <div className="mb-6 p-4 bg-yellow-50 border border-yellow-200 rounded-lg">
