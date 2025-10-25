@@ -5,6 +5,13 @@ import { Turnstile } from '@marsidev/react-turnstile';
 import Link from 'next/link';
 import { useTranslations } from "next-intl";
 
+const errorMap: Record<string, string> = {
+  "Human verification failed.": "human_verification_failed",
+  "This email is already registered. Please use another email.": "email_exists",
+  "This username is already taken. Please choose another username.": "username_exists",
+  "Registration failed.": "register_failed"
+};
+
 export default function NewUser({ params }: { params: Promise<{ locale: string }> }) {
   const { locale } = use(params);
   const t = useTranslations("NewUser");

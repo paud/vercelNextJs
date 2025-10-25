@@ -90,7 +90,7 @@ export const authOptions: NextAuthOptions = {
     },
     async session({ session, token }) {
       if (session?.user && token?.username) {
-        session.user.username = token.username;
+        (session.user as any).username = token.username;
       }
       if (session?.user && token?.uid) {
         session.user.id = String(token.uid);
@@ -103,8 +103,8 @@ export const authOptions: NextAuthOptions = {
       if (user?.id) {
         token.uid = String(user.id);
       }
-      if (user?.username) {
-        token.username = user.username;
+      if ((user as any)?.username) {
+        token.username = (user as any).username;
       }
       if (account?.provider === 'credentials' && user?.id) {
         token.sub = String(user.id);

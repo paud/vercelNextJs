@@ -34,7 +34,7 @@ export function useCombinedAuth() {
         email: session.user.email || '',
         name: session.user.name || null,
         image: session.user.image || null,
-        username: session.user.username || session.user.email?.split('@')[0] || 'user',
+        username: (session.user as any).username || session.user.email?.split('@')[0] || 'user',
         phone: null, // Google users don't have phone by default
         createdAt: new Date().toISOString(), // Default to current time for OAuth users
         provider: 'oauth'
