@@ -4,7 +4,7 @@ import type { NextConfig } from "next";
 const nextConfig: NextConfig = {
   // 支持所有语言前缀
   i18n: {
-    locales: ['zh', 'en', 'ja', 'vi', 'ne'],
+    locales: ['zh', 'en', 'ja', 'vi', 'ne', 'ko'],
     defaultLocale: 'en',
   },
   /* config options here */

@@ -5,6 +5,8 @@ import { useRouter, usePathname } from "next/navigation";
 import { useLocale, useTranslations } from 'next-intl';
 import { useCombinedAuth } from '../hooks/useCombinedAuth';
 import InstallPWAButton from "@/components/InstallPWAButton";
+import { GiSouthKorea } from 'react-icons/gi';
+import ReactCountryFlag from "react-country-flag";
 
 
 export default function Header() {
@@ -42,7 +44,7 @@ export default function Header() {
 
   // 获取地区显示名称
   const getRegionDisplayName = (regionCode: string) => {
-    const regionData = availableRegions.find(r => r.code === regionCode);
+    const regionData = availableRegions.find((r: any) => r.code === regionCode);
     if (regionData) {
       switch (locale) {
         case 'zh': return regionData.nameZh || regionData.nameEn || regionData.nameJa;
@@ -403,14 +405,14 @@ export default function Header() {
     if (currentLevel === 'region') {
       return treeData;
     } else if (currentLevel === 'prefecture') {
-      const region = treeData.find(r => r.code === selectedPath[0]);
+      const region = treeData.find((r: any) => r.code === selectedPath[0]);
       return region?.prefectures || [];
     } else if (currentLevel === 'city') {
-      const region = treeData.find(r => r.code === selectedPath[0]);
+      const region = treeData.find((r: any) => r.code === selectedPath[0]);
       const prefecture = region?.prefectures?.find((p: any) => p.code === selectedPath[1]);
       return prefecture?.cities || [];
     } else if (currentLevel === 'ward') {
-      const region = treeData.find(r => r.code === selectedPath[0]);
+      const region = treeData.find((r: any) => r.code === selectedPath[0]);
       const prefecture = region?.prefectures?.find((p: any) => p.code === selectedPath[1]);
       const city = prefecture?.cities?.find((c: any) => c.code === selectedPath[2]);
       return [...(city?.districts || []), ...(city?.wards || [])];
@@ -489,7 +491,7 @@ export default function Header() {
 
   function handleLocaleChange(newLocale: string) {
     setLangMenuOpen(false);
-    const supportedLocales = ["zh", "en", "ja", "vi", "ne"];
+    const supportedLocales = ["zh", "en", "ja", "vi", "ne", "ko"];
     const segments = pathname.split('/').filter(Boolean);
     // 移除所有前缀中的语言代码，只保留第一个非语言段
     let firstNonLocaleIdx = 0;
@@ -748,54 +750,38 @@ export default function Header() {
             >
               {locale === 'zh' && (
                 <>
-                  <svg className="w-4 h-4 mr-1 text-red-500" fill="currentColor" viewBox="0 0 24 24">
-                    <rect x="2" y="4" width="20" height="16" rx="2" fill="currentColor" />
-                    <circle cx="8" cy="8" r="1.5" fill="yellow" />
-                    <circle cx="10.5" cy="6.5" r="0.5" fill="yellow" />
-                    <circle cx="11" cy="9" r="0.5" fill="yellow" />
-                    <circle cx="10" cy="10.5" r="0.5" fill="yellow" />
-                    <circle cx="8.5" cy="10" r="0.5" fill="yellow" />
-                  </svg>
+                  <ReactCountryFlag countryCode="CN" svg className="w-5 h-5 mr-1" />
                   中文
                 </>
               )}
               {locale === 'en' && (
                 <>
-                  <svg className="w-4 h-4 mr-1" viewBox="0 0 24 24" fill="none">
-                    <rect x="2" y="4" width="20" height="16" rx="2" fill="#012169" />
-                    <path d="M2 4l20 16M22 4L2 20" stroke="white" strokeWidth="1" />
-                    <path d="M12 4v16M2 12h20" stroke="white" strokeWidth="2" />
-                    <path d="M12 4v16M2 12h20" stroke="#C8102E" strokeWidth="1" />
-                  </svg>
+                  <ReactCountryFlag countryCode="GB" svg className="w-5 h-5 mr-1" />
                   EN
                 </>
               )}
               {locale === 'ja' && (
                 <>
-                  <svg className="w-4 h-4 mr-1" viewBox="0 0 24 24" fill="none">
-                    <rect x="2" y="4" width="20" height="16" rx="2" fill="white" />
-                    <circle cx="12" cy="12" r="4" fill="#BC002D" />
-                  </svg>
+                  <ReactCountryFlag countryCode="JP" svg className="w-5 h-5 mr-1" />
                   日本語
                 </>
               )}
               {locale === 'vi' && (
                 <>
-                  <svg className="w-4 h-4 mr-1" viewBox="0 0 24 24" fill="none">
-                    <rect x="2" y="4" width="20" height="16" rx="2" fill="#da251d" />
-                    <polygon points="12,9 13,13 17,13 14,15 15,19 12,17 9,19 10,15 7,13 11,13" fill="#ff0" />
-                  </svg>
+                  <ReactCountryFlag countryCode="VN" svg className="w-5 h-5 mr-1" />
                   Tiếng Việt
                 </>
               )}
               {locale === 'ne' && (
                 <>
-                  <svg className="w-4 h-4 mr-1" viewBox="0 0 24 24" fill="none">
-                    <rect x="2" y="4" width="20" height="16" rx="2" fill="#DC143C" />
-                    <polygon points="6,6 12,18 18,6" fill="#fff" />
-                    <circle cx="9" cy="10" r="1" fill="#fff" />
-                  </svg>
+                  <ReactCountryFlag countryCode="NP" svg className="w-5 h-5 mr-1" />
                   नेपाली
+                </>
+              )}
+              {locale === 'ko' && (
+                <>
+                  <ReactCountryFlag countryCode="KR" svg className="w-5 h-5 mr-2" />
+                  한국어
                 </>
               )}
               <svg className="w-4 h-4 ml-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -808,53 +794,43 @@ export default function Header() {
                   onClick={() => handleLocaleChange('ja')}
                   className="flex items-center w-full text-left px-4 py-3 text-sm hover:bg-gray-50 rounded-b-lg"
                 >
-                  <svg className="w-4 h-4 mr-2" viewBox="0 0 24 24" fill="none">
-                    <rect x="2" y="4" width="20" height="16" rx="2" fill="white" />
-                    <circle cx="12" cy="12" r="4" fill="#BC002D" />
-                  </svg>
+                  <ReactCountryFlag countryCode="JP" svg className="w-5 h-5 mr-2" />
                   日本語
                 </button>
                 <button
                   onClick={() => handleLocaleChange('en')}
                   className="flex items-center w-full text-left px-4 py-3 text-sm hover:bg-gray-50"
                 >
-                  <svg className="w-4 h-4 mr-2" viewBox="0 0 24 24" fill="none">
-                    <rect x="2" y="4" width="20" height="16" rx="2" fill="#012169" />
-                    <path d="M12 4v16M2 12h20" stroke="white" strokeWidth="2" />
-                    <path d="M12 4v16M2 12h20" stroke="#C8102E" strokeWidth="1" />
-                  </svg>
+                  <ReactCountryFlag countryCode="GB" svg className="w-5 h-5 mr-2" />
                   English
                 </button>
                 <button
                   onClick={() => handleLocaleChange('zh')}
                   className="flex items-center w-full text-left px-4 py-3 text-sm hover:bg-gray-50 rounded-t-lg"
                 >
-                  <svg className="w-4 h-4 mr-2 text-red-500" fill="currentColor" viewBox="0 0 24 24">
-                    <rect x="2" y="4" width="20" height="16" rx="2" fill="currentColor" />
-                    <circle cx="8" cy="8" r="1.5" fill="yellow" />
-                  </svg>
+                  <ReactCountryFlag countryCode="CN" svg className="w-5 h-5 mr-2" />
                   中文
                 </button>
                 <button
                   onClick={() => handleLocaleChange('vi')}
                   className="flex items-center w-full text-left px-4 py-3 text-sm hover:bg-gray-50"
                 >
-                  <svg className="w-4 h-4 mr-2" viewBox="0 0 24 24" fill="none">
-                    <rect x="2" y="4" width="20" height="16" rx="2" fill="#da251d" />
-                    <polygon points="12,9 13,13 17,13 14,15 15,19 12,17 9,19 10,15 7,13 11,13" fill="#ff0" />
-                  </svg>
+                  <ReactCountryFlag countryCode="VN" svg className="w-5 h-5 mr-2" />
                   Tiếng Việt
                 </button>
                 <button
                   onClick={() => handleLocaleChange('ne')}
                   className="flex items-center w-full text-left px-4 py-3 text-sm hover:bg-gray-50"
                 >
-                  <svg className="w-4 h-4 mr-2" viewBox="0 0 24 24" fill="none">
-                    <rect x="2" y="4" width="20" height="16" rx="2" fill="#DC143C" />
-                    <polygon points="6,6 12,18 18,6" fill="#fff" />
-                    <circle cx="9" cy="10" r="1" fill="#fff" />
-                  </svg>
+                  <ReactCountryFlag countryCode="NP" svg className="w-5 h-5 mr-2" />
                   नेपाली
+                </button>
+                <button
+                  onClick={() => handleLocaleChange('ko')}
+                  className="flex items-center w-full text-left px-4 py-3 text-sm hover:bg-gray-50"
+                >
+                  <ReactCountryFlag countryCode="KR" svg className="w-5 h-5 mr-2" />
+                  한국어
                 </button>
               </div>
             )}

@@ -1,7 +1,7 @@
 import { NextResponse } from 'next/server';
 import type { NextRequest } from 'next/server';
 
-const SUPPORTED_LOCALES = ['zh', 'en', 'ja', 'vi', 'ne'];
+const SUPPORTED_LOCALES = ['zh', 'en', 'ja', 'vi', 'ne', 'ko'];
 const DEFAULT_LOCALE = 'en';
 
 export function middleware(request: NextRequest) {
