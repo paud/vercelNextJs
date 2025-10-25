@@ -69,8 +69,8 @@ export default function UserHeader({
   // 处理退出登录
   const handleLogout = async () => {
     try {
-      await logout();
-      router.push(`/${locale}`);
+      await logout(locale);
+      // router.push(`/${locale}/auth/signin`); // OAuth logout 已自动跳转
     } catch (error) {
       console.error('退出登录失败:', error);
     }

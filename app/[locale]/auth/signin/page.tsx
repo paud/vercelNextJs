@@ -4,6 +4,7 @@ import { signIn, getProviders } from "next-auth/react";
 import { useEffect, useState } from "react";
 import { useTranslations, useLocale } from "next-intl";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 
 interface Provider {
   id: string;
@@ -31,6 +32,7 @@ export default function SignIn() {
   const [loading, setLoading] = useState(true);
   const t = useTranslations('Auth');
   const locale = useLocale();
+  const router = useRouter();
 
   useEffect(() => {
     const setUpProviders = async () => {
@@ -45,6 +47,11 @@ export default function SignIn() {
     };
     setUpProviders();
   }, []);
+
+  const handleSignIn = async (providerId: string) => {
+    await signIn(providerId, { callbackUrl: `/${locale}/users/profile` });
+    // 登录后由 next-auth 自动跳转，无需 router.replace
+  };
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 to-green-50 flex flex-col pt-2 pb-16 px-2 sm:px-4 md:px-6 lg:px-8">
@@ -75,7 +82,7 @@ export default function SignIn() {
                     .map((provider) => (
                       <button
                         key={provider.id}
-                        onClick={() => signIn(provider.id, { callbackUrl: `/${locale}` })}
+                        onClick={() => handleSignIn(provider.id)}
                         className={`flex items-center justify-center py-2.5 px-3 sm:py-3 sm:px-4 rounded-lg font-semibold transition text-base shadow-sm border border-gray-200 hover:shadow-md focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-400 bg-white text-gray-800 hover:bg-gray-50 ${provider.id}`}
                       >
                         {providerIcons[provider.id]}

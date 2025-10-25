@@ -98,6 +98,13 @@
     "no_description": "説明なし"
   },
   "NewUser": {
+    "human_verification_failed": "人間認証に失敗しました。",
+    "email_exists": "このメールアドレスは既に登録されています。別のメールアドレスを使用してください。",
+    "username_exists": "このユーザー名は既に使用されています。別のユーザー名を選択してください。",
+    "register_success": "登録が成功しました。",
+    "register_failed": "登録に失敗しました。",
+    "loading": "ロード中...",
+    "submit": "登録",
     "title": "ユーザー登録",
     "username": "ユーザー名",
     "username_placeholder": "ユーザー名を入力してください...",

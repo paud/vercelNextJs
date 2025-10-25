@@ -97,6 +97,8 @@
     "no_description": "Không có mô tả"
   },
   "NewUser": {
+    "loading": "Đang tải...",
+    "submit": "Đăng ký",
     "title": "Đăng Ký Người Dùng",
     "username": "Tên người dùng",
     "username_placeholder": "Nhập tên người dùng của bạn...",
@@ -111,7 +113,12 @@
     "required": "Bắt buộc",
     "submit": "Tạo người dùng",
     "have_account": "Đã có tài khoản?",
-    "login_link": "Đăng nhập ngay"
+    "login_link": "Đăng nhập ngay",
+    "human_verification_failed": "Xác minh người dùng thất bại.",
+    "email_exists": "Email này đã được đăng ký. Vui lòng sử dụng email khác.",
+    "username_exists": "Tên người dùng này đã được sử dụng. Vui lòng chọn tên khác.",
+    "register_success": "Đăng ký thành công.",
+    "register_failed": "Đăng ký thất bại."
   },
   "LoginUser": {
     "title": "Đăng Nhập Người Dùng",
@@ -266,5 +273,7 @@
   },
   "PWA": {
     "installApp": "Cài đặt ứng dụng"
-  }
+  },
+  "human_verification_required": "Yêu cầu xác minh người dùng. Vui lòng hoàn thành xác minh.",
+  "register_failed": "Đăng ký thất bại. Vui lòng thử lại."
 }

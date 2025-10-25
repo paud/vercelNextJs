@@ -68,26 +68,46 @@ export const authOptions: NextAuthOptions = {
               email: profile.email,
               name: profile.name || null,
               username: profile.email.split('@')[0],
-              // 可根据 schema 增加更多字段
+            }
+          });
+          // 首次 Google 登录，发送欢迎通知
+          await prisma.systemNotification.create({
+            data: {
+              userId: dbUser.id,
+              title: "Welcome!",
+              content: "Thank you for registering with Google. Enjoy our marketplace!",
+              type: "welcome"
             }
           });
         }
         user.id = String(dbUser.id); // 用本地数据库ID覆盖 user.id，确保为字符串
       }
-      
+      // Credentials 登录也确保 user.id 为字符串
+      if (account?.provider === 'credentials' && user?.id) {
+        user.id = String(user.id);
+      }
       return true;
     },
     async session({ session, token }) {
-      // 将用户ID写入 session（JWT 模式下从 token 读取，确保为字符串）
+      if (session?.user && token?.username) {
+        session.user.username = token.username;
+      }
       if (session?.user && token?.uid) {
         session.user.id = String(token.uid);
+      } else if (session?.user && token?.sub) {
+        session.user.id = String(token.sub);
       }
       return session;
     },
-    async jwt({ user, token }) {
-      // 用本地 user.id 写入 token.uid
-      if (user) {
-        token.uid = user.id;
+    async jwt({ user, token, account }) {
+      if (user?.id) {
+        token.uid = String(user.id);
+      }
+      if (user?.username) {
+        token.username = user.username;
+      }
+      if (account?.provider === 'credentials' && user?.id) {
+        token.sub = String(user.id);
       }
       return token;
     },

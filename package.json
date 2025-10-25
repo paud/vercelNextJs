@@ -13,6 +13,7 @@
   "dependencies": {
     "@auth/prisma-adapter": "^2.11.0",
     "@khmyznikov/pwa-install": "^0.5.8",
+    "@marsidev/react-turnstile": "^1.3.1",
     "@prisma/extension-accelerate": "latest",
     "@vercel/blob": "^2.0.0",
     "next": "latest",

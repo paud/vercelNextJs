@@ -5,6 +5,8 @@ import { useLocale, useTranslations } from 'next-intl';
 import Link from 'next/link';
 import { useCurrentUser } from '../../../../hooks/useCurrentUser';
 import UserHeader from '../../../../components/UserHeader';
+import { useSession } from "next-auth/react";
+import { useRouter } from "next/navigation";
 
 interface UserInfo {
   id: number;
@@ -16,6 +18,8 @@ interface UserInfo {
 }
 
 export default function ProfilePage() {
+  const { data: session, status } = useSession();
+  const router = useRouter();
   const [isEditing, setIsEditing] = useState(false);
   const [editData, setEditData] = useState({
     name: '',
@@ -28,6 +32,12 @@ export default function ProfilePage() {
   const locale = useLocale();
   const t = useTranslations('Profile');
   const { user: currentUser, setCurrentUser } = useCurrentUser();
+
+  useEffect(() => {
+    if (status === "unauthenticated") {
+      router.replace("/auth/signin");
+    }
+  }, [status, router]);
 
   useEffect(() => {
     if (!currentUser) return; // UserHeader 已经处理了认证检查
@@ -98,6 +108,9 @@ export default function ProfilePage() {
       setIsSuccess(false);
     }
   };
+
+  if (status === "loading") return <div>Loading...</div>;
+  if (!session) return null;
 
   return (
     <UserHeader>

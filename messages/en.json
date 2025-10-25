@@ -109,9 +109,15 @@
     "password": "Password",
     "password_placeholder": "Enter your password...",
     "required": "Required",
-    "submit": "Create User",
+    "submit": "Register",
     "have_account": "Already have an account?",
-    "login_link": "Login now"
+    "login_link": "Login now",
+    "loading": "Loading...",
+    "human_verification_failed": "Human verification failed.",
+    "email_exists": "This email is already registered. Please use another email.",
+    "username_exists": "This username is already taken. Please choose another username.",
+    "register_success": "Registration successful.",
+    "register_failed": "Registration failed."
   },
   "LoginUser": {
     "title": "User Login",
@@ -266,5 +272,7 @@
   },
   "PWA": {
     "installApp": "Install App"
-  }
+  },
+  "human_verification_required": "Human verification required. Please complete the verification.",
+  "register_failed": "Registration failed. Please try again."
 }

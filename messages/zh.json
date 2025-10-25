@@ -97,6 +97,8 @@
     "no_description": "暂无描述"
   },
   "NewUser": {
+    "loading": "加载中...",
+    "submit": "注册",
     "title": "用户注册",
     "username": "账号",
     "username_placeholder": "请输入账号...",
@@ -109,9 +111,13 @@
     "password": "密码",
     "password_placeholder": "请输入密码...",
     "required": "必填",
-    "submit": "注册用户",
     "have_account": "已有账号？",
-    "login_link": "立即登录"
+    "login_link": "立即登录",
+    "human_verification_failed": "人机验证未通过。",
+    "email_exists": "该邮箱已注册，请使用其他邮箱。",
+    "username_exists": "该用户名已被占用，请更换用户名。",
+    "register_success": "注册成功。",
+    "register_failed": "注册失败。"
   },
   "LoginUser": {
     "title": "用户登录",

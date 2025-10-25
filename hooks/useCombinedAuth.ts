@@ -34,7 +34,7 @@ export function useCombinedAuth() {
         email: session.user.email || '',
         name: session.user.name || null,
         image: session.user.image || null,
-        username: session.user.name || session.user.email?.split('@')[0] || 'user',
+        username: session.user.username || session.user.email?.split('@')[0] || 'user',
         phone: null, // Google users don't have phone by default
         createdAt: new Date().toISOString(), // Default to current time for OAuth users
         provider: 'oauth'
@@ -57,9 +57,9 @@ export function useCombinedAuth() {
     setIsLoading(false);
   }, [session, status, traditionalAuth.currentUser, traditionalAuth.isLoading]);
 
-  const logout = async () => {
+  const logout = async (locale?: string) => {
     if (currentUser?.provider === 'oauth') {
-      await signOut({ callbackUrl: '/' });
+      await signOut({ callbackUrl: locale ? `/${locale}/auth/signin` : '/auth/signin' });
     } else {
       traditionalAuth.logout();
     }
