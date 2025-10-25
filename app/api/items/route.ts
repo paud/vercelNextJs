@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import prisma from "@/lib/prisma";
+import { safeContent, defaultSafeContentOptions } from "@/lib/safeContent";
 
 export async function POST(req: Request) {
   console.log('POST /api/items called');
@@ -7,9 +8,12 @@ export async function POST(req: Request) {
     const data = await req.json();
     console.log('Request data:', data);
     const { title, description, price, imageUrl, sellerId } = data;
+    const safeTitle = safeContent(title, defaultSafeContentOptions);
+    const safeDescription = safeContent(description, defaultSafeContentOptions);
+    const safeImageUrl = safeContent(imageUrl, defaultSafeContentOptions);
     
     // Validate required fields
-    if (!title || !price) {
+    if (!safeTitle || !price) {
       console.log('Validation failed: missing title or price');
       return NextResponse.json({ 
         error: "Title and price are required",
@@ -52,10 +56,10 @@ export async function POST(req: Request) {
     
     const item = await prisma.item.create({
       data: {
-        title,
-        description,
+        title: safeTitle,
+        description: safeDescription,
         price,
-        imageUrl,
+        imageUrl: safeImageUrl,
         sellerId: sellerIdNum,
       },
     });

@@ -6,6 +6,7 @@ import { useTranslations } from 'next-intl';
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { useCombinedAuth } from '../../../../../hooks/useCombinedAuth';
+import { safeContent, defaultSafeContentOptions } from "@/lib/safeContent";
 
 interface Item {
   id: number;
@@ -107,31 +108,30 @@ export default function EditItemPage({ params }: { params: Promise<{ id: string;
             alert(t('form_incomplete'));
             return;
         }
-        
         if (!currentUser || !item) {
             alert(t('invalid_state'));
             return;
         }
-
-        // 兼容 string 和 number 类型的 ID 比较
         const itemSellerId = item.sellerId?.toString();
         const currentUserId = currentUser.id.toString();
         if (itemSellerId !== currentUserId) {
             alert(t('no_permission'));
             return;
         }
-        
+        // 对输入内容进行安全过滤
+        const safeTitle = safeContent(title, defaultSafeContentOptions);
+        const safeDescription = safeContent(description, defaultSafeContentOptions);
+        const safeImageUrl = safeContent(imageUrl, defaultSafeContentOptions);
         try {
-            console.log('Updating item:', { title, description, price: parseFloat(price), imageUrl });
-            
+            console.log('Updating item:', { title: safeTitle, description: safeDescription, price: parseFloat(price), imageUrl: safeImageUrl });
             const res = await fetch(`/api/items/${item.id}`, {
                 method: "PUT",
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify({ 
-                    title, 
-                    description, 
+                    title: safeTitle, 
+                    description: safeDescription, 
                     price: parseFloat(price), 
-                    imageUrl 
+                    imageUrl: safeImageUrl 
                 }),
             });
             

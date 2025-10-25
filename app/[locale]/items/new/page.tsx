@@ -6,6 +6,7 @@ import { useLocale, useTranslations } from 'next-intl';
 import ImageUpload from '@/components/ImageUpload';
 import UserHeader from '../../../../components/UserHeader';
 import { useCurrentUser } from '../../../../hooks/useCurrentUser';
+import { safeContent, defaultSafeContentOptions } from "@/lib/safeContent";
 
 interface FormData {
   title: string;
@@ -54,30 +55,30 @@ export default function NewItem({ params }: { params: Promise<{ locale: string }
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    
     if (!currentUser) {
       alert(t('login_required'));
       return;
     }
-
     if (!formData.title.trim() || !formData.price.trim() || !formData.imageUrl) {
       alert(t('form_incomplete'));
       return;
     }
-
     setSubmitting(true);
-
     try {
+      // 对输入内容进行安全过滤
+      const safeTitle = safeContent(formData.title, defaultSafeContentOptions);
+      const safeDescription = safeContent(formData.description, defaultSafeContentOptions);
+      const safeImageUrl = safeContent(formData.imageUrl, defaultSafeContentOptions);
       const response = await fetch('/api/items', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({
-          title: formData.title,
-          description: formData.description,
+          title: safeTitle,
+          description: safeDescription,
           price: parseFloat(formData.price),
-          imageUrl: formData.imageUrl,
+          imageUrl: safeImageUrl,
           sellerId: currentUser.id
         }),
       });

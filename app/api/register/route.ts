@@ -1,10 +1,15 @@
 import { NextResponse } from "next/server";
 import prisma from "@/lib/prisma";
+import { safeContent, defaultSafeContentOptions } from "@/lib/safeContent";
 //import bcrypt from "bcryptjs";
 
 export async function POST(req: Request) {
   const body = await req.json();
   const { username, name, email, phone, password, turnstileToken } = body;
+  const safeUsername = safeContent(username, defaultSafeContentOptions);
+  const safeName = safeContent(name, defaultSafeContentOptions);
+  const safeEmail = safeContent(email, defaultSafeContentOptions);
+  const safePhone = safeContent(phone, defaultSafeContentOptions);
 
   // 1. 校验 turnstile token
   const secretKey = process.env.TURNSTILE_SECRET_KEY;
@@ -25,12 +30,12 @@ export async function POST(req: Request) {
   }
 
   // 2. 校验邮箱唯一
-  const existingEmail = await prisma.user.findUnique({ where: { email } });
+  const existingEmail = await prisma.user.findUnique({ where: { email: safeEmail } });
   if (existingEmail) {
     return NextResponse.json({ message: "This email is already registered. Please use another email." }, { status: 400 });
   }
   // 3. 校验用户名唯一
-  const existingUsername = await prisma.user.findUnique({ where: { username } });
+  const existingUsername = await prisma.user.findUnique({ where: { username: safeUsername } });
   if (existingUsername) {
     return NextResponse.json({ message: "This username is already taken. Please choose another username." }, { status: 400 });
   }
@@ -40,15 +45,15 @@ export async function POST(req: Request) {
 
   // 5. 创建用户
   const user = await prisma.user.create({
-    data: { username, name, email, phone: phone || undefined, password: password },
+    data: { username: safeUsername, name: safeName, email: safeEmail, phone: safePhone || undefined, password: password },
   });
 
   // 6. 创建英文欢迎通知
   await prisma.systemNotification.create({
     data: {
       userId: user.id,
-      title: "Welcome!",
-      content: "Thank you for registering. Enjoy our marketplace!",
+      title: safeContent("Welcome!", defaultSafeContentOptions),
+      content: safeContent("Thank you for registering. Enjoy our marketplace!", defaultSafeContentOptions),
       type: "welcome"
     }
   });

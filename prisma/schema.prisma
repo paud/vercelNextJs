@@ -8,19 +8,19 @@ datasource db {
 }
 
 model User {
-  email         String      @unique
-  name          String?
-  password      String?     @default("temp123")
-  phone         String?
-  username      String?     @unique
+  email         String      @unique @db.VarChar(8192)
+  name          String? @db.VarChar(8192)
+  password      String?     @default("temp123") @db.VarChar(8192)
+  phone         String? @db.VarChar(8192)
+  username      String?     @unique @db.VarChar(8192)
+  image         String? @db.VarChar(8192)
+  region        String?     @default("kansai") @db.VarChar(8192)
   createdAt     DateTime    @default(now())
   emailVerified DateTime?
-  image         String?
   updatedAt     DateTime    @updatedAt
   cityId        Int?
   districtId    Int?
   prefectureId  Int?
-  region        String?     @default("kansai")
   regionId      Int?
   wardId        Int?
   id            Int         @id @default(autoincrement())
@@ -35,6 +35,7 @@ model User {
   Region        Region?     @relation(fields: [regionId], references: [id])
   Ward          Ward?       @relation(fields: [wardId], references: [id])
   systemNotifications SystemNotification[]
+  comments      Comment[]
 
   @@index([regionId])
   @@index([cityId])
@@ -47,14 +48,14 @@ model Item {
   id           Int         @id @default(autoincrement())
   createdAt    DateTime    @default(now())
   updatedAt    DateTime    @updatedAt
-  title        String
-  description  String?
+  title        String @db.VarChar(8192)
+  description  String? @db.VarChar(8192)
   price        Float
-  imageUrl     String?
+  imageUrl     String? @db.VarChar(8192)
+  region       String?     @default("kansai") @db.VarChar(8192)
   cityId       Int?
   districtId   Int?
   prefectureId Int?
-  region       String?     @default("kansai")
   regionId     Int?
   wardId       Int?
   sellerId     Int
@@ -64,6 +65,7 @@ model Item {
   Region       Region?     @relation(fields: [regionId], references: [id])
   seller       User        @relation(fields: [sellerId], references: [id])
   Ward         Ward?       @relation(fields: [wardId], references: [id])
+  comments     Comment[]
 
   @@index([regionId])
   @@index([cityId])
@@ -74,17 +76,17 @@ model Item {
 }
 
 model Account {
-  id                String  @id @default(cuid())
-  type              String
-  provider          String
-  providerAccountId String
-  refresh_token     String?
-  access_token      String?
+  id                String  @id @default(cuid()) @db.VarChar(8192)
+  type              String @db.VarChar(8192)
+  provider          String @db.VarChar(8192)
+  providerAccountId String @db.VarChar(8192)
+  refresh_token     String? @db.VarChar(8192)
+  access_token      String? @db.VarChar(8192)
   expires_at        Int?
-  token_type        String?
-  scope             String?
-  id_token          String?
-  session_state     String?
+  token_type        String? @db.VarChar(8192)
+  scope             String? @db.VarChar(8192)
+  id_token          String? @db.VarChar(8192)
+  session_state     String? @db.VarChar(8192)
   userId            Int
   user              User    @relation(fields: [userId], references: [id], onDelete: Cascade)
 
@@ -92,16 +94,16 @@ model Account {
 }
 
 model Session {
-  id           String   @id @default(cuid())
-  sessionToken String   @unique
+  id           String   @id @default(cuid()) @db.VarChar(8192)
+  sessionToken String   @unique @db.VarChar(8192)
   expires      DateTime
   userId       Int
   user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
 }
 
 model VerificationToken {
-  identifier String
-  token      String   @unique
+  identifier String @db.VarChar(8192)
+  token      String   @unique @db.VarChar(8192)
   expires    DateTime
 
   @@unique([identifier, token])
@@ -109,12 +111,12 @@ model VerificationToken {
 
 model City {
   id           Int        @id @default(autoincrement())
-  code         String     @unique
-  nameJa       String
-  nameEn       String
-  nameZh       String
-  type         String
-  level        String
+  code         String     @unique @db.VarChar(8192)
+  nameJa       String @db.VarChar(8192)
+  nameEn       String @db.VarChar(8192)
+  nameZh       String @db.VarChar(8192)
+  type         String @db.VarChar(8192)
+  level        String @db.VarChar(8192)
   prefectureId Int
   isCapital    Boolean    @default(false)
   population   Int?
@@ -135,13 +137,14 @@ model City {
 
 model District {
   id         Int      @id @default(autoincrement())
-  code       String   @unique
-  nameJa     String
-  nameEn     String
-  nameZh     String
+  code       String   @unique @db.VarChar(8192)
+  nameJa     String @db.VarChar(8192)
+  nameEn     String @db.VarChar(8192)
+  nameZh     String @db.VarChar(8192)
   cityId     Int
   population Int?
   area       Float?
+  postalCode String? @db.VarChar(8192)
   createdAt  DateTime @default(now())
   updatedAt  DateTime @updatedAt
   City       City     @relation(fields: [cityId], references: [id])
@@ -155,14 +158,14 @@ model District {
 
 model Prefecture {
   id         Int      @id @default(autoincrement())
-  code       String   @unique
-  nameJa     String
-  nameEn     String
-  nameZh     String
+  code       String   @unique @db.VarChar(8192)
+  nameJa     String @db.VarChar(8192)
+  nameEn     String @db.VarChar(8192)
+  nameZh     String @db.VarChar(8192)
   regionId   Int
-  type       String
-  capital    String?
-  postalCode String?
+  type       String @db.VarChar(8192)
+  capital    String? @db.VarChar(8192)
+  postalCode String? @db.VarChar(8192)
   area       Float?
   population Int?
   createdAt  DateTime @default(now())
@@ -179,11 +182,11 @@ model Prefecture {
 
 model Region {
   id          Int          @id @default(autoincrement())
-  code        String       @unique
-  nameJa      String
-  nameEn      String
-  nameZh      String
-  description String?
+  code        String       @unique @db.VarChar(8192)
+  nameJa      String @db.VarChar(8192)
+  nameEn      String @db.VarChar(8192)
+  nameZh      String @db.VarChar(8192)
+  description String? @db.VarChar(8192)
   area        Float?
   population  Int?
   createdAt   DateTime     @default(now())
@@ -197,16 +200,16 @@ model Region {
 
 model Ward {
   id         Int       @id @default(autoincrement())
-  code       String?   @unique
-  nameJa     String
-  nameEn     String
-  nameZh     String
-  type       String
+  code       String?   @unique @db.VarChar(8192)
+  nameJa     String @db.VarChar(8192)
+  nameEn     String @db.VarChar(8192)
+  nameZh     String @db.VarChar(8192)
+  type       String @db.VarChar(8192)
   cityId     Int?
   districtId Int?
   population Int?
   area       Float?
-  postalCode String?
+  postalCode String? @db.VarChar(8192)
   createdAt  DateTime  @default(now())
   updatedAt  DateTime  @updatedAt
   Item       Item[]
@@ -222,13 +225,13 @@ model Message {
   id          Int      @id @default(autoincrement())
   senderId    Int
   receiverId  Int
-  content     String
+  content     String @db.VarChar(8192)
   createdAt   DateTime @default(now())
   read        Boolean  @default(false)
   readAt      DateTime?
   itemId      Int?
-  itemTitle   String?
-  imageUrl    String?
+  itemTitle   String? @db.VarChar(8192)
+  imageUrl    String? @db.VarChar(8192)
 
   sender      User     @relation("SentMessages", fields: [senderId], references: [id])
   receiver    User     @relation("ReceivedMessages", fields: [receiverId], references: [id])
@@ -242,9 +245,9 @@ model Message {
 model SystemNotification {
   id        Int      @id @default(autoincrement())
   userId    Int?     // null 表示全员通知
-  title     String
-  content   String
-  type      String?  // 可选：如 announcement, alert, etc.
+  title     String @db.VarChar(8192)
+  content   String @db.VarChar(8192)
+  type      String?  @db.VarChar(8192) // 可选：如 announcement, alert, etc.
   read      Boolean  @default(false)
   createdAt DateTime @default(now())
   user      User?    @relation(fields: [userId], references: [id])
@@ -252,4 +255,17 @@ model SystemNotification {
   @@index([userId])
   @@index([read])
   @@index([createdAt])
+}
+
+model Comment {
+  id        Int      @id @default(autoincrement())
+  content   String @db.VarChar(8192)
+  createdAt DateTime @default(now())
+  itemId    Int
+  userId    Int?
+  parentId  Int? // 新增，支持嵌套回复
+  item      Item     @relation(fields: [itemId], references: [id])
+  user      User?    @relation(fields: [userId], references: [id])
+  parent    Comment? @relation("CommentParent", fields: [parentId], references: [id])
+  replies   Comment[] @relation("CommentParent")
 }

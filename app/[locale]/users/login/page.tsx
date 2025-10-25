@@ -5,6 +5,7 @@ import { useTranslations, useLocale } from "next-intl";
 import Link from "next/link";
 import { Turnstile } from '@marsidev/react-turnstile';
 import { useRouter } from "next/navigation";
+import { safeContent, defaultSafeContentOptions } from "@/lib/safeContent";
 
 const TURNSTILE_SITEKEY = "0x4AAAAAAB8kSdvfjPElLqJ_";
 
@@ -51,10 +52,13 @@ export default function LoginUser() {
       setLoading(false);
       return;
     }
+    // 对用户名和密码进行安全过滤
+    const safeUsername = safeContent(username, defaultSafeContentOptions);
+    const safePassword = safeContent(password, defaultSafeContentOptions);
     const res = await signIn("credentials", {
       redirect: false,
-      identifier: username,
-      password,
+      identifier: safeUsername,
+      password: safePassword,
       turnstileToken,
     });
     setLoading(false);

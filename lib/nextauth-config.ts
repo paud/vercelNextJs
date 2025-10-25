@@ -67,7 +67,7 @@ export const authOptions: NextAuthOptions = {
             data: {
               email: profile.email,
               name: profile.name || null,
-              username: profile.email.split('@')[0],
+              username: null, // 首次 Google 登录 username 留空
             }
           });
           // 首次 Google 登录，发送欢迎通知
@@ -80,7 +80,8 @@ export const authOptions: NextAuthOptions = {
             }
           });
         }
-        user.id = String(dbUser.id); // 用本地数据库ID覆盖 user.id，确保为字符串
+        user.id = dbUser.id;
+        (user as any).username = dbUser.username;
       }
       // Credentials 登录也确保 user.id 为字符串
       if (account?.provider === 'credentials' && user?.id) {

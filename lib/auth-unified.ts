@@ -17,7 +17,7 @@ export async function getCurrentUser(): Promise<UserInfo | null> {
       // Convert NextAuth user to our UserInfo format
       return {
         id: parseInt(session.user.id as string), // NextAuth user.id might be string
-        username: (session.user as any).username || session.user.email?.split('@')[0] || 'user',
+        username: (session.user as any).username || null,
         email: session.user.email!,
         name: session.user.name || null
       };

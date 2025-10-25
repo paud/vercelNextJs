@@ -88,7 +88,16 @@
     "no_contact": "No contact info",
     "published_at": "Published at",
     "contact_seller": "Contact Seller",
-    "contact_seller_message": "Open the message box to contact the seller."
+    "contact_seller_message": "Open the message box to contact the seller.",
+    "comments": "Comments",
+    "add_comment": "Add a comment",
+    "submit_comment": "Submit Comment",
+    "empty_comment": "Comment cannot be empty",
+    "no_comments": "No comments yet",
+    "post_comment": "Post a comment",
+    "comment_user": "User",
+    "comment_time": "Commented at",
+    "login_required_detail": "You must login to post comments."
   },
   "ItemsList": {
     "page_title": "All Items",
@@ -158,7 +167,15 @@
     "other_actions": "Other Actions",
     "add_item": "Sell",
     "view_my_items": "My Items",
-    "logout": "Logout"
+    "logout": "Logout",
+    "change_password": "Change Password",
+    "change_password_title": "Change Password",
+    "change_password_success": "Password changed successfully!",
+    "change_password_fail": "Password change failed.",
+    "change_password_input": "Enter new password",
+    "change_password_min_length": "Password must be at least 6 characters.",
+    "change_password_cancel": "Cancel",
+    "change_password_save": "Save"
   },
   "MyItems": {
     "title": "My Items",

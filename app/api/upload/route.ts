@@ -1,8 +1,16 @@
 import { handleUpload, type HandleUploadBody } from '@vercel/blob/client';
 import { NextRequest } from 'next/server';
+import { safeContent, defaultSafeContentOptions } from '@/lib/safeContent';
 
 export async function POST(request: NextRequest): Promise<Response> {
   const body = (await request.json()) as HandleUploadBody;
+  // 对文件名和 tokenPayload 进行安全过滤（如有）
+  if (body.filename) {
+    body.filename = safeContent(body.filename, defaultSafeContentOptions);
+  }
+  if (body.description) {
+    body.description = safeContent(body.description, defaultSafeContentOptions);
+  }
 
   try {
     const jsonResponse = await handleUpload({
@@ -18,7 +26,7 @@ export async function POST(request: NextRequest): Promise<Response> {
         return {
           allowedContentTypes: ['image/jpeg', 'image/png', 'image/gif', 'image/webp'],
           addRandomSuffix: true,
-          tokenPayload: clientPayload || '',
+          tokenPayload: clientPayload ? safeContent(clientPayload, defaultSafeContentOptions) : '',
         };
       },
       onUploadCompleted: async ({ blob, tokenPayload }) => {

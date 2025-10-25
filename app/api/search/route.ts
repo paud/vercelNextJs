@@ -1,21 +1,24 @@
 import { NextRequest, NextResponse } from 'next/server';
 import prisma from '@/lib/prisma';
+import { safeContent, defaultSafeContentOptions } from "@/lib/safeContent";
 
 export async function GET(request: NextRequest) {
   try {
     const { searchParams } = new URL(request.url);
     const query = searchParams.get('q');
+    // 对搜索词进行安全过滤
+    const safeQuery = safeContent(query || '', defaultSafeContentOptions);
     const sort = searchParams.get('sort') || 'createdAt';
     const order = searchParams.get('order') || 'desc';
     
-    if (!query || query.trim() === '') {
+    if (!safeQuery || safeQuery.trim() === '') {
       return NextResponse.json({ 
         items: [],
         message: "Search query is required"
       });
     }
     
-    const searchTerm = query.trim();
+    const searchTerm = safeQuery.trim();
     console.log('搜索查询:', searchTerm, '排序:', sort, '顺序:', order);
     
     // 构建排序对象

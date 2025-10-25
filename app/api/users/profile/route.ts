@@ -1,11 +1,17 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { PrismaClient } from '@prisma/client';
+import { safeContent, defaultSafeContentOptions } from "@/lib/safeContent";
+import { getServerSession } from "next-auth";
+import { authOptions } from "@/lib/nextauth-config";
 
 const prisma = new PrismaClient();
 
 export async function PUT(request: NextRequest) {
   try {
     const { userId, name, email, phone } = await request.json();
+    const safeName = safeContent(name, defaultSafeContentOptions);
+    const safeEmail = safeContent(email, defaultSafeContentOptions);
+    const safePhone = safeContent(phone, defaultSafeContentOptions);
 
     if (!userId) {
       return NextResponse.json(
@@ -26,7 +32,7 @@ export async function PUT(request: NextRequest) {
     }
 
     // 验证邮箱格式
-    if (email && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email.trim())) {
+    if (safeEmail && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(safeEmail.trim())) {
       return NextResponse.json(
         { error: 'Invalid email format' },
         { status: 400 }
@@ -35,21 +41,21 @@ export async function PUT(request: NextRequest) {
 
     // 准备更新数据
     const updateData: any = {};
-    if (name !== undefined) {
-      updateData.name = name.trim() || null;
+    if (safeName !== undefined) {
+      updateData.name = safeName.trim() || null;
     }
-    if (email !== undefined) {
-      updateData.email = email.trim();
+    if (safeEmail !== undefined) {
+      updateData.email = safeEmail.trim();
     }
-    if (phone !== undefined) {
-      updateData.phone = phone.trim() || null;
+    if (safePhone !== undefined) {
+      updateData.phone = safePhone.trim() || null;
     }
 
     // 检查邮箱是否已被其他用户使用
-    if (email) {
+    if (safeEmail) {
       const existingUser = await prisma.user.findFirst({
         where: {
-          email: email.trim(),
+          email: safeEmail.trim(),
           NOT: {
             id: userIdNum
           }
@@ -81,4 +87,17 @@ export async function PUT(request: NextRequest) {
       { status: 500 }
     );
   }
+}
+
+export async function GET(request: NextRequest) {
+  // 使用 next-auth 获取当前登录用户 session
+  const session = await getServerSession(authOptions);
+  if (!session?.user?.id) {
+    return NextResponse.json({ error: 'login_required' }, { status: 401 });
+  }
+  const user = await prisma.user.findUnique({ where: { id: Number(session.user.id) } });
+  if (!user) {
+    return NextResponse.json({ error: 'user_not_found' }, { status: 404 });
+  }
+  return NextResponse.json({ id: user.id, username: user.username, name: user.name, email: user.email });
 }

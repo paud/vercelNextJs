@@ -25,7 +25,7 @@ export default function Header() {
   const [regionsLoading, setRegionsLoading] = useState(false);
   const [treeData, setTreeData] = useState<any[]>([]);
   const [selectedPath, setSelectedPath] = useState<string[]>([]);
-  const [currentLevel, setCurrentLevel] = useState<'region' | 'prefecture' | 'city' | 'ward'>('region');
+  const [currentLevel, setCurrentLevel] = useState<'region' | 'prefecture' | 'city' | 'district' | 'ward' | 'subdistrict'>('region');
   const [isDetectingLocation, setIsDetectingLocation] = useState(false);
   const [locationDetected, setLocationDetected] = useState(false);
   const [userSelectedRegion, setUserSelectedRegion] = useState(false); // 跟踪用户是否手动选择过地区
@@ -187,7 +187,10 @@ export default function Header() {
       return true; // 都道府県总是有市区町村
     }
     if (currentLevel === 'city') {
-      return item.Ward && item.Ward.length > 0; // 检查是否有区
+      return item.districts && item.districts.length > 0;
+    }
+    if (currentLevel === 'district') {
+      return item.subdistricts && item.subdistricts.length > 0; // 检查是否有子区/村/社区
     }
     return false;
   };
@@ -211,6 +214,10 @@ export default function Header() {
       setSelectedCity(item);
       setSelectedPath([...selectedPath.slice(0, 2), item.code]);
       setCurrentLevel('ward');
+    } else if (level === 'ward') {
+      setCurrentLevel('subdistrict');
+    } else if (level === 'subdistrict') {
+      // 最底层，选中 subdistrict
     } else {
       // 最终选择，关闭弹窗并更新地区
       const fullPath = [...selectedPath.slice(0, 3), item.code];
@@ -287,6 +294,18 @@ export default function Header() {
         selectedItem = selectedCity;
         finalLocationName = getLocationName(selectedCity);
       }
+    } else if (currentLevel === 'subdistrict') {
+      // 在子区级别
+      const currentData = getCurrentLevelData();
+      if (currentData.length > 0) {
+        // 如果有子区数据，选择第一个子区
+        selectedItem = currentData[0];
+        finalLocationName = getLocationName(selectedItem); // 只显示子区名称
+      } else if (selectedCity) {
+        // 如果没有子区数据，回退到市
+        selectedItem = selectedCity;
+        finalLocationName = getLocationName(selectedCity);
+      }
     }
 
     if (selectedItem) {
@@ -352,6 +371,10 @@ export default function Header() {
       // 选择了区
       fullPath = `${selectedRegion ? getLocationName(selectedRegion) + '-' : ''}${selectedPrefecture ? getLocationName(selectedPrefecture) + '-' : ''}${selectedCity ? getLocationName(selectedCity) + '-' : ''}${getLocationName(item)}`;
       displayName = getLocationName(item);
+    } else if (currentLevel === 'subdistrict') {
+      // 选择了子区
+      fullPath = `${selectedRegion ? getLocationName(selectedRegion) + '-' : ''}${selectedPrefecture ? getLocationName(selectedPrefecture) + '-' : ''}${selectedCity ? getLocationName(selectedCity) + '-' : ''}${getLocationName(item)}`;
+      displayName = getLocationName(item);
     }
 
     // 更新显示的地区名称
@@ -397,6 +420,9 @@ export default function Header() {
     } else if (currentLevel === 'ward') {
       setCurrentLevel('city');
       setSelectedPath(selectedPath.slice(0, 2));
+    } else if (currentLevel === 'subdistrict') {
+      setCurrentLevel('ward');
+      setSelectedPath(selectedPath.slice(0, 3));
     }
   };
 
@@ -416,6 +442,11 @@ export default function Header() {
       const prefecture = region?.prefectures?.find((p: any) => p.code === selectedPath[1]);
       const city = prefecture?.cities?.find((c: any) => c.code === selectedPath[2]);
       return [...(city?.districts || []), ...(city?.wards || [])];
+    } else if (currentLevel === 'subdistrict') {
+      const region = treeData.find((r: any) => r.code === selectedPath[0]);
+      const prefecture = region?.prefectures?.find((p: any) => p.code === selectedPath[1]);
+      const city = prefecture?.cities?.find((c: any) => c.code === selectedPath[2]);
+      return city?.subdistricts || [];
     }
     return [];
   };
@@ -613,6 +644,7 @@ export default function Header() {
                         {currentLevel === 'prefecture' && t('selectPrefecture')}
                         {currentLevel === 'city' && t('selectCity')}
                         {currentLevel === 'ward' && t('selectWard')}
+                        {currentLevel === 'subdistrict' && t('selectSubdistrict')}
                       </h3>
                     </div>
                     {/* 关闭按钮 */}
@@ -663,18 +695,15 @@ export default function Header() {
                               <div className="font-medium text-gray-800">
                                 {getLocationName(item)}
                               </div>
-                              {item.type === 'city' && item.population && (
+                              {/* 每一级都显示人口、面积、邮编（如果有） */}
+                              {(item.population || item.area || item.postalCode) && (
                                 <div className="text-xs text-gray-500 mt-1">
-                                  {t('population')}: {item.population.toLocaleString()}
-                                </div>
-                              )}
-                              {item.isCapital && (
-                                <div className="text-xs text-blue-600 mt-1">
-                                  {t('capital')}
+                                  {item.population && <span>{t('population')}: {item.population.toLocaleString()} </span>}
+                                  {item.area && <span>{t('area')}: {item.area} km² </span>}
+                                  {item.postalCode && <span>{t('postalCode')}: {item.postalCode} </span>}
                                 </div>
                               )}
                             </div>
-
                             <div className="flex items-center">
                               {hasSubLevels(item) && (
                                 <svg className="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -700,6 +729,7 @@ export default function Header() {
                             {currentLevel === 'prefecture' && t('canSelectCurrentRegion')}
                             {currentLevel === 'city' && t('canSelectCurrentPrefecture')}
                             {currentLevel === 'ward' && t('canSelectCurrentCity')}
+                            {currentLevel === 'subdistrict' && t('canSelectCurrentSubdistrict')}
                           </div>
                           <button
                             onClick={handleCurrentLevelSelection}
@@ -709,6 +739,7 @@ export default function Header() {
                             {currentLevel === 'prefecture' && selectedPrefecture && `${t('select')} ${getLocationName(selectedPrefecture)}`}
                             {currentLevel === 'city' && selectedCity && `${t('select')} ${getLocationName(selectedCity)}`}
                             {currentLevel === 'ward' && selectedCity && `${t('select')} ${getLocationName(selectedCity)}`}
+                            {currentLevel === 'subdistrict' && selectedCity && `${t('select')} ${getLocationName(selectedCity)}`}
                             {(!selectedRegion && !selectedPrefecture && !selectedCity) && t('selectCurrent')}
                           </button>
                         </div>

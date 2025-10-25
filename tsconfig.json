@@ -15,7 +15,8 @@
     "moduleResolution": "bundler",
     "types": [
       "dom-chromium-installation-events",
-      "web-app-manifest"
+      "web-app-manifest",
+      "node"
     ],
     "resolveJsonModule": true,
     "isolatedModules": true,

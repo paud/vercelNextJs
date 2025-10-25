@@ -5,29 +5,31 @@ import ItemDetailClient from "@/components/ItemDetailClient";
 
 export default async function ItemDetailPage({ params }: { params: Promise<{ id: string; locale: string }> }) {
   const { id, locale } = await params;
-  const t = await getTranslations({ locale, namespace: 'ItemDetail' });
+  // 获取整个 ItemDetail 多语言对象
+  const tAll = await getTranslations({ locale, namespace: 'ItemDetail' });
+  // 获取所有 key
+  const itemDetailKeys = [
+    "not_found", "seller", "contact", "anonymous", "no_contact", "published_at", "contact_seller", "contact_seller_message",
+    "comments", "add_comment", "submit_comment", "empty_comment", "no_comments", "post_comment", "comment_user", "comment_time",
+    "login_required_detail"
+  ];
+  const tObj: Record<string, string> = {};
+  itemDetailKeys.forEach(key => {
+    tObj[key] = tAll(key);
+  });
+
   const homeT = await getTranslations({ locale, namespace: 'Home' });
   const messagesT = await getTranslations({ locale, namespace: 'Messages' });
-  
+
   const item = await prisma.item.findUnique({
     where: { id: Number(id) },
     include: { seller: { select: { name: true, email: true } } },
   });
 
   if (!item) {
-    return <div className="p-8 text-center text-red-500">{t('not_found')}</div>;
+    return <div className="p-8 text-center text-red-500">{tObj.not_found}</div>;
   }
 
-  // 多语言对象
-  const tObj = {
-    contact_seller: t('contact_seller'),
-    seller: t('seller'),
-    anonymous: t('anonymous'),
-    contact: t('contact'),
-    no_contact: t('no_contact'),
-    published_at: t('published_at'),
-    not_found: t('not_found'),
-  };
   const homeTObj = {
     currency: String(homeT('currency')),
     date_locale: String(homeT('date_locale')),

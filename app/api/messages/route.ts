@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { getServerSession } from 'next-auth';
 import prisma from '@/lib/prisma';
 import { authOptions } from '@/lib/nextauth-config';
+import { safeContent, defaultSafeContentOptions } from "@/lib/safeContent";
 
 // 获取消息列表（支持与某用户的对话、分页）
 export async function GET(req: NextRequest) {
@@ -58,7 +59,8 @@ export async function POST(req: NextRequest) {
   const userId = Number(session.user.id);
   const body = await req.json();
   const { receiverId, content, itemId } = body;
-  if (!receiverId || !content) {
+  const safe = safeContent(content, defaultSafeContentOptions);
+  if (!receiverId || !safe) {
     return NextResponse.json({ error: 'Missing receiverId or content' }, { status: 400 });
   }
   let itemTitle = undefined;
@@ -74,7 +76,7 @@ export async function POST(req: NextRequest) {
     data: {
       senderId: userId,
       receiverId: Number(receiverId),
-      content,
+      content: safe,
       itemId: itemId ? Number(itemId) : undefined,
       itemTitle,
       imageUrl,
