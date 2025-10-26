@@ -1,0 +1,12 @@
+name: Clear Old Messages
+on:
+  schedule:
+    - cron: '0 3 * * *' # 每天凌晨3点执行
+  workflow_dispatch:
+jobs:
+  clear-old-messages:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Call Vercel API to clear old messages
+        run: |
+          curl -X POST "https://2.zzzz.tech/api/clear-old-messages" --fail
