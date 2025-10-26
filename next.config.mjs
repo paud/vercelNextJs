@@ -56,7 +56,27 @@ const nextConfig = withNextIntl(
         },*/
       ];
     },
-    
+    async headers() {
+      return [
+        {
+          source: '/(.*)',
+          headers: [
+            {
+              key: 'Content-Security-Policy',
+              value: "default-src *; script-src * 'unsafe-inline' 'unsafe-eval'; frame-src *; connect-src *; style-src * 'unsafe-inline'; img-src *; frame-ancestors *;"
+            },
+            {
+              key: 'X-Content-Type-Options',
+              value: 'nosniff'
+            },
+            {
+              key: 'X-Frame-Options',
+              value: 'DENY'
+            }
+          ]
+        }
+      ];
+    },
   })
 );
 
