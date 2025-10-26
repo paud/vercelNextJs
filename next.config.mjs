@@ -56,35 +56,7 @@ const nextConfig = withNextIntl(
         },*/
       ];
     },
-    async headers() {
-      return [
-        {
-          source: '/(.*)',
-          headers: [
-            {
-              key: 'Content-Security-Policy',
-              value: "default-src 'self'; img-src 'self' https:; script-src 'self'; style-src 'self' 'unsafe-inline'; frame-ancestors 'none';"
-            },
-            {
-              key: 'X-Content-Type-Options',
-              value: 'nosniff'
-            },
-            {
-              key: 'X-Frame-Options',
-              value: 'DENY'
-            },
-            {
-              key: 'Cross-Origin-Resource-Policy',
-              value: 'same-origin'
-            },
-            {
-              key: 'Referrer-Policy',
-              value: 'strict-origin-when-cross-origin'
-            }
-          ]
-        }
-      ];
-    },
+    
   })
 );
 
