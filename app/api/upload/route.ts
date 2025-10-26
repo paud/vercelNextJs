@@ -5,10 +5,10 @@ import { safeContent, defaultSafeContentOptions } from '@/lib/safeContent';
 export async function POST(request: NextRequest): Promise<Response> {
   const body = (await request.json()) as HandleUploadBody;
   // 对文件名和 tokenPayload 进行安全过滤（如有）
-  if (body.filename) {
+  if ('filename' in body && typeof body.filename === 'string' && body.filename) {
     body.filename = safeContent(body.filename, defaultSafeContentOptions);
   }
-  if (body.description) {
+  if ('description' in body && typeof body.description === 'string' && body.description) {
     body.description = safeContent(body.description, defaultSafeContentOptions);
   }
 

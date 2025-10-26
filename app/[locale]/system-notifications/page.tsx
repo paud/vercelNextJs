@@ -85,7 +85,7 @@ export default function SystemNotificationsPage() {
 
   return (
     <UserHeader>
-      <div className="max-w-lg mx-auto p-2 sm:p-4">
+      <div className="max-w-lg mx-auto p-2 sm:p-4 pb-24">
         <h1 className="text-xl sm:text-2xl font-bold mb-4 text-center">{t("title")}</h1>
         {notifications.length === 0 ? (
           <div className="text-gray-400 text-center py-12">{t("no_notification")}</div>

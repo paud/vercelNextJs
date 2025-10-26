@@ -80,7 +80,7 @@ export const authOptions: NextAuthOptions = {
             }
           });
         }
-        user.id = dbUser.id;
+        user.id = String(dbUser.id);
         (user as any).username = dbUser.username;
       }
       // Credentials 登录也确保 user.id 为字符串

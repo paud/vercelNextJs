@@ -114,8 +114,12 @@ export default function ProfilePage() {
   };
 
   const handlePasswordChange = async () => {
+    if (!currentUser) {
+      setPasswordMsg(t('change_password_fail'));
+      return;
+    }
     if (!newPassword || newPassword.length < 6) {
-      setPasswordMsg('密码至少6位');
+      setPasswordMsg(t('change_password_min_length'));
       return;
     }
     try {
@@ -125,14 +129,14 @@ export default function ProfilePage() {
         body: JSON.stringify({ userId: currentUser.id, password: newPassword })
       });
       if (response.ok) {
-        setPasswordMsg('密码修改成功');
+        setPasswordMsg(t('change_password_success'));
         setNewPassword('');
         setIsPasswordDialogOpen(false);
       } else {
-        setPasswordMsg('密码修改失败');
+        setPasswordMsg(t('change_password_fail'));
       }
     } catch {
-      setPasswordMsg('网络错误');
+      setPasswordMsg(t('change_password_fail'));
     }
   };
 

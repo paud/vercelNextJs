@@ -23,6 +23,26 @@ function HomeContent() {
   };
   const [items, setItems] = useState<ItemWithSeller[]>([]);
 
+  // 初始值设为3，避免SSR访问window
+  const [itemsPerRow, setItemsPerRow] = useState(3);
+  useEffect(() => {
+    function getItemsPerRow() {
+      return window.innerWidth < 640 ? 2 : 3;
+    }
+    setItemsPerRow(getItemsPerRow());
+    function handleResize() {
+      setItemsPerRow(getItemsPerRow());
+    }
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, []);
+  // 动态生成 grid-cols class
+  const gridColsClass = `grid-cols-${itemsPerRow}`;
+  const INITIAL_ROWS = 4;
+  const LOAD_MORE_ROWS = 4;
+  const [visibleRows, setVisibleRows] = useState(INITIAL_ROWS);
+  const visibleCount = visibleRows * itemsPerRow;
+
   useEffect(() => {
     async function fetchItems() {
       const res = await fetch(`/api/items?sort=${sort}&order=${order}`);
@@ -31,6 +51,19 @@ function HomeContent() {
     }
     fetchItems();
   }, [sort, order]);
+
+  useEffect(() => {
+    function handleScroll() {
+      if (
+        window.innerHeight + window.scrollY >= document.body.offsetHeight - 100 &&
+        visibleCount < items.length
+      ) {
+        setVisibleRows((rows) => rows + LOAD_MORE_ROWS);
+      }
+    }
+    window.addEventListener('scroll', handleScroll);
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, [items.length, visibleCount]);
 
   function handleSortChange(value: string) {
     if (sort === value) {
@@ -79,12 +112,19 @@ function HomeContent() {
           ))}
         </div>
       </div>
-      <div className="grid gap-4 sm:gap-6 grid-cols-2 md:grid-cols-2 lg:grid-cols-3 w-full max-w-6xl mb-6 sm:mb-8">
-        {items.map((item) => (
+      {/* 动态 grid-cols-x */}
+      <div className={`grid gap-4 sm:gap-6 w-full max-w-6xl mb-6 sm:mb-8 grid-cols-${itemsPerRow}`}>
+        {items.slice(0, visibleCount).map((item) => (
           <Link key={item.id} href={`/items/${item.id}`} className="group">
             <div className="border rounded-lg shadow-md bg-white p-3 sm:p-4 hover:shadow-lg transition-shadow duration-300 flex flex-col">
               {item.imageUrl && (
-                <img src={item.imageUrl} alt={item.title} className="w-full h-28 sm:h-40 object-cover rounded mb-2" />
+                <div className="w-full aspect-square mb-2 overflow-hidden rounded">
+                  <img 
+                    src={item.imageUrl + (item.imageUrl.includes('?') ? '&' : '?') + 'w=200&h=200&fit=crop'} 
+                    alt={item.title} 
+                    className="w-full h-full object-contain bg-white" 
+                  />
+                </div>
               )}
               <h2 className="text-base sm:text-lg font-semibold text-blue-600 group-hover:underline mb-1">
                 {item.title}
