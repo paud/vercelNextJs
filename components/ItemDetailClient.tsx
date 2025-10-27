@@ -3,6 +3,22 @@ import { useState, useEffect } from "react";
 import ChatModal from "@/components/ChatModal";
 import { useCurrentUser } from "@/hooks/useCurrentUser";
 import React from "react";
+import Image from "next/image";
+
+function SkeletonDetail() {
+  return (
+    <div className="max-w-sm w-full mx-auto p-3 sm:p-6 bg-gray-200 animate-pulse rounded-lg shadow mt-2 mb-16 min-h-screen flex flex-col justify-start">
+      <div className="w-full h-40 sm:h-64 bg-gray-300 rounded mb-3 sm:mb-4" />
+      <div className="h-7 bg-gray-300 rounded mb-2 w-2/3" />
+      <div className="h-6 bg-gray-300 rounded mb-2 w-1/2" />
+      <div className="h-5 bg-gray-300 rounded mb-2 w-1/3" />
+      <div className="h-4 bg-gray-300 rounded mb-2 w-1/4" />
+      <div className="h-4 bg-gray-300 rounded w-full mb-3" />
+      <div className="h-4 bg-gray-300 rounded w-full mb-3" />
+      <div className="h-4 bg-gray-300 rounded w-full mb-3" />
+    </div>
+  );
+}
 
 export default function ItemDetailClient({ item, tObj, homeTObj, messagesTObj }: { item: any, tObj: Record<string, string>, homeTObj: Record<string, string>, messagesTObj: Record<string, string> }) {
   const [showChat, setShowChat] = useState(false);
@@ -114,13 +130,19 @@ export default function ItemDetailClient({ item, tObj, homeTObj, messagesTObj }:
       ))}
     </ul>
   );
+  if (!item) {
+    return <SkeletonDetail />;
+  }
   return (
     <div className="max-w-sm w-full mx-auto p-3 sm:p-6 bg-white rounded-lg shadow mt-2 mb-16 min-h-screen flex flex-col justify-start">
       {item.imageUrl && (
-        <img
+        <Image
           src={item.imageUrl}
           alt={item.title}
+          width={400}
+          height={256}
           className="w-full h-40 sm:h-64 object-cover rounded mb-3 sm:mb-4"
+          loading="lazy"
         />
       )}
       <h1 className="text-xl sm:text-2xl font-bold mb-2">{item.title}</h1>

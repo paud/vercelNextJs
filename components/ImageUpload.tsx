@@ -2,6 +2,8 @@
 
 import { useState, useRef } from 'react';
 import { upload } from '@vercel/blob/client';
+import * as nsfwjs from 'nsfwjs';
+import * as tf from '@tensorflow/tfjs';
 
 interface ImageUploadProps {
   onImageUploaded: (url: string) => void;
@@ -13,6 +15,23 @@ export default function ImageUpload({ onImageUploaded, className = "" }: ImageUp
   const [preview, setPreview] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const nsfwModelRef = useRef<any>(null);
+
+  const nsfwCheck = async (blob: Blob): Promise<boolean> => {
+    await tf.ready();
+    if (!nsfwModelRef.current) {
+      // 使用自定义模型地址，需将模型文件放在 public/nsfw-model 目录下
+      nsfwModelRef.current = await nsfwjs.load('/nsfw-model/');
+    }
+    const model = nsfwModelRef.current;
+    const img = document.createElement('img');
+    img.src = URL.createObjectURL(blob);
+    await new Promise((resolve) => { img.onload = resolve; });
+    const predictions = await model.classify(img);
+    // 检查 NSFW 类别概率
+    const nsfwScore = predictions.find((p: any) => p.className === 'Porn' || p.className === 'Sexy');
+    return nsfwScore && nsfwScore.probability > 0.5; // 阈值可调整
+  };
 
   const handleFileSelect = async (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
@@ -32,11 +51,19 @@ export default function ImageUpload({ onImageUploaded, className = "" }: ImageUp
 
     setError(null);
     setUploading(true);
-
     try {
       // Create preview
       const previewUrl = URL.createObjectURL(file);
       setPreview(previewUrl);
+
+      // NSFW 检测
+      const isNSFW = await nsfwCheck(file);
+      if (isNSFW) {
+        setError('Image may contain NSFW content and cannot be uploaded.');
+        setUploading(false);
+        setPreview(null);
+        return;
+      }
 
       // Upload to Vercel Blob
       const blob = await upload(file.name, file, {

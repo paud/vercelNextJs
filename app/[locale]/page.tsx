@@ -3,6 +3,7 @@ import { useTranslations, useLocale } from 'next-intl';
 import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useState, useEffect, Suspense } from "react";
+import Image from "next/image";
 
 function HomeContent() {
   const t = useTranslations('Home');
@@ -27,7 +28,11 @@ function HomeContent() {
   const [itemsPerRow, setItemsPerRow] = useState(3);
   useEffect(() => {
     function getItemsPerRow() {
-      return window.innerWidth < 640 ? 2 : 3;
+      if (window.innerWidth < 640) return 2;
+      if (window.innerWidth < 1024) return 3;
+      if (window.innerWidth < 1440) return 4;
+      if (window.innerWidth < 1920) return 5;
+      return 6; // 超大屏幕自动更多列
     }
     setItemsPerRow(getItemsPerRow());
     function handleResize() {
@@ -36,8 +41,14 @@ function HomeContent() {
     window.addEventListener('resize', handleResize);
     return () => window.removeEventListener('resize', handleResize);
   }, []);
-  // 动态生成 grid-cols class
-  const gridColsClass = `grid-cols-${itemsPerRow}`;
+  // 动态生成 grid-cols class（静态映射，确保 Tailwind 编译）
+  const gridColsClass = {
+    2: "grid-cols-2",
+    3: "grid-cols-3",
+    4: "grid-cols-4",
+    5: "grid-cols-5",
+    6: "grid-cols-6"
+  }[itemsPerRow];
   const INITIAL_ROWS = 4;
   const LOAD_MORE_ROWS = 4;
   const [visibleRows, setVisibleRows] = useState(INITIAL_ROWS);
@@ -85,6 +96,19 @@ function HomeContent() {
     { label: t('sort_seller'), value: 'seller' },
   ];
 
+  function SkeletonCard() {
+    return (
+      <div className="border rounded-lg shadow-md bg-gray-200 animate-pulse p-3 sm:p-4 flex flex-col">
+        <div className="w-full aspect-square mb-2 overflow-hidden rounded bg-gray-300" />
+        <div className="h-5 bg-gray-300 rounded mb-2 w-2/3" />
+        <div className="h-4 bg-gray-300 rounded mb-1 w-1/2" />
+        <div className="h-3 bg-gray-300 rounded mb-1 w-1/3" />
+        <div className="h-3 bg-gray-300 rounded mb-2 w-1/4" />
+        <div className="h-4 bg-gray-300 rounded w-full" />
+      </div>
+    );
+  }
+
   return (
     <div className="min-h-screen bg-gray-50 flex flex-col items-center pt-2 pb-16 px-2 sm:px-4">
       <div className="mb-3 sm:mb-4 w-full max-w-6xl flex flex-wrap items-center justify-between">
@@ -113,39 +137,45 @@ function HomeContent() {
         </div>
       </div>
       {/* 动态 grid-cols-x */}
-      <div className={`grid gap-4 sm:gap-6 w-full max-w-6xl mb-6 sm:mb-8 grid-cols-${itemsPerRow}`}>
-        {items.slice(0, visibleCount).map((item) => (
-          <Link key={item.id} href={`/${locale}/items/${item.id}`} className="group">
-            <div className="border rounded-lg shadow-md bg-white p-3 sm:p-4 hover:shadow-lg transition-shadow duration-300 flex flex-col">
-              {item.imageUrl && (
-                <div className="w-full aspect-square mb-2 overflow-hidden rounded">
-                  <img 
-                    src={item.imageUrl + (item.imageUrl.includes('?') ? '&' : '?') + 'w=200&h=200&fit=crop'} 
-                    alt={item.title} 
-                    className="w-full h-full object-contain bg-white" 
-                  />
+      <div className={`grid gap-4 sm:gap-6 w-full max-w-6xl mb-6 sm:mb-8 ${gridColsClass}`}>
+        {items.length === 0
+          ? Array.from({ length: visibleCount }).map((_, i) => <SkeletonCard key={i} />)
+          : items.slice(0, visibleCount).map((item) => (
+              <Link key={item.id} href={`/${locale}/items/${item.id}`} className="group">
+                <div className="border rounded-lg shadow-md bg-white p-3 sm:p-4 hover:shadow-lg transition-shadow duration-300 flex flex-col">
+                  {item.imageUrl && (
+                    <div className="w-full aspect-square mb-2 overflow-hidden rounded">
+                      <Image 
+                        src={item.imageUrl + (item.imageUrl.includes('?') ? '&' : '?') + 'w=200&h=200&fit=crop'}
+                        alt={item.title}
+                        width={200}
+                        height={200}
+                        className="w-full h-full object-contain bg-white"
+                        loading="lazy"
+                        style={{ objectFit: 'contain', background: 'white' }}
+                      />
+                    </div>
+                  )}
+                  <h2 className="text-base sm:text-lg font-semibold text-blue-600 group-hover:underline mb-1">
+                    {item.title}
+                  </h2>
+                  <p className="text-sm sm:text-base text-green-600 font-bold mb-1">¥{item.price}</p>
+                  <p className="text-xs sm:text-sm text-gray-500 mb-1">
+                    {t('seller')}: {item.seller ? item.seller.name : t('anonymous')}
+                  </p>
+                  <p className="text-xs text-gray-400 mb-2">
+                    {new Date(item.createdAt).toLocaleDateString(t('date_locale'), {
+                      year: "numeric",
+                      month: "long",
+                      day: "numeric",
+                    })}
+                  </p>
+                  <p className="text-xs sm:text-sm text-gray-700 leading-relaxed line-clamp-2">
+                    {item.description || t('no_description')}
+                  </p>
                 </div>
-              )}
-              <h2 className="text-base sm:text-lg font-semibold text-blue-600 group-hover:underline mb-1">
-                {item.title}
-              </h2>
-              <p className="text-sm sm:text-base text-green-600 font-bold mb-1">{t('currency')}{item.price}</p>
-              <p className="text-xs sm:text-sm text-gray-500 mb-1">
-                {t('seller')}: {item.seller ? item.seller.name : t('anonymous')}
-              </p>
-              <p className="text-xs text-gray-400 mb-2">
-                {new Date(item.createdAt).toLocaleDateString(t('date_locale'), {
-                  year: "numeric",
-                  month: "long",
-                  day: "numeric",
-                })}
-              </p>
-              <p className="text-xs sm:text-sm text-gray-700 leading-relaxed line-clamp-2">
-                {item.description || t('no_description')}
-              </p>
-            </div>
-          </Link>
-        ))}
+              </Link>
+            ))}
       </div>
     </div>
   );

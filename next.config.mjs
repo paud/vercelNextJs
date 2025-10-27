@@ -13,6 +13,9 @@ const nextConfig = withNextIntl(
     //sw: 'service-worker.js', // 自定义 SW 文件名
   })({
     reactStrictMode: true,
+    images: {
+      domains: ['images.unsplash.com', 'wok79uiqqzankgbh.public.blob.vercel-storage.com'],
+    },
     async rewrites() {
       return [
         // 允许带语言前缀的静态资源访问
@@ -63,7 +66,7 @@ const nextConfig = withNextIntl(
           headers: [
             {
               key: 'Content-Security-Policy',
-              value: "default-src *; script-src * 'unsafe-inline' 'unsafe-eval'; frame-src *; connect-src *; style-src * 'unsafe-inline'; img-src *; frame-ancestors *;"
+              value: "default-src *; script-src * 'unsafe-inline' 'unsafe-eval'; frame-src *; connect-src *; style-src * 'unsafe-inline'; img-src * blob:; frame-ancestors *;"
             },
             {
               key: 'X-Content-Type-Options',
