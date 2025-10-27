@@ -115,7 +115,7 @@ function HomeContent() {
       {/* 动态 grid-cols-x */}
       <div className={`grid gap-4 sm:gap-6 w-full max-w-6xl mb-6 sm:mb-8 grid-cols-${itemsPerRow}`}>
         {items.slice(0, visibleCount).map((item) => (
-          <Link key={item.id} href={`/items/${item.id}`} className="group">
+          <Link key={item.id} href={`/${locale}/items/${item.id}`} className="group">
             <div className="border rounded-lg shadow-md bg-white p-3 sm:p-4 hover:shadow-lg transition-shadow duration-300 flex flex-col">
               {item.imageUrl && (
                 <div className="w-full aspect-square mb-2 overflow-hidden rounded">
