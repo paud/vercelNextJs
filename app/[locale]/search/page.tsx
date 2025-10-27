@@ -39,12 +39,12 @@ export default function SearchPage() {
   const t = useTranslations('Search');
   const homeT = useTranslations('Home');
   
-  const query = searchParams.get('q') || '';
+  const query = searchParams?.get('q') || '';
 
   useEffect(() => {
     // 从URL参数获取排序设置
-    const sortParam = searchParams.get('sort') || 'createdAt';
-    const orderParam = searchParams.get('order') || 'desc';
+    const sortParam = searchParams?.get('sort') || 'createdAt';
+    const orderParam = searchParams?.get('order') || 'desc';
     setSort(sortParam);
     setOrder(orderParam);
     

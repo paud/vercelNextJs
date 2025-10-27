@@ -214,9 +214,9 @@ export default function MessagesPage() {
   // 自动根据 URL 参数打开会话窗口，并预填商品信息到输入框
   useEffect(() => {
     if (hasAutoOpened.current) return;
-    const withId = searchParams.get('with');
-    const itemId = searchParams.get('itemId');
-    const itemTitle = searchParams.get('itemTitle');
+    const withId = searchParams?.get('with');
+    const itemId = searchParams?.get('itemId');
+    const itemTitle = searchParams?.get('itemTitle');
     if (withId && conversations.length > 0) {
       const target = conversations.find(c => String(c.userId) === String(withId));
       if (target) {
@@ -228,11 +228,6 @@ export default function MessagesPage() {
             itemTitle: decodeURIComponent(itemTitle)
           }] : target.messages
         });
-        // 预填商品信息到输入框
-        if (itemTitle) {
-          setNewMessage(`${t('about_item')}: ${decodeURIComponent(itemTitle)} `);
-        }
-        hasAutoOpened.current = true;
       }
     }
   }, [searchParams, conversations]);
@@ -322,7 +317,7 @@ export default function MessagesPage() {
             sellerId={selectedConversation.userId}
             itemId={selectedConversation.messages[0]?.itemId}
             itemTitle={selectedConversation.messages[0]?.itemTitle}
-            imageUrl={searchParams.get('imageUrl') ? decodeURIComponent(searchParams.get('imageUrl')!) : undefined}
+            imageUrl={searchParams?.get('imageUrl') ? decodeURIComponent(searchParams.get('imageUrl')!) : undefined}
             sellerName={selectedConversation.userName}
           />
         )}

@@ -10,8 +10,8 @@ function HomeContent() {
   const locale = useLocale();
   const router = useRouter();
   const searchParams = useSearchParams();
-  const [sort, setSort] = useState(searchParams.get("sort") || "createdAt");
-  const [order, setOrder] = useState(searchParams.get("order") || "desc");
+  const [sort, setSort] = useState(searchParams?.get("sort") || "createdAt");
+  const [order, setOrder] = useState(searchParams?.get("order") || "desc");
 
   type ItemWithSeller = {
     id: number;

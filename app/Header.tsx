@@ -523,7 +523,7 @@ export default function Header() {
   function handleLocaleChange(newLocale: string) {
     setLangMenuOpen(false);
     const supportedLocales = ["zh", "en", "ja", "vi", "ne", "ko"];
-    const segments = pathname.split('/').filter(Boolean);
+    const segments = (pathname ?? '').split('/').filter(Boolean);
     // 移除所有前缀中的语言代码，只保留第一个非语言段
     let firstNonLocaleIdx = 0;
     while (firstNonLocaleIdx < segments.length && supportedLocales.includes(segments[firstNonLocaleIdx])) {

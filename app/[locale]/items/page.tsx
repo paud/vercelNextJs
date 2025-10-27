@@ -12,7 +12,7 @@ export default async function ItemsPage({ params }: { params: Promise<{ locale: 
     orderBy: { createdAt: "desc" },
   });
   // 补充 locale 字段，便于跳转
-  const itemsWithLocale = items.map(item => ({ ...item, locale }));
+  const itemsWithLocale = items.map((item: typeof items[0]) => ({ ...item, locale }));
 
   // 只传递需要的文案对象
   const tObj = {
