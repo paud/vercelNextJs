@@ -59,7 +59,8 @@
     "seller": "Seller",
     "anonymous": "Anonymous",
     "date_locale": "en-US",
-    "no_description": "No description"
+    "no_description": "No description",
+    "no_more_items": "No more items"
   },
   "ItemNew": {
     "page_title": "Add Secondhand Item",

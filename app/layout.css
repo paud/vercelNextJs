@@ -1,0 +1,22 @@
+/* app/layout.css */
+body {
+  font-family: 'Segoe UI', Arial, sans-serif;
+  background: #f8f9fa;
+  color: #222;
+}
+
+h1, h2, h3, h4, h5, h6 {
+  font-weight: 600;
+  color: #333;
+}
+
+a {
+  color: #2563eb;
+  text-decoration: none;
+}
+
+a:hover {
+  text-decoration: underline;
+}
+
+/* 可根据需要添加更多样式 */

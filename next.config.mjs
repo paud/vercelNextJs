@@ -14,7 +14,16 @@ const nextConfig = withNextIntl(
   })({
     reactStrictMode: true,
     images: {
-      domains: ['images.unsplash.com', 'wok79uiqqzankgbh.public.blob.vercel-storage.com'],
+      remotePatterns: [
+        {
+          protocol: 'https',
+          hostname: 'images.unsplash.com',
+        },
+        {
+          protocol: 'https',
+          hostname: 'wok79uiqqzankgbh.public.blob.vercel-storage.com',
+        },
+      ],
     },
     async rewrites() {
       return [
@@ -66,19 +75,28 @@ const nextConfig = withNextIntl(
           headers: [
             {
               key: 'Content-Security-Policy',
-              value: "default-src *; script-src * 'unsafe-inline' 'unsafe-eval'; frame-src *; connect-src *; style-src * 'unsafe-inline'; img-src * blob:; frame-ancestors *;"
+              value: "default-src *; script-src * 'unsafe-inline' 'unsafe-eval' *; frame-src *; connect-src *; style-src * 'unsafe-inline' 'self' data:; img-src * blob:; frame-ancestors *;"
             },
             {
               key: 'X-Content-Type-Options',
               value: 'nosniff'
-            },
-            {
-              key: 'X-Frame-Options',
-              value: 'DENY'
             }
+            // 继续不设置 X-Frame-Options，兼容所有 OAuth
           ]
         }
       ];
+    },
+    webpack(config) {
+      config.watchOptions = {
+        ignored: [
+          '**/node_modules',
+          'C:/pagefile.sys',
+          'C:/hiberfil.sys',
+          'C:/swapfile.sys',
+          'C:/DumpStack.log.tmp'
+        ]
+      };
+      return config;
     },
   })
 );

@@ -1,5 +1,6 @@
 // app/layout.tsx
 import "./globals.css";
+import "./layout.css";
 import Providers from "./providers";
 
 export const metadata = {

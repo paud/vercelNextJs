@@ -4,7 +4,7 @@ import type { NextRequest } from 'next/server';
 const SUPPORTED_LOCALES = ['zh', 'en', 'ja', 'vi', 'ne', 'ko'];
 const DEFAULT_LOCALE = 'en';
 
-export function middleware(request: NextRequest) {
+export function proxy(request: NextRequest) {
   const { pathname } = request.nextUrl;
   // 已有语言前缀则直接通过
   const hasLocalePrefix = SUPPORTED_LOCALES.some((locale) => pathname.startsWith(`/${locale}`));
@@ -31,5 +31,5 @@ export function middleware(request: NextRequest) {
 }
 
 export const config = {
-  matcher: ['/((?!_next|api|static|favicon.ico|manifest.json|service-worker.js|pwa-install.bundle.js|nsfw-model).*)'],
+  matcher: ['/((?!_next|api|static|favicon.ico|manifest.json|service-worker.js|pwa-install.bundle.js).*)'],
 };

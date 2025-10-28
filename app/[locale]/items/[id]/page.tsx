@@ -41,6 +41,10 @@ export default async function ItemDetailPage({ params }: { params: Promise<{ id:
     type_message: messagesT('type_message'),
     loading: messagesT('loading'),
     no_conversations: messagesT('no_conversations'),
+    reply_comment: messagesT('reply_comment'),
+    submit_reply: messagesT('submit_reply'),
+    submitting: messagesT('submitting'),
+    cancel: messagesT('cancel'),
     // 可按需补充更多 key
   };
 

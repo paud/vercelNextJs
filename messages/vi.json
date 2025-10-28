@@ -59,7 +59,8 @@
     "seller": "Người bán",
     "anonymous": "Ẩn danh",
     "date_locale": "vi-VN",
-    "no_description": "Không có mô tả"
+    "no_description": "Không có mô tả",
+    "no_more_items": "Không còn sản phẩm nào nữa"
   },
   "ItemNew": {
     "page_title": "Thêm sản phẩm cũ",

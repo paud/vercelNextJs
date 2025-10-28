@@ -59,7 +59,8 @@
     "seller": "बिक्रेता",
     "anonymous": "अनाम",
     "date_locale": "ne-NP",
-    "no_description": "विवरण छैन"
+    "no_description": "विवरण छैन",
+    "no_more_items": "अब थप वस्तुहरू छैनन्"
   },
   "ItemNew": {
     "page_title": "पुरानो वस्तु थप्नुहोस्",

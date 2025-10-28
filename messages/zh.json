@@ -59,7 +59,8 @@
     "seller": "卖家",
     "anonymous": "匿名",
     "date_locale": "zh-CN",
-    "no_description": "暂无描述"
+    "no_description": "暂无描述",
+    "no_more_items": "没有更多商品了"
   },
   "ItemNew": {
     "page_title": "添加二手商品",

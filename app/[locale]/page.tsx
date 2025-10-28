@@ -23,9 +23,14 @@ function HomeContent() {
     seller?: { name?: string };
   };
   const [items, setItems] = useState<ItemWithSeller[]>([]);
+  const [total, setTotal] = useState(0);
+  const [loading, setLoading] = useState(false);
+  const [page, setPage] = useState(0);
+  const INITIAL_ROWS = 4;
+  const [itemsPerRow, setItemsPerRow] = useState(3);
+  const PAGE_SIZE = itemsPerRow * INITIAL_ROWS;
 
   // 初始值设为3，避免SSR访问window
-  const [itemsPerRow, setItemsPerRow] = useState(3);
   useEffect(() => {
     function getItemsPerRow() {
       if (window.innerWidth < 640) return 2;
@@ -49,32 +54,53 @@ function HomeContent() {
     5: "grid-cols-5",
     6: "grid-cols-6"
   }[itemsPerRow];
-  const INITIAL_ROWS = 4;
   const LOAD_MORE_ROWS = 4;
   const [visibleRows, setVisibleRows] = useState(INITIAL_ROWS);
   const visibleCount = visibleRows * itemsPerRow;
 
   useEffect(() => {
-    async function fetchItems() {
-      const res = await fetch(`/api/items?sort=${sort}&order=${order}`);
-      const data = await res.json();
-      setItems(data);
+    setItems([]); setPage(0); setTotal(0); // 切换排序时重置
+    loadPage(0, true);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [sort, order, itemsPerRow]);
+
+  async function loadPage(pageNum: number, reset = false) {
+    setLoading(true);
+    const offset = pageNum * PAGE_SIZE;
+    const res = await fetch(`/api/items?sort=${sort}&order=${order}&limit=${PAGE_SIZE}&offset=${offset}`);
+    const data = await res.json();
+    setTotal(data.total);
+    if (reset) {
+      setItems(data.items);
+    } else {
+      // 合并去重逻辑
+      setItems(prev => {
+        const idSet = new Set<number>();
+        const merged = [...prev, ...data.items].filter(item => {
+          if (idSet.has(item.id)) return false;
+          idSet.add(item.id);
+          return true;
+        });
+        return merged;
+      });
     }
-    fetchItems();
-  }, [sort, order]);
+    setLoading(false);
+  }
 
   useEffect(() => {
     function handleScroll() {
       if (
         window.innerHeight + window.scrollY >= document.body.offsetHeight - 100 &&
-        visibleCount < items.length
+        items.length < total && !loading
       ) {
-        setVisibleRows((rows) => rows + LOAD_MORE_ROWS);
+        const nextPage = page + 1;
+        setPage(nextPage);
+        loadPage(nextPage);
       }
     }
     window.addEventListener('scroll', handleScroll);
     return () => window.removeEventListener('scroll', handleScroll);
-  }, [items.length, visibleCount]);
+  }, [items.length, total, loading, page]);
 
   function handleSortChange(value: string) {
     if (sort === value) {
@@ -109,6 +135,26 @@ function HomeContent() {
     );
   }
 
+  useEffect(() => {
+    if (items.length > 0) {
+      // 检查当前页 items 的 id 是否有重复
+      const idSet = new Set();
+      const duplicateIds: number[] = [];
+      items.forEach(item => {
+        if (idSet.has(item.id)) {
+          duplicateIds.push(item.id);
+        } else {
+          idSet.add(item.id);
+        }
+      });
+      if (duplicateIds.length > 0) {
+        console.warn('发现重复 item id:', duplicateIds);
+      }
+      // 打印当前所有 item id，便于调试
+      console.log('当前 items id 列表:', items.map(item => item.id));
+    }
+  }, [items]);
+
   return (
     <div className="min-h-screen bg-gray-50 flex flex-col items-center pt-2 pb-16 px-2 sm:px-4">
       <div className="mb-3 sm:mb-4 w-full max-w-6xl flex flex-wrap items-center justify-between">
@@ -138,10 +184,10 @@ function HomeContent() {
       </div>
       {/* 动态 grid-cols-x */}
       <div className={`grid gap-4 sm:gap-6 w-full max-w-6xl mb-6 sm:mb-8 ${gridColsClass}`}>
-        {items.length === 0
-          ? Array.from({ length: visibleCount }).map((_, i) => <SkeletonCard key={i} />)
-          : items.slice(0, visibleCount).map((item) => (
-              <Link key={item.id} href={`/${locale}/items/${item.id}`} className="group">
+        {items.length === 0 && loading
+          ? Array.from({ length: PAGE_SIZE }).map((_, i) => <SkeletonCard key={i} />)
+          : items.map((item, index) => (
+              <Link key={item.id + '-' + index} href={`/${locale}/items/${item.id}`} className="group">
                 <div className="border rounded-lg shadow-md bg-white p-3 sm:p-4 hover:shadow-lg transition-shadow duration-300 flex flex-col">
                   {item.imageUrl && (
                     <div className="w-full aspect-square mb-2 overflow-hidden rounded">
@@ -177,6 +223,10 @@ function HomeContent() {
               </Link>
             ))}
       </div>
+      {loading && <div className="p-4 text-center text-gray-500">Loading...</div>}
+      {items.length >= total && total > 0 && (
+        <div className="p-4 text-center text-gray-400">{t('no_more_items') || '没有更多商品了'}</div>
+      )}
     </div>
   );
 }

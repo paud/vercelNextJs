@@ -59,7 +59,8 @@
     "seller": "판매자",
     "anonymous": "익명",
     "date_locale": "ko-KR",
-    "no_description": "설명 없음"
+    "no_description": "설명 없음",
+    "no_more_items": "더 이상 상품이 없습니다"
   },
   "ItemNew": {
     "page_title": "중고 상품 추가",

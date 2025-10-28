@@ -77,6 +77,8 @@ export async function GET(req: Request) {
     const { searchParams } = new URL(req.url);
     const sort = searchParams.get("sort") || "createdAt";
     const order = searchParams.get("order") || "desc";
+    const limit = parseInt(searchParams.get("limit") || "8", 10); // 默认每页8条
+    const offset = parseInt(searchParams.get("offset") || "0", 10);
 
     function getOrderBy(sort: string, order: string) {
       if (sort === "price") return { price: order };
@@ -87,12 +89,17 @@ export async function GET(req: Request) {
 
     const orderBy = JSON.stringify(getOrderBy(sort, order));
 
+    // 查询总数
+    const total = await prisma.item.count();
+    // 查询分页数据
     const items = await prisma.item.findMany({
       orderBy: JSON.parse(orderBy),
       include: { seller: { select: { name: true } } },
+      skip: offset,
+      take: limit,
     });
 
-    return NextResponse.json(items);
+    return NextResponse.json({ items, total });
   } catch (err) {
     return NextResponse.json({ error: "接口异常", detail: String(err) }, { status: 500 });
   }

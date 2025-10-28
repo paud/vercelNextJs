@@ -59,7 +59,8 @@
     "seller": "出品者",
     "anonymous": "匿名",
     "date_locale": "ja-JP",
-    "no_description": "説明なし"
+    "no_description": "説明なし",
+    "no_more_items": "商品はこれ以上ありません"
   },
   "ItemNew": {
     "page_title": "中古商品を追加",
