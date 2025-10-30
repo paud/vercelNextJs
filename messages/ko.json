@@ -98,7 +98,11 @@
     "post_comment": "댓글 등록",
     "comment_user": "사용자",
     "comment_time": "댓글 시간",
-    "login_required_detail": "댓글을 작성하려면 로그인해야 합니다."
+    "login_required_detail": "댓글을 작성하려면 로그인해야 합니다.",
+    "reply_comment": "댓글에 답글",
+    "submit_reply": "답글 보내기",
+    "submitting": "보내는 중...",
+    "cancel": "취소"
   },
   "ItemsList": {
     "page_title": "전체 상품",

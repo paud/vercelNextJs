@@ -39,9 +39,9 @@ export default function ProfilePage() {
 
   useEffect(() => {
     if (status === "unauthenticated") {
-      router.replace("/auth/signin");
+      router.replace(`/${locale}/auth/signin`);
     }
-  }, [status, router]);
+  }, [status, router, locale]);
 
   useEffect(() => {
     if (!currentUser) return; // UserHeader 已经处理了认证检查

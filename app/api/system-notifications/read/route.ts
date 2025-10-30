@@ -3,8 +3,8 @@ import { getServerSession } from 'next-auth';
 import prisma from '@/lib/prisma';
 import { authOptions } from '@/lib/nextauth-config';
 
-// DELETE /api/system-notifications/delete  批量删除系统通知 { ids: number[] }
-export async function DELETE(req: NextRequest) {
+// POST /api/system-notifications/read  批量标记系统通知为已读 { ids: number[] }
+export async function POST(req: NextRequest) {
   const session = await getServerSession(authOptions);
   if (!session?.user?.id) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
@@ -14,8 +14,8 @@ export async function DELETE(req: NextRequest) {
   if (!Array.isArray(ids) || ids.length === 0) {
     return NextResponse.json({ error: 'Missing ids' }, { status: 400 });
   }
-  // 只允许删除属于自己的或全员的通知
-  const result = await prisma.systemNotification.deleteMany({
+  // 只允许标记属于自己的或全员的通知
+  const result = await prisma.systemNotification.updateMany({
     where: {
       id: { in: ids },
       OR: [
@@ -23,6 +23,7 @@ export async function DELETE(req: NextRequest) {
         { userId: userId },
       ],
     },
+    data: { read: true },
   });
   return NextResponse.json({ count: result.count });
 }

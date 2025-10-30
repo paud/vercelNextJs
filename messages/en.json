@@ -267,7 +267,11 @@
     "type_message": "Type a message...",
     "send": "Send",
     "sending": "Sending...",
-    "chat_with_seller": "Chat with Seller"
+    "chat_with_seller": "Chat with Seller",
+    "reply_comment": "Reply to comment",
+    "submit_reply": "Submit reply",
+    "submitting": "Submitting...",
+    "cancel": "Cancel"
   },
   "Message": {
     "conversations": "Conversations",

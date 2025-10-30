@@ -72,7 +72,7 @@ export default function SystemNotificationsPage() {
   async function deleteNotifications(ids: number[]) {
     if (!ids.length) return;
     await fetch("/api/system-notifications/delete", {
-      method: "POST",
+      method: "DELETE",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ ids })
     });

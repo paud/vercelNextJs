@@ -98,7 +98,11 @@
     "post_comment": "Đăng bình luận",
     "comment_user": "Người dùng",
     "comment_time": "Thời gian bình luận",
-    "login_required_detail": "Bạn phải đăng nhập để bình luận."
+    "login_required_detail": "Bạn phải đăng nhập để bình luận.",
+    "reply_comment": "Trả lời bình luận",
+    "submit_reply": "Gửi trả lời",
+    "submitting": "Đang gửi...",
+    "cancel": "Hủy"
   },
   "ItemsList": {
     "page_title": "Tất cả sản phẩm",

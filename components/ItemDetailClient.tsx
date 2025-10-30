@@ -137,7 +137,7 @@ export default function ItemDetailClient({ item, tObj, homeTObj, messagesTObj }:
     <div className="max-w-sm w-full mx-auto p-3 sm:p-6 bg-white rounded-lg shadow mt-2 mb-16 min-h-screen flex flex-col justify-start">
       {item.imageUrl && (
         <Image
-          src={item.imageUrl}
+          src={item.imageUrl.split('?')[0]}
           alt={item.title}
           width={400}
           height={256}

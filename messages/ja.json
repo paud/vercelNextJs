@@ -98,7 +98,11 @@
     "post_comment": "コメント投稿",
     "comment_user": "ユーザー",
     "comment_time": "コメント日時",
-    "login_required_detail": "コメントを投稿するにはログインしてください。"
+    "login_required_detail": "コメントを投稿するにはログインしてください。",
+    "reply_comment": "コメントに返信",
+    "submit_reply": "返信を送信",
+    "submitting": "送信中...",
+    "cancel": "キャンセル"
   },
   "ItemsList": {
     "page_title": "全商品",

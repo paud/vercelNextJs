@@ -32,7 +32,7 @@ export default function UserHeader({
     if (isLoading) return; // 等待认证检查完成
     
     if (!currentUser) {
-      router.push(`/${locale}${redirectTo}`);
+      router.push(`/${locale}${redirectTo.startsWith('/') ? redirectTo : '/' + redirectTo}`);
       return;
     }
   }, [currentUser, isLoading, locale, router, requireAuth, redirectTo]);

@@ -117,6 +117,6 @@ export const authOptions: NextAuthOptions = {
     strategy: "jwt",
   },
   pages: {
-    signIn: "/en/auth/signin", // 使用默认语言的路径
+    signIn: `/${typeof window !== 'undefined' ? (window.location.pathname.split('/')[1] || 'en') : 'en'}/auth/signin`,
   },
 }

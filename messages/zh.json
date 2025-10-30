@@ -96,10 +96,13 @@
     "submit_comment": "提交评论",
     "empty_comment": "评论不能为空",
     "no_comments": "暂无评论",
-    "post_comment": "发布评论",
     "comment_user": "用户",
     "comment_time": "评论时间",
-    "login_required_detail": "请登录后发表评论。"
+    "login_required_detail": "请登录后发表评论。",
+    "reply_comment": "回复评论",
+    "submit_reply": "提交回复",
+    "submitting": "提交中...",
+    "cancel": "取消"
   },
   "ItemsList": {
     "page_title": "全部商品",

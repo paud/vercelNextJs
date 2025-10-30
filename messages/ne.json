@@ -97,7 +97,11 @@
     "no_comments": "अहिलेसम्म कुनै टिप्पणी छैन",
     "comment_user": "प्रयोगकर्ता",
     "comment_time": "टिप्पणी समय",
-    "login_required_detail": "टिप्पणी पोस्ट गर्न लगइन गर्नुहोस्।"
+    "login_required_detail": "टिप्पणी पोस्ट गर्न लगइन गर्नुहोस्।",
+    "reply_comment": "टिप्पणीमा उत्तर दिनुहोस्",
+    "submit_reply": "उत्तर पठाउनुहोस्",
+    "submitting": "पठाउँदै...",
+    "cancel": "रद्द गर्नुहोस्"
   },
   "ItemsList": {
     "page_title": "सबै वस्तुहरू",

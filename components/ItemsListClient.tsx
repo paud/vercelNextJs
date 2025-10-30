@@ -26,7 +26,7 @@ export default function ItemsListClient({ items, tObj, homeTObj }: { items: any[
               <Link key={item.id} href={`/${item.locale}/items/${item.id}`} className="group">
                 <div className="border rounded-lg shadow-md bg-white p-3 sm:p-4 hover:shadow-lg transition-shadow duration-300 flex flex-col">
                   {item.imageUrl && (
-                    <Image src={item.imageUrl} alt={item.title} width={200} height={160} className="w-full h-28 sm:h-40 object-cover rounded mb-2" loading="lazy" />
+                    <Image src={item.imageUrl.split('?')[0]} alt={item.title} width={200} height={160} className="w-full h-28 sm:h-40 object-cover rounded mb-2" loading="lazy" />
                   )}
                   <h2 className="text-base sm:text-lg font-semibold text-blue-600 group-hover:underline mb-1">
                     {item.title}
