@@ -59,7 +59,7 @@ export default function NewItem({ params }: { params: Promise<{ locale: string }
       alert(t('login_required'));
       return;
     }
-    if (!formData.title.trim() || !formData.price.trim() || !formData.imageUrl) {
+    if (!formData.title.trim() || !formData.imageUrl) {
       alert(t('form_incomplete'));
       return;
     }
@@ -77,7 +77,7 @@ export default function NewItem({ params }: { params: Promise<{ locale: string }
         body: JSON.stringify({
           title: safeTitle,
           description: safeDescription,
-          price: parseFloat(formData.price),
+          price: formData.price.trim() === '' ? 0 : parseFloat(formData.price),
           imageUrl: safeImageUrl,
           sellerId: currentUser.id
         }),
@@ -136,7 +136,7 @@ export default function NewItem({ params }: { params: Promise<{ locale: string }
         </div>
         <div>
           <label htmlFor="price" className="block text-base sm:text-lg font-medium mb-1 sm:mb-2 text-gray-700">
-            {t('price')} *
+            {t('price')}
           </label>
           <input
             type="number"
@@ -146,7 +146,6 @@ export default function NewItem({ params }: { params: Promise<{ locale: string }
             onChange={handleInputChange}
             step="0.01"
             min="0"
-            required
             placeholder="0.00"
             className="w-full px-3 py-2 sm:px-4 sm:py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-400 focus:border-transparent"
           />

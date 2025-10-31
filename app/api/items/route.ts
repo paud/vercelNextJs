@@ -12,12 +12,15 @@ export async function POST(req: Request) {
     const safeDescription = safeContent(description, defaultSafeContentOptions);
     const safeImageUrl = safeContent(imageUrl, defaultSafeContentOptions);
     
+    // 自动填充价格为0
+    const priceValue = price === undefined || price === null ? 0 : price;
+    
     // Validate required fields
-    if (!safeTitle || !price) {
-      console.log('Validation failed: missing title or price');
+    if (!safeTitle) {
+      console.log('Validation failed: missing title');
       return NextResponse.json({ 
-        error: "Title and price are required",
-        message: "商品标题和价格为必填项"
+        error: "Title is required",
+        message: "商品标题为必填项"
       }, { status: 400 });
     }
     
@@ -54,11 +57,12 @@ export async function POST(req: Request) {
       }, { status: 404 });
     }
     
+    // 创建商品时使用 priceValue
     const item = await prisma.item.create({
       data: {
         title: safeTitle,
         description: safeDescription,
-        price,
+        price: priceValue,
         imageUrl: safeImageUrl,
         sellerId: sellerIdNum,
       },
