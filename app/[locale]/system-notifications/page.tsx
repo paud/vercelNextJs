@@ -12,6 +12,7 @@ interface Notification {
   type?: string;
   read: boolean;
   createdAt: string;
+  userId?: number; // 增加 userId 字段用于区分
 }
 
 const PAGE_SIZE = 10;
@@ -135,6 +136,7 @@ export default function SystemNotificationsPage() {
                     checked={selected.includes(n.id)}
                     onChange={() => toggleSelect(n.id)}
                     className="mt-1 accent-blue-500 w-4 h-4"
+                    disabled={typeof n.userId === 'undefined'} // 没有 userId 的通知不能选中
                   />
                   <div className="flex-1 min-w-0">
                     <div className="flex items-center gap-2 mb-1">
@@ -151,10 +153,12 @@ export default function SystemNotificationsPage() {
                         onClick={() => markRead([n.id])}
                       >{t("mark_read")}</button>
                     )}
-                    <button
-                      className="text-xs text-red-500 hover:underline"
-                      onClick={() => deleteNotifications([n.id])}
-                    >{t("delete")}</button>
+                    {typeof n.userId !== 'undefined' && (
+                      <button
+                        className="text-xs text-red-500 hover:underline"
+                        onClick={() => deleteNotifications([n.id])}
+                      >{t("delete")}</button>
+                    )}
                   </div>
                 </li>
               ))}
