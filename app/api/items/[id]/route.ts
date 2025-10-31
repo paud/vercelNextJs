@@ -31,6 +31,16 @@ export async function DELETE(
       );
     }
 
+    // 删除商品前，先删除相关 Comment
+    await prisma.comment.deleteMany({
+      where: { itemId: itemId }
+    });
+    // 删除商品前，先将相关 Message 的 itemId 设为 null
+    await prisma.message.updateMany({
+      where: { itemId: itemId },
+      data: { itemId: null }
+    });
+
     // 删除商品
     await prisma.item.delete({
       where: { id: itemId }
