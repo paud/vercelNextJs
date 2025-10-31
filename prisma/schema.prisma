@@ -66,6 +66,7 @@ model Item {
   Region       Region?     @relation(fields: [regionId], references: [id])
   seller       User        @relation(fields: [sellerId], references: [id])
   Ward         Ward?       @relation(fields: [wardId], references: [id])
+  messages     Message[]
 
   @@index([regionId])
   @@index([cityId])
@@ -230,6 +231,7 @@ model Message {
   read       Boolean   @default(false)
   readAt     DateTime?
   itemId     Int?
+  item       Item?     @relation(fields: [itemId], references: [id], onDelete: SetNull)
   itemTitle  String?   @db.VarChar(8192)
   imageUrl   String?   @db.VarChar(8192)
   receiver   User      @relation("ReceivedMessages", fields: [receiverId], references: [id])

@@ -1,9 +1,9 @@
-import { handleUpload, type HandleUploadBody } from '@vercel/blob/client';
+import { handleUpload } from '@vercel/blob/client';
 import { NextRequest } from 'next/server';
 import { safeContent, defaultSafeContentOptions } from '@/lib/safeContent';
 
 export async function POST(request: NextRequest): Promise<Response> {
-  const body = (await request.json()) as HandleUploadBody;
+  const body = (await request.json()) as any; // 兼容无类型导出
   // 对文件名和 tokenPayload 进行安全过滤（如有）
   if ('filename' in body && typeof body.filename === 'string' && body.filename) {
     body.filename = safeContent(body.filename, defaultSafeContentOptions);
@@ -29,10 +29,10 @@ export async function POST(request: NextRequest): Promise<Response> {
           tokenPayload: clientPayload ? safeContent(clientPayload, defaultSafeContentOptions) : '',
         };
       },
-      onUploadCompleted: async ({ blob, tokenPayload }) => {
+      onUploadCompleted: async ({ blob, tokenPayload }: any) => {
         // ✅ This will be called after the upload is completed
         // You can use this to update your database with the blob URL
-        
+
         console.log('blob upload completed', blob, tokenPayload);
 
         try {
@@ -47,9 +47,10 @@ export async function POST(request: NextRequest): Promise<Response> {
 
     return Response.json(jsonResponse);
   } catch (error) {
+    // 优化错误返回，包含 status 和 message
     return Response.json(
-      { error: (error as Error).message },
-      { status: 400 }, // The webhook will retry 5 times waiting for a 200
+      { error: (error as Error).message || 'Unknown error', status: 400 },
+      { status: 400 },
     );
   }
 }
