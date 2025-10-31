@@ -136,7 +136,7 @@ export default function SystemNotificationsPage() {
                     checked={selected.includes(n.id)}
                     onChange={() => toggleSelect(n.id)}
                     className="mt-1 accent-blue-500 w-4 h-4"
-                    disabled={typeof n.userId === 'undefined'} // 没有 userId 的通知不能选中
+                    disabled={n.userId == null} // userId 为 null 时禁用选择框
                   />
                   <div className="flex-1 min-w-0">
                     <div className="flex items-center gap-2 mb-1">
@@ -153,7 +153,7 @@ export default function SystemNotificationsPage() {
                         onClick={() => markRead([n.id])}
                       >{t("mark_read")}</button>
                     )}
-                    {typeof n.userId !== 'undefined' && (
+                    {n.userId != null && (
                       <button
                         className="text-xs text-red-500 hover:underline"
                         onClick={() => deleteNotifications([n.id])}
