@@ -31,5 +31,15 @@ export function proxy(request: NextRequest) {
 }
 
 export const config = {
-  matcher: ['/((?!_next|api|static|favicon.ico|manifest.json|service-worker.js|pwa-install.bundle.js|nsfw-model).*)'],
+  matcher: [
+    /*
+     * 匹配所有路径，除了：
+     * - _next/static (静态文件)
+     * - _next/image (图片优化)
+     * - api路由
+     * - 所有文件扩展名 (.png, .jpg, .json等)
+     * - service-worker.js等PWA文件
+     */
+    '/((?!_next/static|_next/image|api|favicon.ico|manifest.json|service-worker.js|pwa-install.bundle.js|nsfw-model|icons/|screenshots/|.*\\.(?:png|jpg|jpeg|gif|svg|ico|webp|json|js|css|woff|woff2|ttf|eot)).*)',
+  ],
 };

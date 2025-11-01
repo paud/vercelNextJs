@@ -63,8 +63,10 @@ export default function UserHeader({
   useEffect(() => {
     getSession().then(session => {
       console.log("[UserHeader] 当前 session:", session);
+      console.log("[UserHeader] currentUser:", currentUser);
+      console.log("[UserHeader] isLoading:", isLoading);
     });
-  }, []);
+  }, [currentUser, isLoading]);
 
   // 处理退出登录
   const handleLogout = async () => {

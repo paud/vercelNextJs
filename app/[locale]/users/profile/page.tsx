@@ -35,10 +35,22 @@ export default function ProfilePage() {
 
   const locale = useLocale();
   const t = useTranslations('Profile');
-  const { user: currentUser, setCurrentUser } = useCurrentUser();
+  const { user: currentUser, setCurrentUser, isLoading } = useCurrentUser();
+
+  // Debug: 打印状态变化
+  useEffect(() => {
+    console.log('[ProfilePage] State:', {
+      sessionStatus: status,
+      hasSession: !!session,
+      sessionUserId: session?.user?.id,
+      currentUser,
+      isLoading
+    });
+  }, [session, status, currentUser, isLoading]);
 
   useEffect(() => {
     if (status === "unauthenticated") {
+      console.log('[ProfilePage] Unauthenticated, redirecting to signin');
       router.replace(`/${locale}/auth/signin`);
     }
   }, [status, router, locale]);

@@ -1,18 +1,11 @@
 "use client";
 
 import { signIn, getProviders } from "next-auth/react";
+import type { ClientSafeProvider } from "next-auth/react";
 import { useEffect, useState } from "react";
 import { useTranslations, useLocale } from "next-intl";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
-
-interface Provider {
-  id: string;
-  name: string;
-  type: string;
-  signinUrl: string;
-  callbackUrl: string;
-}
+import { FaLine } from "react-icons/fa";
 
 const providerIcons: Record<string, React.ReactNode> = {
   google: (
@@ -25,33 +18,66 @@ const providerIcons: Record<string, React.ReactNode> = {
       </g>
     </svg>
   ),
+  line: <FaLine className="w-5 h-5 mr-2" />,
+};
+
+const defaultProviderIcon = (
+  <svg className="w-5 h-5 mr-2" viewBox="0 0 20 20" fill="currentColor" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+    <path d="M10 20a10 10 0 100-20 10 10 0 000 20zm1-14a1 1 0 10-2 0v3H6a1 1 0 100 2h3v3a1 1 0 102 0v-3h3a1 1 0 100-2h-3V6z" />
+  </svg>
+);
+
+const providerStyles: Record<string, string> = {
+  line: "bg-[#06C755] text-white hover:bg-[#05b74f] border-transparent",
 };
 
 export default function SignIn() {
-  const [providers, setProviders] = useState<Record<string, Provider> | null>(null);
+  const [providers, setProviders] = useState<Record<string, ClientSafeProvider> | null>(null);
   const [loading, setLoading] = useState(true);
+  const [loadError, setLoadError] = useState<Error | null>(null);
+  const [signingInId, setSigningInId] = useState<string | null>(null);
+  const [autoLoginAttempted, setAutoLoginAttempted] = useState(false);
   const t = useTranslations('Auth');
   const locale = useLocale();
-  const router = useRouter();
+
+  const handleSignIn = async (providerId: string) => {
+    if (signingInId) return;
+    setSigningInId(providerId);
+    try {
+      await signIn(providerId, { callbackUrl: `/${locale}/users/profile` });
+    } finally {
+      // If redirect doesn't happen (e.g., popup blocked), allow retry
+      setSigningInId(null);
+    }
+  };
 
   useEffect(() => {
     const setUpProviders = async () => {
       try {
         const response = await getProviders();
         setProviders(response);
-      } catch (error) {
+        
+        // 检测是否从LINE app打开
+        const userAgent = navigator.userAgent || '';
+        const isLineApp = userAgent.includes('Line/') || userAgent.includes('LINE/');
+        
+        if (isLineApp && response?.line && !autoLoginAttempted) {
+          // 如果从LINE app打开，自动触发LINE登录
+          console.log('Detected LINE app, auto-triggering LINE login...');
+          setAutoLoginAttempted(true);
+          setTimeout(() => {
+            signIn('line', { callbackUrl: `/${locale}/users/profile` });
+          }, 500); // 延迟500ms，让UI先渲染
+        }
+      } catch (error: any) {
         console.error("Failed to load providers:", error);
+        setLoadError(error);
       } finally {
         setLoading(false);
       }
     };
     setUpProviders();
-  }, []);
-
-  const handleSignIn = async (providerId: string) => {
-    await signIn(providerId, { callbackUrl: `/${locale}/users/profile` });
-    // 登录后由 next-auth 自动跳转，无需 router.replace
-  };
+  }, [locale, autoLoginAttempted]);
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 to-green-50 flex flex-col pt-2 pb-16 px-2 sm:px-4 md:px-6 lg:px-8">
@@ -83,16 +109,26 @@ export default function SignIn() {
                       <button
                         key={provider.id}
                         onClick={() => handleSignIn(provider.id)}
-                        className={`flex items-center justify-center py-2.5 px-3 sm:py-3 sm:px-4 rounded-lg font-semibold transition text-base shadow-sm border border-gray-200 hover:shadow-md focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-400 bg-white text-gray-800 hover:bg-gray-50 ${provider.id}`}
+                        disabled={!!signingInId}
+                        aria-label={`${t('signin_with')} ${provider.id === 'twitter' ? 'X' : provider.name}`}
+                        className={`flex items-center justify-center py-2.5 px-3 sm:py-3 sm:px-4 rounded-lg font-semibold transition text-base shadow-sm border focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-400 disabled:opacity-60 disabled:cursor-not-allowed ${providerStyles[provider.id] ?? 'bg-white text-gray-800 hover:bg-gray-50 border-gray-200'}`}
                       >
-                        {providerIcons[provider.id]}
+                        {providerIcons[provider.id] ?? defaultProviderIcon}
                         {t('signin_with')} {provider.id === 'twitter' ? 'X' : provider.name}
+                        {signingInId === provider.id && (
+                          <span className="ml-2 inline-block h-4 w-4 border-2 border-blue-600 border-t-transparent rounded-full animate-spin" aria-hidden />
+                        )}
                       </button>
                     ))}
                 </div>
               ) : (
                 <div className="mb-6 p-4 bg-yellow-50 border border-yellow-200 rounded-lg">
                   <p className="text-sm text-yellow-800">{t('oauth_not_configured')}</p>
+                  {loadError && (
+                    <p className="mt-1 text-xs text-yellow-700">
+                      Failed to load login providers. Please retry.
+                    </p>
+                  )}
                 </div>
               )}
             </>
@@ -118,7 +154,7 @@ export default function SignIn() {
 
           <div className="mt-3 sm:mt-4 text-center">
             <span className="text-sm text-gray-600">
-              {t('no_account')} {' '}
+              {t('no_account')} {" "}
               <Link
                 href={`/${locale}/users/new`}
                 className="text-blue-600 hover:text-blue-500 font-medium"

@@ -90,6 +90,7 @@
     "published_at": "Published at",
     "contact_seller": "Contact Seller",
     "contact_seller_message": "Open the message box to contact the seller.",
+    "share_to_line": "Share to LINE",
     "comments": "Comments",
     "add_comment": "Add a comment",
     "submit_comment": "Submit Comment",
@@ -98,7 +99,11 @@
     "post_comment": "Post a comment",
     "comment_user": "User",
     "comment_time": "Commented at",
-    "login_required_detail": "You must login to post comments."
+    "login_required_detail": "You must login to post comments.",
+    "reply_comment": "Reply to comment",
+    "submit_reply": "Submit Reply",
+    "submitting": "Submitting...",
+    "cancel": "Cancel"
   },
   "ItemsList": {
     "page_title": "All Items",

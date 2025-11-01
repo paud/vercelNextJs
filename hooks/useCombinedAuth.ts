@@ -29,16 +29,25 @@ export function useCombinedAuth() {
 
     if (session?.user) {
       // NextAuth user with database session
+      const userId = session.user.id?.toString() || '';
+      
+      // 如果 session 中没有 id，说明 session callback 可能还没完成
+      // 但我们仍然设置用户，只是标记 id 为临时值
+      if (!userId) {
+        console.warn('[useCombinedAuth] Session user exists but id is missing:', session.user);
+      }
+
       setCurrentUser({
-        id: session.user.id?.toString() || '',
+        id: userId,
         email: session.user.email || '',
         name: session.user.name || null,
         image: session.user.image || null,
-        username: (session.user as any).username || null,
-        phone: null, // Google users don't have phone by default
+        username: (session.user as any).username || session.user.email?.split('@')[0] || 'User',
+        phone: null, // OAuth users don't have phone by default
         createdAt: new Date().toISOString(), // Default to current time for OAuth users
         provider: 'oauth'
       });
+      setIsLoading(false);
     } else if (traditionalAuth.currentUser) {
       // Traditional auth user  
       setCurrentUser({
@@ -50,11 +59,11 @@ export function useCombinedAuth() {
         createdAt: traditionalAuth.currentUser.createdAt,
         provider: 'traditional'
       });
+      setIsLoading(false);
     } else {
       setCurrentUser(null);
+      setIsLoading(false);
     }
-
-    setIsLoading(false);
   }, [session, status, traditionalAuth.currentUser, traditionalAuth.isLoading]);
 
   const logout = async (locale?: string) => {

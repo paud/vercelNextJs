@@ -1,17 +1,79 @@
 # 二手商品交易平台 - Second-hand Item Trading Platform
 
+> 🎉 **最新更新：完整 LINE 集成支持！** 现已支持 LINE OAuth 登录和智能预览卡片功能。
+> 📖 [快速开始指南](docs/QUICK_START.md) | [LINE 集成文档](docs/LINE_INTEGRATION_README.md) | [部署清单](docs/DEPLOYMENT_CHECKLIST.md)
+
 基于Next.js和Prisma ORM构建的现代化二手商品交易平台，支持精确的日本地理位置定位和OAuth认证。
 
 A modern second-hand item trading platform built with Next.js and Prisma ORM, featuring precise Japanese geographic location support and OAuth authentication.
 
 ## ✨ 主要功能 Key Features
 
+- 📱 **LINE 集成** - LINE OAuth 登录、智能预览卡片、一键分享
 - 🗾 **五级地理层级** - 完整的日本行政区划支持（地方→都道府県→市区町村→区域→区町）
-- 🔐 **OAuth认证** - 支持Google、GitHub等第三方登录
+- 🔐 **多种登录方式** - 支持 LINE、Google、邮箱密码登录
+- 🎴 **智能预览卡片** - 在 LINE 分享时自动生成美观的预览卡片
 - 📱 **响应式设计** - 适配桌面和移动设备
-- 🌐 **多语言支持** - 地名支持日文、英文、中文
+- 🌐 **多语言支持** - 支持中文、日文、英文、韩文、越南文、尼泊尔文
 - 🔍 **智能搜索** - 基于地理位置的商品搜索
 - 📊 **性能优化** - 数据库索引和查询优化
+- 💬 **实时消息** - 用户间私信和未读消息提醒
+
+## 🚀 5 分钟快速开始
+
+### 使用现有项目
+
+```bash
+# 1. 克隆项目
+git clone <repository-url>
+cd prisma-postgres
+
+# 2. 安装依赖
+npm install
+
+# 3. 配置环境变量
+cp .env.local.example .env.local
+# 编辑 .env.local，填入必要配置
+
+# 4. 检查配置
+node scripts/check-env.js
+
+# 5. 初始化数据库
+npx prisma migrate dev
+
+# 6. 启动开发服务器
+npm run dev
+```
+
+**完整指南：** 查看 [快速开始文档](docs/QUICK_START.md) 获取详细步骤。
+
+## 📱 LINE 功能配置
+
+### LINE OAuth 登录
+1. 在 [LINE Developers Console](https://developers.line.biz/) 创建 LINE Login Channel
+2. 添加回调 URL：`http://localhost:3000/api/auth/callback/line`
+3. 在 `.env.local` 添加：
+   ```bash
+   LINE_CLIENT_ID="your-channel-id"
+   LINE_CLIENT_SECRET="your-channel-secret"
+   ```
+4. 重启开发服务器
+
+### LINE 预览卡片
+✅ **已自动配置！** 当你在 LINE 中分享产品链接时，会自动显示包含图片、标题、价格的精美预览卡片。
+
+**测试方法：**
+```bash
+# 1. 访问 OG 图片 API
+http://localhost:3000/api/og
+
+# 2. 查看产品详情页 OG 标签
+curl -s http://localhost:3000/ja/items/1 | grep "og:"
+
+# 3. 在 LINE 中分享链接测试（需部署后）
+```
+
+**详细文档：** [LINE 集成完整指南](docs/LINE_INTEGRATION_README.md)
 
 ## 🏗️ 地理层级结构 Geographic Hierarchy
 
@@ -251,7 +313,7 @@ bun run dev
 
 </details>
 
-Once the server is running, visit `http://localhost:3000` to start using the app.
+Once the server is running, visit `http://localhost:3000` to start using the app。
 
 ## Usage
 
