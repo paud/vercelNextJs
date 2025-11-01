@@ -246,7 +246,9 @@
     "search_tip_1": "短いキーワードを使ってみてください",
     "search_tip_2": "スペルが正しいか確認してください",
     "search_tip_3": "商品の主な特徴の単語を使ってください",
-    "sort_by": "並び替え"
+    "sort_by": "並び替え",
+    "prev": "前へ",
+    "next": "次へ"
   },
   "Auth": {
     "signin_title": "アカウントにサインイン",
@@ -259,7 +261,15 @@
     "oauth_not_configured": "サードパーティログインサービスはまだ設定されていません。ユーザー名/パスワードでログインしてください。",
     "no_account": "アカウントをお持ちでないですか?",
     "create_account": "今すぐ登録",
-    "google_signin_note": "サインインまたは登録 - アカウントがなければ自動的に作成されます"
+    "google_signin_note": "サインインまたは登録 - アカウントがなければ自動的に作成されます",
+    "line_login": "LINEでログイン",
+    "line_login_fast": "高速",
+    "loading": "読み込み中...",
+    "liff_debug_title": "環境検出",
+    "liff_in_line": "LINE内",
+    "liff_ready": "LIFF準備完了",
+    "liff_nextauth": "NextAuth",
+    "liff_user": "LIFFユーザー"
   },
   "Messages": {
     "title": "メッセージ",
@@ -291,7 +301,10 @@
     "mark_all_read": "すべて既読にする",
     "read": "既読",
     "prev": "前へ",
-    "next": "次へ"
+    "next": "次へ",
+    "select_all": "ページ内全選択",
+    "deselect_all": "選択解除",
+    "clear_selection": "選択をクリア"
   },
   "PWA": {
     "installApp": "アプリをインストール"

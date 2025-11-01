@@ -6,6 +6,7 @@ import { useEffect, useState } from "react";
 import { useTranslations, useLocale } from "next-intl";
 import Link from "next/link";
 import { FaLine } from "react-icons/fa";
+import LineLoginButton from "@/components/LineLoginButton";
 
 const providerIcons: Record<string, React.ReactNode> = {
   google: (
@@ -36,7 +37,6 @@ export default function SignIn() {
   const [loading, setLoading] = useState(true);
   const [loadError, setLoadError] = useState<Error | null>(null);
   const [signingInId, setSigningInId] = useState<string | null>(null);
-  const [autoLoginAttempted, setAutoLoginAttempted] = useState(false);
   const t = useTranslations('Auth');
   const locale = useLocale();
 
@@ -57,18 +57,8 @@ export default function SignIn() {
         const response = await getProviders();
         setProviders(response);
         
-        // 检测是否从LINE app打开
-        const userAgent = navigator.userAgent || '';
-        const isLineApp = userAgent.includes('Line/') || userAgent.includes('LINE/');
-        
-        if (isLineApp && response?.line && !autoLoginAttempted) {
-          // 如果从LINE app打开，自动触发LINE登录
-          console.log('Detected LINE app, auto-triggering LINE login...');
-          setAutoLoginAttempted(true);
-          setTimeout(() => {
-            signIn('line', { callbackUrl: `/${locale}/users/profile` });
-          }, 500); // 延迟500ms，让UI先渲染
-        }
+        // 不再自动触发登录，让 LineAuthWrapper 处理 LINE App 内的登录
+        // 如果 LineAuthWrapper 降级，用户可以手动点击登录按钮
       } catch (error: any) {
         console.error("Failed to load providers:", error);
         setLoadError(error);
@@ -77,7 +67,7 @@ export default function SignIn() {
       }
     };
     setUpProviders();
-  }, [locale, autoLoginAttempted]);
+  }, [locale]);
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 to-green-50 flex flex-col pt-2 pb-16 px-2 sm:px-4 md:px-6 lg:px-8">
@@ -105,21 +95,29 @@ export default function SignIn() {
                 <div className="flex flex-col gap-3 sm:gap-4">
                   {Object.values(providers)
                     .filter((provider) => provider.id !== "credentials")
-                    .map((provider) => (
-                      <button
-                        key={provider.id}
-                        onClick={() => handleSignIn(provider.id)}
-                        disabled={!!signingInId}
-                        aria-label={`${t('signin_with')} ${provider.id === 'twitter' ? 'X' : provider.name}`}
-                        className={`flex items-center justify-center py-2.5 px-3 sm:py-3 sm:px-4 rounded-lg font-semibold transition text-base shadow-sm border focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-400 disabled:opacity-60 disabled:cursor-not-allowed ${providerStyles[provider.id] ?? 'bg-white text-gray-800 hover:bg-gray-50 border-gray-200'}`}
-                      >
-                        {providerIcons[provider.id] ?? defaultProviderIcon}
-                        {t('signin_with')} {provider.id === 'twitter' ? 'X' : provider.name}
-                        {signingInId === provider.id && (
-                          <span className="ml-2 inline-block h-4 w-4 border-2 border-blue-600 border-t-transparent rounded-full animate-spin" aria-hidden />
-                        )}
-                      </button>
-                    ))}
+                    .map((provider) => {
+                      // 如果是 LINE 登录，使用智能 LINE 登录按钮
+                      if (provider.id === 'line') {
+                        return <LineLoginButton key={provider.id} />;
+                      }
+                      
+                      // 其他登录方式保持原样
+                      return (
+                        <button
+                          key={provider.id}
+                          onClick={() => handleSignIn(provider.id)}
+                          disabled={!!signingInId}
+                          aria-label={`${t('signin_with')} ${provider.id === 'twitter' ? 'X' : provider.name}`}
+                          className={`flex items-center justify-center py-2.5 px-3 sm:py-3 sm:px-4 rounded-lg font-semibold transition text-base shadow-sm border focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-400 disabled:opacity-60 disabled:cursor-not-allowed ${providerStyles[provider.id] ?? 'bg-white text-gray-800 hover:bg-gray-50 border-gray-200'}`}
+                        >
+                          {providerIcons[provider.id] ?? defaultProviderIcon}
+                          {t('signin_with')} {provider.id === 'twitter' ? 'X' : provider.name}
+                          {signingInId === provider.id && (
+                            <span className="ml-2 inline-block h-4 w-4 border-2 border-blue-600 border-t-transparent rounded-full animate-spin" aria-hidden />
+                          )}
+                        </button>
+                      );
+                    })}
                 </div>
               ) : (
                 <div className="mb-6 p-4 bg-yellow-50 border border-yellow-200 rounded-lg">

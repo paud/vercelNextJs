@@ -198,8 +198,8 @@ export default function EditItemPage({ params }: { params: Promise<{ id: string;
     }
 
     return (
-        <div className="min-h-screen bg-gray-50 pt-2 pb-16">
-            <div className="max-w-sm w-full mx-auto px-2 sm:px-4">
+        <div className="min-h-screen bg-gray-50 pt-2 pb-16 w-full">
+            <div className="w-full px-2 sm:px-4 md:px-6 lg:px-8">
                 {/* 返回链接 */}
                 <Link
                     href={`/${resolvedParams?.locale}/users/my-items`}
@@ -211,7 +211,7 @@ export default function EditItemPage({ params }: { params: Promise<{ id: string;
                     {t('back_to_items')}
                 </Link>
 
-                <div className="bg-white rounded-lg shadow-md p-3 sm:p-6">
+                <div className="bg-white rounded-lg shadow-md p-3 sm:p-6 max-w-2xl mx-auto">
                     <h1 className="text-xl sm:text-2xl font-bold mb-4 sm:mb-6">{t('page_title')}</h1>
                     <form onSubmit={handleSubmit} className="space-y-4 sm:space-y-6">
                         <div>

@@ -246,7 +246,9 @@
     "search_tip_1": "Try using shorter keywords",
     "search_tip_2": "Check if spelling is correct",
     "search_tip_3": "Use main feature words of the product",
-    "sort_by": "Sort by"
+    "sort_by": "Sort by",
+    "prev": "Prev",
+    "next": "Next"
   },
   "Auth": {
     "signin_title": "Sign in to your account",
@@ -259,7 +261,15 @@
     "oauth_not_configured": "Third-party login services are not configured yet. Please use username/password to login.",
     "no_account": "Don't have an account?",
     "create_account": "Sign up now",
-    "google_signin_note": "Sign in or register - account will be created automatically if it doesn't exist"
+    "google_signin_note": "Sign in or register - account will be created automatically if it doesn't exist",
+    "line_login": "Sign in with LINE",
+    "line_login_fast": "Fast",
+    "loading": "Loading...",
+    "liff_debug_title": "Environment Detection",
+    "liff_in_line": "In LINE App",
+    "liff_ready": "LIFF Ready",
+    "liff_nextauth": "NextAuth",
+    "liff_user": "LIFF User"
   },
   "Messages": {
     "title": "Messages",
@@ -295,7 +305,10 @@
     "mark_all_read": "Mark all as read",
     "read": "Read",
     "prev": "Prev",
-    "next": "Next"
+    "next": "Next",
+    "select_all": "Select all on page",
+    "deselect_all": "Deselect all",
+    "clear_selection": "Clear selection"
   },
   "PWA": {
     "installApp": "Install App"

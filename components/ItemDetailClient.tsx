@@ -7,7 +7,7 @@ import Image from "next/image";
 
 function SkeletonDetail() {
   return (
-    <div className="max-w-sm w-full mx-auto p-3 sm:p-6 bg-gray-200 animate-pulse rounded-lg shadow mt-2 mb-16 min-h-screen flex flex-col justify-start">
+    <div className="w-full p-3 sm:p-6 bg-gray-200 animate-pulse rounded-lg shadow mt-2 mb-16 min-h-screen flex flex-col justify-start">
       <div className="w-full h-40 sm:h-64 bg-gray-300 rounded mb-3 sm:mb-4" />
       <div className="h-7 bg-gray-300 rounded mb-2 w-2/3" />
       <div className="h-6 bg-gray-300 rounded mb-2 w-1/2" />
@@ -134,7 +134,7 @@ export default function ItemDetailClient({ item, tObj, homeTObj, messagesTObj }:
     return <SkeletonDetail />;
   }
   return (
-    <div className="max-w-sm w-full mx-auto p-3 sm:p-6 bg-white rounded-lg shadow mt-2 mb-16 min-h-screen flex flex-col justify-start">
+    <div className="w-full p-3 sm:p-6 bg-white rounded-lg shadow mt-2 mb-16 min-h-screen flex flex-col justify-start">
       {item.imageUrl && (
         <Image
           src={item.imageUrl.split('?')[0]}

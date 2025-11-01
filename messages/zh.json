@@ -47,7 +47,12 @@
     "capital": "首府",
     "viewSubLevel": "查看下级",
     "autoDetectLocation": "自动定位",
-    "system_notification": "通知"
+    "system_notification": "通知",
+    "liff_debug_title": "环境检测",
+    "liff_in_line": "在 LINE 中",
+    "liff_ready": "LIFF 就绪",
+    "liff_auth_status": "认证状态",
+    "liff_user": "LIFF 用户"
   },
   "Home": {
     "market_title": "二手市场",
@@ -246,7 +251,9 @@
     "search_tip_1": "尝试使用更短的关键词",
     "search_tip_2": "检查拼写是否正确",
     "search_tip_3": "使用商品的主要特征词",
-    "sort_by": "排序方式"
+    "sort_by": "排序方式",
+    "prev": "上一页",
+    "next": "下一页"
   },
   "Auth": {
     "signin_title": "登录您的账号",
@@ -259,7 +266,15 @@
     "oauth_not_configured": "第三方登录服务尚未配置，请使用用户名/密码登录。",
     "no_account": "还没有账号?",
     "create_account": "立即注册",
-    "google_signin_note": "登录或注册 - 没有账号会自动创建"
+    "google_signin_note": "登录或注册 - 没有账号会自动创建",
+    "line_login": "用 LINE 登录",
+    "line_login_fast": "快速",
+    "loading": "加载中...",
+    "liff_debug_title": "环境检测",
+    "liff_in_line": "在 LINE 中",
+    "liff_ready": "LIFF 就绪",
+    "liff_nextauth": "NextAuth",
+    "liff_user": "LIFF 用户"
   },
   "Messages": {
     "title": "消息",
@@ -291,7 +306,10 @@
     "mark_all_read": "全部标记为已读",
     "read": "已读",
     "prev": "上一页",
-    "next": "下一页"
+    "next": "下一页",
+    "select_all": "全选当前页",
+    "deselect_all": "取消全选",
+    "clear_selection": "清除选择"
   },
   "PWA": {
     "installApp": "安装应用"

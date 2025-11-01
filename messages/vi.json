@@ -246,7 +246,9 @@
     "search_tip_1": "Thử dùng từ khóa ngắn hơn",
     "search_tip_2": "Kiểm tra lại chính tả",
     "search_tip_3": "Dùng từ khóa đặc trưng của sản phẩm",
-    "sort_by": "Sắp xếp theo"
+    "sort_by": "Sắp xếp theo",
+    "prev": "Trước",
+    "next": "Tiếp"
   },
   "Auth": {
     "signin_title": "Đăng nhập vào tài khoản",
@@ -259,7 +261,15 @@
     "oauth_not_configured": "Dịch vụ đăng nhập bên thứ ba chưa được cấu hình. Vui lòng đăng nhập bằng tên đăng nhập/mật khẩu.",
     "no_account": "Chưa có tài khoản?",
     "create_account": "Đăng ký ngay",
-    "google_signin_note": "Đăng nhập hoặc đăng ký - tài khoản sẽ được tạo tự động nếu chưa có"
+    "google_signin_note": "Đăng nhập hoặc đăng ký - tài khoản sẽ được tạo tự động nếu chưa có",
+    "line_login": "Đăng nhập bằng LINE",
+    "line_login_fast": "Nhanh",
+    "loading": "Đang tải...",
+    "liff_debug_title": "Phát hiện môi trường",
+    "liff_in_line": "Trong LINE",
+    "liff_ready": "LIFF sẵn sàng",
+    "liff_nextauth": "NextAuth",
+    "liff_user": "Người dùng LIFF"
   },
   "Messages": {
     "title": "Tin nhắn",
@@ -291,7 +301,10 @@
     "mark_all_read": "Đánh dấu tất cả đã đọc",
     "read": "Đã đọc",
     "prev": "Trước",
-    "next": "Tiếp"
+    "next": "Tiếp",
+    "select_all": "Chọn tất cả trang hiện tại",
+    "deselect_all": "Bỏ chọn tất cả",
+    "clear_selection": "Xóa lựa chọn"
   },
   "PWA": {
     "installApp": "Cài đặt ứng dụng"

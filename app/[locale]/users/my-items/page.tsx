@@ -101,7 +101,7 @@ export default function MyItemsPage() {
     <UserHeader>
       <div className="min-h-screen bg-gray-50 pb-16 pt-2">
         <div className="py-4 mb-6">
-          <div className="max-w-sm w-full mx-auto px-2 sm:px-4">
+          <div className="w-full mx-auto px-2 sm:px-4 lg:px-6">
         {/* 页面标题 */}
         <div className="mb-4 sm:mb-8">
           <Link
@@ -148,7 +148,7 @@ export default function MyItemsPage() {
             </Link>
           </div>
         ) : (
-          <div className="grid gap-4 sm:gap-6 grid-cols-2 md:grid-cols-2 lg:grid-cols-3">
+          <div className="grid gap-4 sm:gap-6 grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6">
             {items.map((item) => (
               <div key={item.id} className="bg-white rounded-lg shadow-md overflow-hidden hover:shadow-lg transition-shadow duration-300">
                 {item.imageUrl && (

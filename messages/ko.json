@@ -246,7 +246,9 @@
     "search_tip_1": "더 짧은 키워드를 사용해보세요",
     "search_tip_2": "철자가 맞는지 확인하세요",
     "search_tip_3": "상품의 주요 특징 단어를 사용하세요",
-    "sort_by": "정렬 기준"
+    "sort_by": "정렬 기준",
+    "prev": "이전",
+    "next": "다음"
   },
   "Auth": {
     "signin_title": "계정에 로그인",
@@ -259,7 +261,15 @@
     "oauth_not_configured": "서드파티 로그인 서비스가 아직 설정되지 않았습니다. 아이디/비밀번호로 로그인하세요.",
     "no_account": "계정이 없으신가요?",
     "create_account": "지금 가입",
-    "google_signin_note": "로그인 또는 가입 - 계정이 없으면 자동으로 생성됩니다"
+    "google_signin_note": "로그인 또는 가입 - 계정이 없으면 자동으로 생성됩니다",
+    "line_login": "LINE으로 로그인",
+    "line_login_fast": "빠른",
+    "loading": "로딩 중...",
+    "liff_debug_title": "환경 감지",
+    "liff_in_line": "LINE 앱",
+    "liff_ready": "LIFF 준비",
+    "liff_nextauth": "NextAuth",
+    "liff_user": "LIFF 사용자"
   },
   "Messages": {
     "title": "메시지",
@@ -291,7 +301,10 @@
     "mark_all_read": "전체 읽음 표시",
     "read": "읽음",
     "prev": "이전",
-    "next": "다음"
+    "next": "다음",
+    "select_all": "현재 페이지 전체 선택",
+    "deselect_all": "선택 취소",
+    "clear_selection": "선택 지우기"
   },
   "PWA": {
     "installApp": "앱 설치"

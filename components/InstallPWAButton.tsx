@@ -6,8 +6,9 @@ import '@khmyznikov/pwa-install';
 export default function InstallPWAButton() {
     const [deferredPrompt, setDeferredPrompt] = useState<any>(null);
     const [isPWA, setIsPWA] = useState(false);
-    const [swState, setSwState] = useState<string | undefined>(undefined); // 修复: 声明 swState
-    const [waitingWorker, setWaitingWorker] = useState<ServiceWorker | null>(null); // 补充: 声明 waitingWorker
+    const [swState, setSwState] = useState<string | undefined>(undefined);
+    const [waitingWorker, setWaitingWorker] = useState<ServiceWorker | null>(null);
+    const [isSocialApp, setIsSocialApp] = useState(false);
     const t = useTranslations('PWA');
 
     //相当于pwaInstallRef.current = document.querySelector("pwa-install");在useEffect前执行
@@ -16,6 +17,11 @@ export default function InstallPWAButton() {
 
     useEffect(() => {
         //var pwaInstall: any;
+
+        // 检测是否在社交应用内
+        const userAgent = navigator.userAgent.toLowerCase();
+        const inSocialApp = /line\/|fbav|fbios|fb_iab|fb4a|messenger|micromessenger|twitter|instagram/.test(userAgent);
+        setIsSocialApp(inSocialApp);
 
         import("@khmyznikov/pwa-install").then(() => {
             const container = document.getElementById("pwa-install-container"); // 指定 div
@@ -90,7 +96,14 @@ export default function InstallPWAButton() {
         }
 
     };
-    if (isPWA) return null;
+
+    // Hide button if in social app or if PWA is already installed
+    if (isPWA || isSocialApp) {
+        if (isSocialApp) {
+            console.log(`[InstallPWAButton] Detected social app environment, hiding install button`);
+        }
+        return null;
+    }
 
     return (
         <div id="pwa-install-container" className="relative">

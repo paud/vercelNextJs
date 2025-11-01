@@ -19,12 +19,109 @@ export const authOptions: NextAuthOptions = {
       name: "Credentials",
       credentials: {
         identifier: { label: "Username or Email", type: "text" },
-        password: { label: "Password", type: "password" }
+        password: { label: "Password", type: "password" },
+        // LIFF 登录字段
+        userId: { label: "User ID", type: "text" },
+        name: { label: "Name", type: "text" },
+        email: { label: "Email", type: "text" },
+        provider: { label: "Provider", type: "text" },
+        image: { label: "Image", type: "text" },
       },
       async authorize(credentials) {
         if (!credentials) return null;
+        
+        // LIFF 登录流程
+        if (credentials.provider === 'line-liff' && credentials.userId) {
+          console.log('[NextAuth] LIFF 登录认证:', credentials);
+          
+          // 先通过 LINE Account 查找用户
+          let account = await prisma.account.findUnique({
+            where: {
+              provider_providerAccountId: {
+                provider: 'line',
+                providerAccountId: credentials.userId
+              }
+            },
+            include: {
+              user: true
+            }
+          });
+
+          let user = account?.user || undefined;
+
+          // 如果没有找到，尝试通过 email 查找
+          if (!user && credentials.email) {
+            const foundUser = await prisma.user.findUnique({
+              where: { email: credentials.email }
+            });
+            user = foundUser || undefined;
+          }
+
+          if (!user && credentials.email) {
+            // 创建新用户和 Account
+            user = await prisma.user.create({
+              data: {
+                email: credentials.email,
+                name: credentials.name || 'LINE User',
+                username: null, // 首次登录 username 留空，用户后续可以设置
+                image: credentials.image,
+                accounts: {
+                  create: {
+                    type: 'oauth',
+                    provider: 'line',
+                    providerAccountId: credentials.userId,
+                  }
+                }
+              }
+            });
+            console.log('[NextAuth] 创建新用户:', user);
+            
+            // 首次 LINE LIFF 登录，发送欢迎通知
+            await prisma.systemNotification.create({
+              data: {
+                userId: user.id,
+                title: "Welcome!",
+                content: "Thank you for registering with LINE. Enjoy our marketplace!",
+                type: "welcome"
+              }
+            });
+            console.log('[NextAuth] 欢迎通知已发送');
+          } else if (user && !account) {
+            // 用户存在但没有 LINE Account，创建关联
+            await prisma.account.create({
+              data: {
+                userId: user.id,
+                type: 'oauth',
+                provider: 'line',
+                providerAccountId: credentials.userId,
+              }
+            });
+            // 更新用户信息
+            user = await prisma.user.update({
+              where: { id: user.id },
+              data: {
+                image: credentials.image || user.image,
+              }
+            });
+            console.log('[NextAuth] 创建 LINE Account 关联:', user);
+          }
+
+          if (user) {
+            return {
+              id: String(user.id),
+              name: user.name,
+              email: user.email,
+              image: user.image,
+            };
+          }
+          
+          return null;
+        }
+        
+        // 原有的用户名/密码登录流程
         const { identifier, password } = credentials;
-        // 支持用户名或邮箱登录
+        if (!identifier || !password) return null;
+        
         const user = await prisma.user.findFirst({
           where: {
             OR: [
@@ -109,7 +206,7 @@ export const authOptions: NextAuthOptions = {
       // 重要：在signIn callback中，profile可能为undefined，我们使用user对象
       if (account?.provider === 'line' && user?.id) {
         // LINE提供的email或者使用占位符email（LINE通常不提供email）
-        const lineEmail = user.email || `${user.id}@line.local`;
+        const lineEmail = user.email || `${user.id}@line.user`; // 统一使用 @line.user
         
         console.log('[NextAuth LINE] Processing sign-in:', { 
           userId: user.id, 

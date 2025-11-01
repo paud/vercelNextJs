@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react';
 import { useSearchParams, useRouter } from 'next/navigation';
 import { useLocale, useTranslations } from 'next-intl';
 import Link from 'next/link';
+import Image from 'next/image';
 
 interface Item {
   id: number;
@@ -41,6 +42,41 @@ export default function SearchPage() {
   
   const query = searchParams?.get('q') || '';
 
+  // 动态响应式网格布局
+  const INITIAL_ROWS = 4;
+  const [itemsPerRow, setItemsPerRow] = useState(3);
+  const INITIAL_DISPLAY = itemsPerRow * INITIAL_ROWS;
+  const [visibleCount, setVisibleCount] = useState(INITIAL_DISPLAY);
+
+  // 动态计算每行显示的商品数
+  useEffect(() => {
+    function getItemsPerRow() {
+      if (window.innerWidth < 640) return 2;
+      if (window.innerWidth < 1024) return 3;
+      if (window.innerWidth < 1440) return 4;
+      if (window.innerWidth < 1920) return 5;
+      return 6; // 超大屏幕自动更多列
+    }
+    setItemsPerRow(getItemsPerRow());
+    function handleResize() {
+      setItemsPerRow(getItemsPerRow());
+    }
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, []);
+
+  // 动态生成 grid-cols class（静态映射，确保 Tailwind 编译）
+  const gridColsClass = {
+    2: "grid-cols-2",
+    3: "grid-cols-3",
+    4: "grid-cols-4",
+    5: "grid-cols-5",
+    6: "grid-cols-6"
+  }[itemsPerRow];
+
+  // 显示的商品列表
+  const displayedItems = searchResult ? searchResult.items.slice(0, visibleCount) : [];
+
   useEffect(() => {
     // 从URL参数获取排序设置
     const sortParam = searchParams?.get('sort') || 'createdAt';
@@ -53,7 +89,28 @@ export default function SearchPage() {
     } else {
       setIsLoading(false);
     }
-  }, [query, searchParams]);
+    
+    // 重置显示数量到初始值
+    setVisibleCount(itemsPerRow * INITIAL_ROWS);
+  }, [query, searchParams, itemsPerRow]);
+
+  // 无限滚动监听
+  useEffect(() => {
+    function handleScroll() {
+      if (
+        window.innerHeight + window.scrollY >= document.body.offsetHeight - 100 &&
+        searchResult &&
+        visibleCount < searchResult.items.length &&
+        !isLoading
+      ) {
+        // 每次加载更多若干行（根据当前屏幕宽度）
+        const loadMoreCount = itemsPerRow * 4; // 每次加载4行
+        setVisibleCount(prev => Math.min(prev + loadMoreCount, searchResult.items.length));
+      }
+    }
+    window.addEventListener('scroll', handleScroll);
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, [searchResult, visibleCount, isLoading, itemsPerRow]);
 
   const performSearch = async (searchQuery: string, sortBy: string = sort, orderBy: string = order) => {
     try {
@@ -88,6 +145,8 @@ export default function SearchPage() {
       setOrder("desc"); // 切换字段时默认降序
       router.push(`/${locale}/search?q=${encodeURIComponent(query)}&sort=${value}&order=desc`);
     }
+    // 重置显示数量
+    setVisibleCount(itemsPerRow * INITIAL_ROWS);
   };
 
   const SORT_OPTIONS = [
@@ -151,14 +210,14 @@ export default function SearchPage() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50 py-8 pb-24">
-      <div className="max-w-6xl mx-auto px-4">
+    <div className="min-h-screen bg-gray-50 pt-2 pb-16 w-full">
+      <div className="w-full px-2 sm:px-4">
         {/* 搜索结果标题 */}
-        <div className="mb-8">
-          <h1 className="text-3xl font-bold text-gray-900 mb-2">
+        <div className="mb-4 sm:mb-6 max-w-6xl mx-auto">
+          <h1 className="text-xl sm:text-2xl md:text-3xl font-bold text-gray-900 mb-2">
             {t('search_results')}
           </h1>
-          <p className="text-gray-600">
+          <p className="text-sm sm:text-base text-gray-600">
             {searchResult && searchResult.count > 0 
               ? `${t('found_results')} - "${searchResult.query}" (${searchResult.count})`
               : `${t('no_results')} - "${query}"`
@@ -168,7 +227,7 @@ export default function SearchPage() {
           {/* 返回首页链接 */}
           <Link
             href={`/${locale}`}
-            className="inline-flex items-center text-blue-600 hover:text-blue-800 mt-4"
+            className="inline-flex items-center text-blue-600 hover:text-blue-800 mt-3 sm:mt-4 text-sm sm:text-base"
           >
             <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 19l-7-7m0 0l7-7m0 7h18" />
@@ -179,21 +238,21 @@ export default function SearchPage() {
 
         {/* 排序按钮 */}
         {searchResult && searchResult.count > 0 && (
-          <div className="mb-6 flex flex-wrap gap-3 items-center">
-            <span className="text-sm text-gray-600 font-medium">{t('sort_by')}:</span>
+          <div className="mb-4 sm:mb-6 flex flex-wrap gap-2 sm:gap-3 items-center max-w-6xl mx-auto">
+            <span className="text-xs sm:text-sm text-gray-600 font-medium">{t('sort_by')}:</span>
             {SORT_OPTIONS.map((option) => (
               <button
                 key={option.value}
                 onClick={() => handleSortChange(option.value)}
-                className={`px-4 py-2 rounded-lg text-sm font-semibold shadow bg-blue-500 text-white hover:bg-blue-600 transition flex items-center gap-1 ${sort === option.value ? "" : "opacity-80"}`}
+                className={`px-3 py-1.5 sm:px-4 sm:py-2 rounded-lg text-xs sm:text-sm font-semibold shadow bg-blue-500 text-white hover:bg-blue-600 transition flex items-center gap-1 ${sort === option.value ? "" : "opacity-80"}`}
               >
                 {option.label}
                 {sort === option.value && (
                   <span>
                     {order === "asc" ? (
-                      <svg width="16" height="16" fill="none" viewBox="0 0 24 24"><path d="M12 8l-6 6h12l-6-6z" fill="currentColor"/></svg>
+                      <svg width="14" height="14" fill="none" viewBox="0 0 24 24" className="sm:w-4 sm:h-4"><path d="M12 8l-6 6h12l-6-6z" fill="currentColor"/></svg>
                     ) : (
-                      <svg width="16" height="16" fill="none" viewBox="0 0 24 24"><path d="M12 16l6-6H6l6 6z" fill="currentColor"/></svg>
+                      <svg width="14" height="14" fill="none" viewBox="0 0 24 24" className="sm:w-4 sm:h-4"><path d="M12 16l6-6H6l6 6z" fill="currentColor"/></svg>
                     )}
                   </span>
                 )}
@@ -204,34 +263,58 @@ export default function SearchPage() {
 
         {/* 搜索结果 */}
         {searchResult && searchResult.count > 0 ? (
-          <div className="grid gap-6 grid-cols-2 md:grid-cols-2 lg:grid-cols-3">
-            {searchResult.items.map((item) => (
-              <Link key={item.id} href={`/${locale}/items/${item.id}`} className="group">
-                <div className="border rounded-lg shadow-md bg-white p-4 hover:shadow-lg transition-shadow duration-300 flex flex-col">
-                  {item.imageUrl && (
-                    <img src={item.imageUrl} alt={item.title} className="w-full h-40 object-cover rounded mb-2" />
-                  )}
-                  <h2 className="text-lg font-semibold text-blue-600 group-hover:underline mb-1">
-                    {item.title}
-                  </h2>
-                  <p className="text-base text-green-600 font-bold mb-1">{homeT('currency')}{item.price}</p>
-                  <p className="text-sm text-gray-500 mb-1">
-                    {t('seller')}: {item.seller ? item.seller.name : t('anonymous')}
-                  </p>
-                  <p className="text-xs text-gray-400 mb-2">
-                    {new Date(item.createdAt).toLocaleDateString(homeT('date_locale'), {
-                      year: "numeric",
-                      month: "long",
-                      day: "numeric",
-                    })}
-                  </p>
-                  <p className="text-gray-700 leading-relaxed line-clamp-2">
-                    {item.description || t('no_description')}
-                  </p>
-                </div>
-              </Link>
-            ))}
-          </div>
+          <>
+            <div className={`grid gap-4 sm:gap-6 w-full max-w-6xl mx-auto mb-6 sm:mb-8 ${gridColsClass}`}>
+              {displayedItems.map((item, index) => (
+                <Link key={item.id + '-' + index} href={`/${locale}/items/${item.id}`} className="group">
+                  <div className="border rounded-lg shadow-md bg-white p-3 sm:p-4 hover:shadow-lg transition-shadow duration-300 flex flex-col">
+                    {item.imageUrl && (
+                      <div className="w-full aspect-square mb-2 overflow-hidden rounded">
+                        <Image 
+                          src={item.imageUrl + (item.imageUrl.includes('?') ? '&' : '?') + 'w=200&h=200&fit=crop'}
+                          alt={item.title}
+                          width={200}
+                          height={200}
+                          className="w-full h-full object-contain bg-white"
+                          loading="lazy"
+                          style={{ objectFit: 'contain', background: 'white' }}
+                        />
+                      </div>
+                    )}
+                    <h2 className="text-base sm:text-lg font-semibold text-blue-600 group-hover:underline mb-1">
+                      {item.title}
+                    </h2>
+                    <p className="text-sm sm:text-base text-green-600 font-bold mb-1">{homeT('currency')}{item.price}</p>
+                    <p className="text-xs sm:text-sm text-gray-500 mb-1">
+                      {t('seller')}: {item.seller ? item.seller.name : t('anonymous')}
+                    </p>
+                    <p className="text-xs text-gray-400 mb-2">
+                      {new Date(item.createdAt).toLocaleDateString(homeT('date_locale'), {
+                        year: "numeric",
+                        month: "long",
+                        day: "numeric",
+                      })}
+                    </p>
+                    <p className="text-xs sm:text-sm text-gray-700 leading-relaxed line-clamp-2">
+                      {item.description || t('no_description')}
+                    </p>
+                  </div>
+                </Link>
+              ))}
+            </div>
+
+            {/* 加载中和到底提示 */}
+            {visibleCount < searchResult.items.length && (
+              <div className="p-4 text-center text-gray-500">
+                {t('searching')}
+              </div>
+            )}
+            {visibleCount >= searchResult.items.length && (
+              <div className="p-4 text-center text-gray-400">
+                {homeT('no_more_items')}
+              </div>
+            )}
+          </>
         ) : searchResult && (
           /* 无搜索结果 */
           <div className="text-center py-12">

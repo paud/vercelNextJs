@@ -5,7 +5,8 @@
     "build": "next build",
     "start": "next start",
     "lint": "eslint .",
-    "postinstall": "prisma generate"
+    "postinstall": "prisma generate",
+    "check-liff": "node scripts/check-liff-config.js"
   },
   "prisma": {
     "seed": "tsx prisma/seed-complete-japan.ts"
