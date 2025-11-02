@@ -56,6 +56,9 @@ export default function RootLayout({
   return (
     <html lang="en" className="h-full force-light-theme">
       <head>
+        {process.env.NODE_ENV === 'development' && (
+          <script src="/liff-simulator-helper.js"></script>
+        )}
         <link rel="manifest" href="/manifest.json" />
         {/* PWA相关 */}
         <meta name="theme-color" content={siteConfig.themeColor} />

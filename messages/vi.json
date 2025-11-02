@@ -309,6 +309,26 @@
   "PWA": {
     "installApp": "Cài đặt ứng dụng"
   },
+  "LiffAuth": {
+    "initializing": "Đang khởi tạo LIFF...",
+    "pleaseWait": "Vui lòng đợi",
+    "welcomeTitle": "Chào mừng đến với ứng dụng!",
+    "authRequired": "Cần ủy quyền để tiếp tục",
+    "infoWeWillGet": "Chúng tôi sẽ truy cập thông tin sau:",
+    "displayName": "Tên hiển thị (để chào hỏi cá nhân hóa)",
+    "profilePicture": "Ảnh đại diện (để hiển thị hồ sơ)",
+    "benefitsTitle": "Sau khi ủy quyền, bạn có thể:",
+    "benefitQuickLogin": "Đăng nhập nhanh (tự động nhận diện lần sau)",
+    "benefitSavePreferences": "Lưu tùy chọn của bạn",
+    "benefitPersonalizedContent": "Xem nội dung cá nhân hóa",
+    "authorizeButton": "Ủy quyền và Tiếp tục",
+    "privacyNotice": "Bằng cách nhấp \"Ủy quyền và Tiếp tục\", bạn đồng ý cho chúng tôi truy cập thông tin trên. Chúng tôi cam kết bảo vệ quyền riêng tư của bạn.",
+    "loggingIn": "Đang đăng nhập...",
+    "almostThere": "Sắp xong",
+    "loginFailed": "Đăng nhập thất bại",
+    "unknownError": "Lỗi không xác định",
+    "retry": "Thử lại"
+  },
   "human_verification_required": "Yêu cầu xác minh người dùng. Vui lòng hoàn thành xác minh.",
   "register_failed": "Đăng ký thất bại. Vui lòng thử lại.",
   "change_password": "Đổi mật khẩu",

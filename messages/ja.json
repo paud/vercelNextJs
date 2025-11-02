@@ -309,6 +309,26 @@
   "PWA": {
     "installApp": "アプリをインストール"
   },
+  "LiffAuth": {
+    "initializing": "LIFFを初期化中...",
+    "pleaseWait": "お待ちください",
+    "welcomeTitle": "アプリへようこそ！",
+    "authRequired": "続行するには認証が必要です",
+    "infoWeWillGet": "以下の情報を取得します：",
+    "displayName": "表示名（パーソナライズされた挨拶用）",
+    "profilePicture": "プロフィール画像（プロフィール表示用）",
+    "benefitsTitle": "認証後、以下が可能になります：",
+    "benefitQuickLogin": "クイックログイン（次回から自動認識）",
+    "benefitSavePreferences": "設定を保存",
+    "benefitPersonalizedContent": "パーソナライズされたコンテンツの表示",
+    "authorizeButton": "認証して続ける",
+    "privacyNotice": "「認証して続ける」をクリックすると、上記の情報へのアクセスに同意したことになります。プライバシーを保護することをお約束します。",
+    "loggingIn": "ログイン中...",
+    "almostThere": "もう少しです",
+    "loginFailed": "ログイン失敗",
+    "unknownError": "不明なエラー",
+    "retry": "再試行"
+  },
   "human_verification_required": "人間認証が必要です。認証を完了してください。",
   "register_failed": "登録失敗。再度お試しください。"
 }

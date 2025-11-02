@@ -1,0 +1,856 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>LINE 浏览器模拟器 - LIFF 调试工具</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
+                'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue', sans-serif;
+            background: #f5f5f5;
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .simulator-container {
+            display: flex;
+            flex-direction: row;
+            height: 100vh;
+        }
+
+        .control-panel {
+            background: linear-gradient(135deg, #06c755 0%, #00b900 100%);
+            color: white;
+            padding: 15px 20px;
+            box-shadow: 2px 0 16px rgba(0, 0, 0, 0.08);
+            width: 340px;
+            min-width: 280px;
+            max-width: 400px;
+            height: 100vh;
+            border-radius: 0 16px 16px 0;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .control-panel h1 {
+            font-size: 20px;
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .control-panel h1::before {
+            content: '📱';
+            font-size: 24px;
+        }
+
+        .controls {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin-bottom: 10px;
+        }
+
+        .control-group {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            background: rgba(255, 255, 255, 0.15);
+            padding: 8px 12px;
+            border-radius: 8px;
+            backdrop-filter: blur(10px);
+        }
+
+        .control-group label {
+            font-size: 13px;
+            font-weight: 500;
+        }
+
+        .control-group input,
+        .control-group select {
+            padding: 6px 10px;
+            border: none;
+            border-radius: 5px;
+            font-size: 13px;
+            background: white;
+            color: #333;
+        }
+
+        .control-group input {
+            min-width: 300px;
+        }
+
+        .control-group select {
+            cursor: pointer;
+            min-width: 150px;
+        }
+
+        .button-group {
+            display: flex;
+            gap: 8px;
+            margin-top: 10px;
+        }
+
+        button {
+            padding: 8px 16px;
+            border: none;
+            border-radius: 6px;
+            font-size: 13px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        button.primary {
+            background: white;
+            color: #06c755;
+        }
+
+        button.primary:hover {
+            background: #f0f0f0;
+            transform: translateY(-1px);
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+        }
+
+        button.secondary {
+            background: rgba(255, 255, 255, 0.2);
+            color: white;
+            border: 1px solid rgba(255, 255, 255, 0.3);
+        }
+
+        button.secondary:hover {
+            background: rgba(255, 255, 255, 0.3);
+        }
+
+        button:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        .device-frame {
+            flex: 1;
+            height: 100vh;
+            align-items: center;
+            justify-content: center;
+            display: flex;
+        }
+
+        .phone-mockup {
+            position: relative;
+            width: 375px;
+            height: 667px;
+            background: #000;
+            border-radius: 40px;
+            padding: 15px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            display: flex;
+            flex-direction: column;
+        }
+
+        .phone-mockup.tablet {
+            width: 768px;
+            height: 1024px;
+        }
+
+        .phone-mockup.desktop {
+            width: 1200px;
+            height: 800px;
+            border-radius: 20px;
+        }
+
+        .phone-notch {
+            position: absolute;
+            top: 0;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 150px;
+            height: 25px;
+            background: #000;
+            border-radius: 0 0 20px 20px;
+            z-index: 10;
+        }
+
+        .line-header {
+            background: #06c755;
+            color: white;
+            padding: 12px;
+            text-align: center;
+            font-size: 16px;
+            font-weight: 600;
+            border-radius: 8px 8px 0 0;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .line-header-title {
+            flex: 1;
+            text-align: center;
+        }
+
+        .line-header-icon {
+            font-size: 20px;
+        }
+
+        .iframe-container {
+            flex: 1;
+            background: white;
+            border-radius: 0 0 8px 8px;
+            overflow: hidden;
+            position: relative;
+        }
+
+        iframe {
+            width: 100%;
+            height: 100%;
+            border: none;
+        }
+
+        .status-bar {
+            background: rgba(0, 0, 0, 0.05);
+            padding: 10px;
+            font-size: 12px;
+            color: #666;
+            border-top: 1px solid #e0e0e0;
+        }
+
+        .status-item {
+            display: flex;
+            justify-content: space-between;
+            margin: 3px 0;
+        }
+
+        .status-item strong {
+            color: #333;
+        }
+
+        .info-panel {
+            background: rgba(255, 255, 255, 0.95);
+            border: 1px solid rgba(6, 199, 85, 0.3);
+            border-radius: 8px;
+            padding: 12px;
+            margin-top: 10px;
+            font-size: 12px;
+            color: #333;
+        }
+
+        .info-panel h3 {
+            font-size: 13px;
+            margin-bottom: 8px;
+            color: #06c755;
+        }
+
+        .info-panel ul {
+            list-style: none;
+            padding-left: 0;
+        }
+
+        .info-panel li {
+            padding: 4px 0;
+            padding-left: 16px;
+            position: relative;
+        }
+
+        .info-panel li::before {
+            content: '✓';
+            position: absolute;
+            left: 0;
+            color: #06c755;
+        }
+
+        .loading-indicator {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            text-align: center;
+        }
+
+        .spinner {
+            border: 3px solid rgba(6, 199, 85, 0.1);
+            border-top: 3px solid #06c755;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 10px;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        @media (max-width: 1400px) {
+            .phone-mockup.desktop {
+                width: 1000px;
+                height: 700px;
+            }
+        }
+
+        @media (max-width: 1100px) {
+            .phone-mockup {
+                width: 360px;
+                height: 640px;
+            }
+            .phone-mockup.tablet {
+                width: 600px;
+                height: 800px;
+            }
+            .phone-mockup.desktop {
+                width: 800px;
+                height: 600px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="simulator-container" style="display: flex; flex-direction: row; height: 100vh;">
+        <!-- 控制面板左侧 -->
+        <div class="control-panel" style="width: 340px; min-width: 280px; max-width: 400px; height: 100vh; border-radius: 0 16px 16px 0; box-shadow: 2px 0 16px rgba(0,0,0,0.08); display: flex; flex-direction: column;">
+            <h1>LINE 浏览器模拟器</h1>
+            
+            <div class="controls">
+                <div class="control-group">
+                    <label>📍 URL:</label>
+                    <input type="text" id="urlInput" placeholder="输入要调试的 URL (例如: http://localhost:3000)" />
+                </div>
+                
+                <div class="control-group">
+                    <label>📱 设备:</label>
+                    <select id="deviceSelect">
+                        <option value="mobile">移动端 (375x667)</option>
+                        <option value="tablet">平板 (768x1024)</option>
+                        <option value="desktop">桌面端 (1200x800)</option>
+                    </select>
+                </div>
+                
+                <div class="control-group">
+                    <label>🌐 User Agent:</label>
+                    <select id="uaSelect">
+                        <option value="line-ios">LINE iOS</option>
+                        <option value="line-android">LINE Android</option>
+                        <option value="chrome">Chrome (测试)</option>
+                    </select>
+                </div>
+                
+                <div class="control-group">
+                    <label>🔐 LIFF 状态:</label>
+                    <select id="liffAuthStatus">
+                        <option value="authorized">已授权 (已登录)</option>
+                        <option value="unauthorized">未授权 (未登录)</option>
+                        <option value="expired">Token 过期</option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="button-group" style="display: flex; flex-wrap: wrap; gap: 8px; margin-top: 10px;">
+                <div style="display: flex; gap: 8px; margin-bottom: 8px;">
+                    <button class="primary" onclick="loadUrl()">🚀 加载页面</button>
+                    <button class="secondary" onclick="reloadIframe()">🔄 刷新</button>
+                    <button class="secondary" onclick="simulateLineLogin()">👤 模拟登录 LINE</button>
+                    <button class="secondary" onclick="simulateLiffAuthorize()">🔐 模拟授权</button>
+                    <button class="secondary" onclick="simulateLiffLogout()">🚪 模拟登出</button>
+                </div>
+                <div style="display: flex; gap: 8px;">
+                    <button class="secondary" onclick="clearCache()">🗑️ 清除缓存</button>
+                    <button class="secondary" onclick="openDevTools()">🔧 开发者工具</button>
+                    <button class="secondary" onclick="copyUrl()">📋 复制 URL</button>
+                    <button class="secondary" onclick="activateTestMode()">🧪 激活测试模式</button>
+                </div>
+            </div>
+        </div>
+        <!-- 设备模拟器右侧 -->
+        <div class="device-frame" style="flex: 1; height: 100vh; align-items: center; justify-content: center; display: flex;">
+            <div class="phone-mockup" id="phoneMockup">
+                <div class="phone-notch"></div>
+                <div class="line-header">
+                    <span class="line-header-icon">←</span>
+                    <span class="line-header-title">LINE</span>
+                    <span class="line-header-icon">⋮</span>
+                </div>
+                <div class="iframe-container">
+                    <div class="loading-indicator" id="loadingIndicator">
+                        <div class="spinner"></div>
+                        <div>加载中...</div>
+                    </div>
+                    <iframe id="appIframe" sandbox="allow-same-origin allow-scripts allow-forms allow-popups allow-popups-to-escape-sandbox allow-modals"></iframe>
+                </div>
+                <div class="status-bar" id="statusBar">
+                    <div class="status-item">
+                        <span><strong>状态:</strong> <span id="statusText">等待加载</span></span>
+                    </div>
+                    <div class="status-item">
+                        <span><strong>LIFF 授权:</strong> <span id="liffAuthText">未授权</span></span>
+                    </div>
+                    <div class="status-item">
+                        <span><strong>User Agent:</strong> <span id="uaText">未设置</span></span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // User Agent 配置
+        const USER_AGENTS = {
+            'line-ios': 'Mozilla/5.0 (iPhone; CPU iPhone OS 16_0 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Mobile/15E148 Safari Line/13.1.1',
+            'line-android': 'Mozilla/5.0 (Linux; Android 12; Pixel 6) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/96.0.4664.45 Mobile Safari/537.36 Line/12.1.1',
+            'chrome': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/119.0.0.0 Safari/537.36'
+        };
+
+        // 模拟 LIFF 用户数据
+        const MOCK_LIFF_USER = {
+            userId: 'U' + Math.random().toString(36).substr(2, 32),
+            displayName: '测试用户',
+            pictureUrl: 'https://via.placeholder.com/200',
+            statusMessage: '这是一个测试账号'
+        };
+
+        // 模拟 Access Token
+        const MOCK_ACCESS_TOKEN = 'mock_access_token_' + Math.random().toString(36).substr(2, 64);
+        const MOCK_ID_TOKEN = 'mock_id_token_' + Math.random().toString(36).substr(2, 64);
+
+        // 默认加载本地开发地址
+        const defaultUrl = window.location.origin.includes('localhost') || window.location.origin.includes('127.0.0.1')
+            ? 'http://localhost:3000'
+            : window.location.origin;
+
+        document.getElementById('urlInput').value = defaultUrl;
+
+        // 获取当前授权状态
+        function getLiffAuthStatus() {
+            return document.getElementById('liffAuthStatus').value;
+        }
+
+        // 更新授权状态显示
+        function updateAuthStatusDisplay() {
+            const status = getLiffAuthStatus();
+            const liffAuthText = document.getElementById('liffAuthText');
+            // 注入 User Agent，无论授权与否都模拟在 LINE App 内
+            updateUserAgentDisplay();
+            // 未授权时清除 token，保留 User Agent
+            if (status === 'unauthorized') {
+                localStorage.removeItem('liff_mock_data');
+                localStorage.removeItem('mock_access_token');
+            }
+            switch(status) {
+                case 'authorized':
+                    liffAuthText.textContent = '✅ 已授权';
+                    liffAuthText.style.color = '#06c755';
+                    break;
+                case 'unauthorized':
+                    liffAuthText.textContent = '❌ 未授权';
+                    liffAuthText.style.color = '#ff6b6b';
+                    break;
+                case 'expired':
+                    liffAuthText.textContent = '⚠️ Token 过期';
+                    liffAuthText.style.color = '#ff9800';
+                    break;
+            }
+        }
+
+        // 模拟 LIFF 登录
+        function simulateLiffLogin() {
+            const status = getLiffAuthStatus();
+            if (status === 'unauthorized') {
+                alert('❌ 当前 LIFF 状态设置为"未授权"，请先将状态改为"已授权"后再模拟登录');
+                return;
+            }
+
+            // 设置模拟的 LIFF 数据到 localStorage
+            try {
+                // 重新生成 token，确保每次模拟登录都唯一
+                const accessToken = 'mock_access_token_' + Math.random().toString(36).substr(2, 64);
+                const idToken = 'mock_id_token_' + Math.random().toString(36).substr(2, 64);
+                const liffData = {
+                    user: MOCK_LIFF_USER,
+                    accessToken: accessToken,
+                    idToken: idToken,
+                    isLoggedIn: true,
+                    expiresAt: status === 'expired' ? Date.now() - 1000 : Date.now() + 3600000, // 1小时后过期
+                    context: {
+                        type: 'utou',
+                        viewType: 'full',
+                        userId: MOCK_LIFF_USER.userId,
+                        utouId: 'U' + Math.random().toString(36).substr(2, 32)
+                    }
+                };
+                localStorage.setItem('liff_mock_data', JSON.stringify(liffData));
+                localStorage.setItem('mock_access_token', accessToken); // 同步写入 mock_access_token
+                // 通知 iframe
+                notifyIframe({
+                    type: 'liff-auth-changed',
+                    status: 'authorized',
+                    user: MOCK_LIFF_USER,
+                    accessToken: accessToken,
+                    idToken: idToken
+                });
+                updateAuthStatusDisplay();
+                console.log('✅ LIFF 登录模拟成功');
+                console.log('👤 用户信息:', MOCK_LIFF_USER);
+                console.log('🔑 Access Token:', accessToken.substring(0, 30) + '...');
+                alert('✅ LIFF 登录模拟成功！\n\n' +
+                      '用户ID: ' + MOCK_LIFF_USER.userId.substring(0, 20) + '...\n' +
+                      '显示名称: ' + MOCK_LIFF_USER.displayName + '\n\n' +
+                      '页面将自动刷新以应用新的登录状态');
+                // 刷新 iframe
+                setTimeout(() => reloadIframe(), 1000);
+            } catch (e) {
+                console.error('❌ 模拟登录失败:', e);
+                alert('❌ 模拟登录失败: ' + e.message);
+            }
+        }
+
+        // 模拟 LIFF 登出
+        function simulateLiffLogout() {
+            try {
+                // 清除模拟的 LIFF 数据
+                localStorage.removeItem('liff_mock_data');
+                
+                // 通知 iframe
+                notifyIframe({
+                    type: 'liff-auth-changed',
+                    status: 'unauthorized',
+                    user: null
+                });
+
+                // 更新状态选择器
+                document.getElementById('liffAuthStatus').value = 'unauthorized';
+                updateAuthStatusDisplay();
+                
+                console.log('✅ LIFF 登出模拟成功');
+                
+                alert('✅ LIFF 登出模拟成功！\n\n页面将自动刷新');
+                
+                // 刷新 iframe
+                setTimeout(() => reloadIframe(), 1000);
+            } catch (e) {
+                console.error('❌ 模拟登出失败:', e);
+                alert('❌ 模拟登出失败: ' + e.message);
+            }
+        }
+
+        // 模拟登录 LINE（只设置 User Agent，不写入 token）
+        function simulateLineLogin() {
+            // 只刷新 User Agent，不写入任何 token
+            updateUserAgentDisplay();
+            localStorage.removeItem('liff_mock_data');
+            localStorage.removeItem('mock_access_token');
+            alert('已模拟登录 LINE（仅设置 User Agent，未授权网页）。\n请刷新页面测试首次访问场景。');
+            reloadIframe();
+        }
+
+        // 模拟 LIFF 授权（写入 token）
+        function simulateLiffAuthorize() {
+            const status = getLiffAuthStatus();
+            if (status !== 'authorized' && status !== 'expired') {
+                alert('请先将 LIFF 状态切换为“已授权”或“Token 过期”再模拟授权');
+                return;
+            }
+            try {
+                const accessToken = 'mock_access_token_' + Math.random().toString(36).substr(2, 64);
+                const idToken = 'mock_id_token_' + Math.random().toString(36).substr(2, 64);
+                const liffData = {
+                    user: MOCK_LIFF_USER,
+                    accessToken: accessToken,
+                    idToken: idToken,
+                    isLoggedIn: true,
+                    expiresAt: status === 'expired' ? Date.now() - 1000 : Date.now() + 3600000,
+                    context: {
+                        type: 'utou',
+                        viewType: 'full',
+                        userId: MOCK_LIFF_USER.userId,
+                        utouId: 'U' + Math.random().toString(36).substr(2, 32)
+                    }
+                };
+                localStorage.setItem('liff_mock_data', JSON.stringify(liffData));
+                localStorage.setItem('mock_access_token', accessToken);
+                notifyIframe({
+                    type: 'liff-auth-changed',
+                    status: 'authorized',
+                    user: MOCK_LIFF_USER,
+                    accessToken: accessToken,
+                    idToken: idToken
+                });
+                updateAuthStatusDisplay();
+                alert('✅ LIFF 授权模拟成功！\n页面将自动刷新以应用新的授权状态。');
+                setTimeout(() => reloadIframe(), 1000);
+            } catch (e) {
+                console.error('❌ 模拟授权失败:', e);
+                alert('❌ 模拟授权失败: ' + e.message);
+            }
+        }
+
+        // 通知 iframe
+        function notifyIframe(message) {
+            const iframe = document.getElementById('appIframe');
+            if (iframe && iframe.contentWindow) {
+                try {
+                    iframe.contentWindow.postMessage(message, '*');
+                    console.log('📤 发送消息到 iframe:', message);
+                } catch (e) {
+                    console.warn('⚠️ 无法发送消息到 iframe:', e.message);
+                }
+            }
+        }
+
+        // 加载 URL
+        function loadUrl() {
+            const url = document.getElementById('urlInput').value.trim();
+            if (!url) {
+                alert('请输入 URL');
+                return;
+            }
+
+            const iframe = document.getElementById('appIframe');
+            const loadingIndicator = document.getElementById('loadingIndicator');
+            const statusText = document.getElementById('statusText');
+
+            loadingIndicator.style.display = 'block';
+            statusText.textContent = '加载中...';
+
+            // 根据授权状态设置模拟数据
+            const authStatus = getLiffAuthStatus();
+            if (authStatus === 'authorized' || authStatus === 'expired') {
+                // 预先设置 LIFF 模拟数据
+                const liffData = {
+                    user: MOCK_LIFF_USER,
+                    accessToken: MOCK_ACCESS_TOKEN,
+                    idToken: MOCK_ID_TOKEN,
+                    isLoggedIn: true,
+                    expiresAt: authStatus === 'expired' ? Date.now() - 1000 : Date.now() + 3600000,
+                    context: {
+                        type: 'utou',
+                        viewType: 'full',
+                        userId: MOCK_LIFF_USER.userId,
+                        utouId: 'U' + Math.random().toString(36).substr(2, 32)
+                    }
+                };
+                localStorage.setItem('liff_mock_data', JSON.stringify(liffData));
+            } else {
+                // 清除 LIFF 模拟数据
+                localStorage.removeItem('liff_mock_data');
+            }
+
+            // 显示加载状态
+            iframe.onload = function() {
+                loadingIndicator.style.display = 'none';
+                statusText.textContent = '已加载';
+                
+                // 尝试注入 LIFF 环境信息到 iframe (如果同源)
+                try {
+                    const iframeWindow = iframe.contentWindow;
+                    if (iframeWindow) {
+                        // 设置一些调试信息
+                        console.log('✅ iframe 加载成功');
+                        console.log('📍 URL:', url);
+                        console.log('🌐 User Agent:', getCurrentUserAgent());
+                        console.log('🔐 LIFF 状态:', authStatus);
+                        
+                        // 发送初始授权状态
+                        notifyIframe({
+                            type: 'liff-init',
+                            status: authStatus,
+                            user: authStatus === 'authorized' || authStatus === 'expired' ? MOCK_LIFF_USER : null
+                        });
+                    }
+                } catch (e) {
+                    console.warn('⚠️ 无法访问 iframe (可能是跨域):', e.message);
+                }
+            };
+
+            iframe.onerror = function() {
+                loadingIndicator.style.display = 'none';
+                statusText.textContent = '加载失败';
+                alert('加载失败，请检查 URL 是否正确');
+            };
+
+            iframe.src = url;
+            updateUserAgentDisplay();
+            updateAuthStatusDisplay();
+        }
+
+        // 刷新 iframe
+        function reloadIframe() {
+            const iframe = document.getElementById('appIframe');
+            if (iframe.src) {
+                iframe.src = iframe.src;
+            } else {
+                loadUrl();
+            }
+        }
+
+        // 清除缓存
+        function clearCache() {
+            if (confirm('确定要清除缓存并重新加载吗？')) {
+                // 清除本地存储
+                try {
+                    localStorage.clear();
+                    sessionStorage.clear();
+                } catch (e) {
+                    console.error('清除缓存失败:', e);
+                }
+                
+                // 重新加载
+                const iframe = document.getElementById('appIframe');
+                const timestamp = new Date().getTime();
+                const url = document.getElementById('urlInput').value;
+                
+                if (url) {
+                    const separator = url.includes('?') ? '&' : '?';
+                    iframe.src = url + separator + '_t=' + timestamp;
+                }
+            }
+        }
+
+        // 打开开发者工具提示
+        function openDevTools() {
+            alert('💡 使用浏览器开发者工具:\n\n' +
+                  '1. 按 F12 或 右键 > 检查元素\n' +
+                  '2. 在 Console 中可以查看日志\n' +
+                  '3. 在 Network 中可以查看网络请求\n' +
+                  '4. 在 Application 中可以查看存储数据\n\n' +
+                  '注意: iframe 内的内容需要在 iframe 上下文中调试');
+        }
+
+        // 复制 URL
+        function copyUrl() {
+            const url = document.getElementById('urlInput').value;
+            navigator.clipboard.writeText(url).then(() => {
+                alert('✅ URL 已复制到剪贴板');
+            }).catch(() => {
+                alert('❌ 复制失败，请手动复制');
+            });
+        }
+
+        // 激活测试模式
+        function activateTestMode() {
+            try {
+                sessionStorage.setItem('liff_test_active', 'true');
+                window.__LIFF_TEST_MODE__ = true;
+                alert('测试模式已激活！\n\n请刷新页面以生效。\n\n此后将强制识别为 LINE 环境，可用于本地调试。');
+            } catch (e) {
+                alert('激活测试模式失败: ' + e.message);
+            }
+        }
+
+        // 获取当前 User Agent
+        function getCurrentUserAgent() {
+            const uaSelect = document.getElementById('uaSelect').value;
+            return USER_AGENTS[uaSelect];
+        }
+
+        // 更新 User Agent 显示
+        function updateUserAgentDisplay() {
+            const uaText = document.getElementById('uaText');
+            const currentUA = getCurrentUserAgent();
+            const shortUA = currentUA.substring(0, 50) + '...';
+            uaText.textContent = shortUA;
+            uaText.title = currentUA;
+        }
+
+        // 设备尺寸切换
+        document.getElementById('deviceSelect').addEventListener('change', function(e) {
+            const phoneMockup = document.getElementById('phoneMockup');
+            phoneMockup.className = 'phone-mockup';
+            
+            if (e.target.value === 'tablet') {
+                phoneMockup.classList.add('tablet');
+            } else if (e.target.value === 'desktop') {
+                phoneMockup.classList.add('desktop');
+            }
+        });
+
+        // User Agent 切换
+        document.getElementById('uaSelect').addEventListener('change', function() {
+            updateUserAgentDisplay();
+            
+            // 提示用户重新加载
+            if (document.getElementById('appIframe').src) {
+                if (confirm('User Agent 已更改，是否重新加载页面？')) {
+                    reloadIframe();
+                }
+            }
+        });
+
+        // LIFF 授权状态切换
+        document.getElementById('liffAuthStatus').addEventListener('change', function() {
+            updateAuthStatusDisplay();
+            
+            const status = getLiffAuthStatus();
+            console.log('🔐 LIFF 状态已更改为:', status);
+            
+            // 提示用户重新加载
+            if (document.getElementById('appIframe').src) {
+                if (confirm('LIFF 授权状态已更改，是否重新加载页面以应用新状态？')) {
+                    reloadIframe();
+                }
+            }
+        });
+
+        // URL 输入框回车加载
+        document.getElementById('urlInput').addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                loadUrl();
+            }
+        });
+
+        // 初始化
+        updateUserAgentDisplay();
+        updateAuthStatusDisplay();
+
+        // 添加控制台日志
+        console.log('%c🚀 LINE 浏览器模拟器已启动', 'color: #06c755; font-size: 16px; font-weight: bold;');
+        console
+        console.log('%c📱 当前 User Agent:', 'color: #06c755; font-weight: bold;');
+        console.log(getCurrentUserAgent());
+        console.log('%c🔐 当前 LIFF 状态:', 'color: #06c755; font-weight: bold;');
+        console.log(getLiffAuthStatus());
+
+        // 监听 iframe 消息 (用于跨域通信)
+        window.addEventListener('message', function(event) {
+            console.log('📨 收到 iframe 消消息:', event.data);
+            
+            // 处理来自 iframe 的消息
+            if (event.data && event.data.type === 'liff-status') {
+                console.log('LIFF 状态:', event.data.status);
+            }
+            
+            // 响应 LIFF 数据请求
+            if (event.data && event.data.type === 'request-liff-data') {
+                const authStatus = getLiffAuthStatus();
+                const response = {
+                    type: 'liff-data-response',
+                    status: authStatus,
+                    user: authStatus === 'authorized' || authStatus === 'expired' ? MOCK_LIFF_USER : null,
+                    accessToken: authStatus === 'authorized' || authStatus === 'expired' ? MOCK_ACCESS_TOKEN : null,
+                    idToken: authStatus === 'authorized' || authStatus === 'expired' ? MOCK_ID_TOKEN : null,
+                    isExpired: authStatus === 'expired'
+                };
+                
+                event.source.postMessage(response, event.origin);
+                console.log('📤 返回 LIFF 数据给 iframe:', response);
+            }
+        });
+
+        // 自动加载默认 URL（可选）
+        if (defaultUrl) {
+            console.log('🔄 自动加载默认 URL:', defaultUrl);
+            // setTimeout(() => loadUrl(), 500); // 取消注释以自动加载
+        }
+    </script>
+</body>
+</html>

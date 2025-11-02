@@ -313,6 +313,26 @@
   "PWA": {
     "installApp": "Install App"
   },
+  "LiffAuth": {
+    "initializing": "Initializing LIFF...",
+    "pleaseWait": "Please wait",
+    "welcomeTitle": "Welcome to our app!",
+    "authRequired": "Authorization required to continue",
+    "infoWeWillGet": "We will access the following information:",
+    "displayName": "Display name (for personalized greetings)",
+    "profilePicture": "Profile picture (for your profile display)",
+    "benefitsTitle": "After authorization, you can:",
+    "benefitQuickLogin": "Quick login (automatic recognition next time)",
+    "benefitSavePreferences": "Save your preferences",
+    "benefitPersonalizedContent": "View personalized content",
+    "authorizeButton": "Authorize and Continue",
+    "privacyNotice": "By clicking \"Authorize and Continue\", you agree to our access to the above information. We promise to protect your privacy.",
+    "loggingIn": "Logging in...",
+    "almostThere": "Almost there",
+    "loginFailed": "Login Failed",
+    "unknownError": "Unknown error",
+    "retry": "Retry"
+  },
   "human_verification_required": "Human verification required. Please complete the verification.",
   "register_failed": "Registration failed. Please try again."
 }

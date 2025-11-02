@@ -309,6 +309,26 @@
   "PWA": {
     "installApp": "앱 설치"
   },
+  "LiffAuth": {
+    "initializing": "LIFF 초기화 중...",
+    "pleaseWait": "잠시 기다려주세요",
+    "welcomeTitle": "앱에 오신 것을 환영합니다!",
+    "authRequired": "계속하려면 인증이 필요합니다",
+    "infoWeWillGet": "다음 정보에 접근합니다:",
+    "displayName": "표시 이름 (개인화된 인사말용)",
+    "profilePicture": "프로필 사진 (프로필 표시용)",
+    "benefitsTitle": "인증 후 다음을 이용할 수 있습니다:",
+    "benefitQuickLogin": "빠른 로그인 (다음번 자동 인식)",
+    "benefitSavePreferences": "환경 설정 저장",
+    "benefitPersonalizedContent": "개인화된 콘텐츠 보기",
+    "authorizeButton": "인증하고 계속하기",
+    "privacyNotice": "\"인증하고 계속하기\"를 클릭하면 위 정보에 대한 접근에 동의하는 것입니다. 귀하의 개인정보를 보호할 것을 약속합니다.",
+    "loggingIn": "로그인 중...",
+    "almostThere": "거의 완료되었습니다",
+    "loginFailed": "로그인 실패",
+    "unknownError": "알 수 없는 오류",
+    "retry": "다시 시도"
+  },
   "human_verification_required": "사람 인증이 필요합니다. 인증을 완료하세요.",
   "register_failed": "가입 실패. 다시 시도하세요"
 }

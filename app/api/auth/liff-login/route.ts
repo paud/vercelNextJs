@@ -2,109 +2,137 @@ import { NextRequest, NextResponse } from 'next/server';
 import prisma from '@/lib/prisma';
 
 /**
- * LIFF 登录/同步 API（统一版本）
+ * LIFF 登录 API（完整验证模式）
  * 
- * 支持两种模式：
- * 1. 完整验证模式：验证 access token，调用 LINE API 获取用户信息
- * 2. 快速同步模式：直接接收前端 profile，适用于已经通过 LIFF SDK 获取的数据
+ * 功能：验证 access token，调用 LINE API 获取用户信息
+ * 安全：后端验证 token 真实性，防止伪造
  */
 export async function POST(request: NextRequest) {
+  console.log('[LIFF API] 收到 POST 请求');
+
   try {
     const body = await request.json();
-    const { accessToken, idToken, profile, mode = 'verify' } = body;
+    console.log('[LIFF API] 请求体:', JSON.stringify(body, null, 2));
 
-    let userData: any = null;
+    const { idToken } = body;
 
-    // 模式 1: 完整验证（新的静默登录）
-    if (mode === 'verify' && accessToken) {
-      console.log('[LIFF API] 模式：完整验证');
-      
-      // 1. 验证 LINE access token
-      const verifyResponse = await fetch('https://api.line.me/oauth2/v2.1/verify', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/x-www-form-urlencoded',
-        },
-        body: new URLSearchParams({
-          access_token: accessToken,
-        }),
-      });
-
-      if (!verifyResponse.ok) {
-        console.error('[LIFF API] Token 验证失败');
-        return NextResponse.json(
-          { error: 'Invalid access token' },
-          { status: 401 }
-        );
-      }
-
-      const verifyData = await verifyResponse.json();
-      console.log('[LIFF API] Token 验证成功:', verifyData);
-
-      // 2. 获取用户 profile
-      const profileResponse = await fetch('https://api.line.me/v2/profile', {
-        headers: {
-          Authorization: `Bearer ${accessToken}`,
-        },
-      });
-
-      if (!profileResponse.ok) {
-        console.error('[LIFF API] 获取 profile 失败');
-        return NextResponse.json(
-          { error: 'Failed to get user profile' },
-          { status: 500 }
-        );
-      }
-
-      const profileData = await profileResponse.json();
-      console.log('[LIFF API] 用户 profile:', profileData);
-
-      // 3. 解析 ID token 获取 email（如果提供）
-      let email = `${profileData.userId}@line.user`; // 默认邮箱
-      if (idToken) {
-        try {
-          const parts = idToken.split('.');
-          if (parts.length === 3) {
-            const payload = JSON.parse(Buffer.from(parts[1], 'base64').toString());
-            email = payload.email || email;
-            console.log('[LIFF API] 从 ID token 解析到 email:', email);
-          }
-        } catch (error) {
-          console.error('[LIFF API] ID token 解析失败:', error);
-        }
-      }
-
-      userData = {
-        userId: profileData.userId,
-        displayName: profileData.displayName,
-        pictureUrl: profileData.pictureUrl,
-        statusMessage: profileData.statusMessage,
-        email: email,
-      };
-    }
-    // 模式 2: 快速同步（兼容旧的 liff-sync）
-    else if (profile && profile.userId) {
-      console.log('[LIFF API] 模式：快速同步（兼容旧版）');
-      console.log('[LIFF API] 接收到的 profile:', profile);
-      
-      userData = {
-        userId: profile.userId,
-        displayName: profile.displayName,
-        pictureUrl: profile.pictureUrl,
-        statusMessage: profile.statusMessage,
-        email: profile.email || `${profile.userId}@line.user`,
-      };
-    }
-    else {
+    // 验证必需参数
+    if (!idToken) {
+      console.log('[LIFF API] ❌ 缺少 idToken');
       return NextResponse.json(
-        { error: 'Missing required parameters. Need either accessToken or profile.' },
+        { error: 'Missing required parameter: idToken' },
         { status: 400 }
       );
     }
 
+    // 🧪 开发环境测试模式（仅用于本地测试）
+    const isMockToken = typeof idToken === 'string' && idToken.startsWith('mock_id_token_');
+    console.log('[LIFF API] 检查测试模式:', idToken === 'test_id_token_123456' || isMockToken);
+
+    if (process.env.NODE_ENV === 'development' && (idToken === 'test_id_token_123456' || isMockToken)) {
+      console.log('[LIFF API] 🧪 使用测试模式');
+
+      const userData = {
+        userId: 'U1234567890abcdef',
+        displayName: '测试用户',
+        pictureUrl: 'https://via.placeholder.com/150',
+        email: 'test@line.user',
+      };
+
+      // 查找或创建测试用户
+      let user = await prisma.user.findFirst({
+        where: { email: userData.email }
+      });
+
+      if (!user) {
+        console.log('[LIFF API] 🧪 创建测试用户');
+        user = await prisma.user.create({
+          data: {
+            email: userData.email,
+            name: userData.displayName,
+            image: userData.pictureUrl,
+            accounts: {
+              create: {
+                type: 'oauth',
+                provider: 'line',
+                providerAccountId: userData.userId,
+                access_token: idToken,
+              }
+            }
+          }
+        });
+      }
+
+      return NextResponse.json({
+        success: true,
+        user: {
+          id: userData.userId,
+          dbId: user.id,
+          name: user.name,
+          email: user.email,
+          image: user.image,
+        },
+        profile: userData,
+        testMode: true,
+      });
+    }
+
+    console.log('[LIFF API] 开始完整验证流程');
+
+    const verifyResponse = await fetch("https://api.line.me/oauth2/v2.1/verify", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/x-www-form-urlencoded",
+      },
+      body: new URLSearchParams({
+        id_token: idToken, // 参数名必须为 id_token
+        client_id: process.env.LINE_CLIENT_ID!,
+      }).toString(), // ✅ 注意这里要转成字符串
+    });
+
+    if (!verifyResponse.ok) {
+      const errorText = await verifyResponse.text();
+      console.error("[LIFF API] Token 验证失败", verifyResponse.status, errorText);
+      return NextResponse.json({ error: "Invalid id_token", details: errorText }, { status: 401 });
+    }
+
+    const verifyData = await verifyResponse.json(); // ✅ 解析响应
+    console.log("Token 验证成功:", verifyData);
+
+    // 2. 获取用户 profile（直接用 verifyData，不再请求 profile API）
+    const profileData = {
+      userId: verifyData.sub,
+      displayName: verifyData.name || verifyData.displayName,
+      pictureUrl: verifyData.picture || verifyData.pictureUrl,
+      email: verifyData.email,
+    };
+    console.log('[LIFF API] 用户 profile:', profileData);
+
+    // 3. 解析 ID token 获取 email（如果提供）
+    let email = `${profileData.userId}@line.user`; // 默认邮箱
+    if (idToken) {
+      try {
+        const parts = idToken.split('.');
+        if (parts.length === 3) {
+          const payload = JSON.parse(Buffer.from(parts[1], 'base64').toString());
+          email = payload.email || email;
+          console.log('[LIFF API] 从 ID token 解析到 email:', email);
+        }
+      } catch (error) {
+        console.error('[LIFF API] ID token 解析失败:', error);
+      }
+    }
+
+    const userData = {
+      userId: profileData.userId,
+      displayName: profileData.displayName,
+      pictureUrl: profileData.pictureUrl,
+      email: email,
+    };
+
     // 4. 查找或创建用户
     console.log('[LIFF API] 查找或创建用户...');
-    
+
     // 先通过 LINE Account 查找用户
     let account = await prisma.account.findUnique({
       where: {
@@ -142,14 +170,14 @@ export async function POST(request: NextRequest) {
               type: 'oauth',
               provider: 'line',
               providerAccountId: userData.userId,
-              access_token: accessToken,
+              access_token: idToken,
               id_token: idToken,
             }
           }
         }
       });
       console.log('[LIFF API] 新用户创建成功:', user.id);
-      
+
       // 首次 LINE 登录，发送欢迎通知
       await prisma.systemNotification.create({
         data: {
@@ -169,7 +197,7 @@ export async function POST(request: NextRequest) {
           type: 'oauth',
           provider: 'line',
           providerAccountId: userData.userId,
-          access_token: accessToken,
+          access_token: idToken,
           id_token: idToken,
         }
       });
@@ -185,7 +213,7 @@ export async function POST(request: NextRequest) {
     } else {
       console.log('[LIFF API] 用户已存在:', user.id);
       // 更新 token（如果提供）
-      if (accessToken || idToken) {
+      if ( idToken) {
         await prisma.account.update({
           where: {
             provider_providerAccountId: {
@@ -194,7 +222,7 @@ export async function POST(request: NextRequest) {
             }
           },
           data: {
-            access_token: accessToken || account.access_token,
+            access_token: account.access_token,
             id_token: idToken || account.id_token,
           }
         });
@@ -212,13 +240,12 @@ export async function POST(request: NextRequest) {
         image: user.image,
       },
       profile: userData,
-      mode: mode,
     });
 
   } catch (error) {
     console.error('[LIFF API] Error:', error);
     return NextResponse.json(
-      { 
+      {
         error: 'Internal server error',
         details: error instanceof Error ? error.message : 'Unknown error'
       },

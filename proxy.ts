@@ -40,6 +40,6 @@ export const config = {
      * - 所有文件扩展名 (.png, .jpg, .json等)
      * - service-worker.js等PWA文件
      */
-    '/((?!_next/static|_next/image|api|favicon.ico|manifest.json|service-worker.js|pwa-install.bundle.js|nsfw-model|icons/|screenshots/|.*\\.(?:png|jpg|jpeg|gif|svg|ico|webp|json|js|css|woff|woff2|ttf|eot)).*)',
+    '/((?!_next/static|_next/image|api|favicon.ico|manifest.json|service-worker.js|pwa-install.bundle.js|nsfw-model|line-browser-simulator.html|icons/|screenshots/|.*\\.(?:png|jpg|jpeg|gif|svg|ico|webp|json|js|css|woff|woff2|ttf|eot)).*)',
   ],
 };
