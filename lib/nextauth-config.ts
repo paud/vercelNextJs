@@ -26,6 +26,8 @@ export const authOptions: NextAuthOptions = {
         email: { label: "Email", type: "text" },
         provider: { label: "Provider", type: "text" },
         image: { label: "Image", type: "text" },
+        openid: { label: "WeChat OpenID", type: "text" },
+        session_key: { label: "WeChat Session Key", type: "text" },
       },
       async authorize(credentials) {
         if (!credentials) return null;
@@ -115,6 +117,63 @@ export const authOptions: NextAuthOptions = {
             };
           }
           
+          return null;
+        }
+        
+        // 微信小程序登录流程
+        if (credentials.provider === 'wechat-miniprogram' && credentials.openid) {
+          console.log('[NextAuth] 微信小程序登录认证:', credentials);
+          let account = await prisma.account.findUnique({
+            where: {
+              provider_providerAccountId: {
+                provider: 'wechat',
+                providerAccountId: credentials.openid
+              }
+            },
+            include: { user: true }
+          });
+
+          let user = account?.user;
+
+          // 如果没有 account，则新建用户和 account
+          if (!user) {
+            user = await prisma.user.create({
+              data: {
+                name: credentials.openid || 'Wechat User',
+                username: null, // 首次登录 username 留空，用户后续可以设置
+                email: `${credentials.openid}@wechat.user`,
+                accounts: {
+                  create: {
+                    type: 'oauth',
+                    provider: 'wechat',
+                    providerAccountId: credentials.openid,
+                    access_token: credentials.session_key || '',
+                  }
+                }
+              }
+            });
+            console.log('[NextAuth] 创建新微信用户:', user);
+          } else if (user && !account) {
+            await prisma.account.create({
+              data: {
+                userId: user.id,
+                type: 'oauth',
+                provider: 'wechat',
+                providerAccountId: credentials.openid,
+                access_token: credentials.session_key || '',
+              }
+            });
+            console.log('[NextAuth] 创建微信 Account 关联:', user);
+          }
+
+          if (user) {
+            return {
+              id: String(user.id),
+              name: user.name,
+              email: user.email,
+              image: user.image,
+            };
+          }
           return null;
         }
         
