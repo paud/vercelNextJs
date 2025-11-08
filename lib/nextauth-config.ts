@@ -28,126 +28,68 @@ export const authOptions: NextAuthOptions = {
         image: { label: "Image", type: "text" },
         openid: { label: "WeChat OpenID", type: "text" },
         session_key: { label: "WeChat Session Key", type: "text" },
+        token: { label: "Token", type: "text" },
       },
       async authorize(credentials) {
         if (!credentials) return null;
         
         // LIFF 登录流程
-        if (credentials.provider === 'line-liff' && credentials.userId) {
-          console.log('[NextAuth] LIFF 登录认证:', credentials);
-          
-          // 先通过 LINE Account 查找用户
-          let account = await prisma.account.findUnique({
-            where: {
-              provider_providerAccountId: {
-                provider: 'line',
-                providerAccountId: credentials.userId
-              }
-            },
-            include: {
-              user: true
-            }
+        if (credentials.provider === 'line-liff' && credentials.token) {
+          const jwt = require('jsonwebtoken');
+          const jwtSecret = process.env.NEXTAUTH_SECRET || 'dev_secret';
+          let payload;
+          try {
+            payload = jwt.verify(credentials.token, jwtSecret);
+          } catch (err) {
+            console.warn('[NextAuth] LINE LIFF token 校验失败:', err);
+            return null;
+          }
+          // 用 token 里的 uid 查找用户
+          let user = await prisma.user.findUnique({
+            where: { id: Number(payload.uid) }
           });
-
-          let user = account?.user || undefined;
-
-          // 如果没有找到，尝试通过 email 查找
-          if (!user && credentials.email) {
-            const foundUser = await prisma.user.findUnique({
-              where: { email: credentials.email }
-            });
-            user = foundUser || undefined;
-          }
-
-          if (!user && credentials.email) {
-            // 创建新用户和 Account
-            user = await prisma.user.create({
-              data: {
-                email: credentials.email,
-                name: credentials.name || 'LINE User',
-                username: null, // 首次登录 username 留空，用户后续可以设置
-                image: credentials.image,
-                accounts: {
-                  create: {
-                    type: 'oauth',
-                    provider: 'line',
-                    providerAccountId: credentials.userId,
-                  }
-                }
-              }
-            });
-            console.log('[NextAuth] 创建新用户:', user);
-            
-            // 首次 LINE LIFF 登录，发送欢迎通知
-            await prisma.systemNotification.create({
-              data: {
-                userId: user.id,
-                title: "Welcome!",
-                content: "Thank you for registering with LINE. Enjoy our marketplace!",
-                type: "welcome"
-              }
-            });
-            console.log('[NextAuth] 欢迎通知已发送');
-          } else if (user && !account) {
-            // 用户存在但没有 LINE Account，创建关联
-            await prisma.account.create({
-              data: {
-                userId: user.id,
-                type: 'oauth',
-                provider: 'line',
-                providerAccountId: credentials.userId,
-              }
-            });
-            // 更新用户信息
-            user = await prisma.user.update({
-              where: { id: user.id },
-              data: {
-                image: credentials.image || user.image,
-              }
-            });
-            console.log('[NextAuth] 创建 LINE Account 关联:', user);
-          }
-
-          if (user) {
-            return {
-              id: String(user.id),
-              name: user.name,
-              email: user.email,
-              image: user.image,
-            };
-          }
-          
-          return null;
+          if (!user) return null;
+          return {
+            id: String(user.id),
+            name: user.name,
+            email: user.email,
+            image: user.image,
+          };
         }
         
         // 微信小程序登录流程
-        if (credentials.provider === 'wechat-miniprogram' && credentials.openid) {
-          console.log('[NextAuth] 微信小程序登录认证:', credentials);
+        if (credentials.provider === 'wechat-miniprogram' && credentials.token) {
+          const jwt = require('jsonwebtoken');
+          const jwtSecret = process.env.NEXTAUTH_SECRET || 'dev_secret';
+          let payload;
+          try {
+            payload = jwt.verify(credentials.token, jwtSecret);
+          } catch (err) {
+            console.warn('[NextAuth] 微信小程序 token 校验失败:', err);
+            return null;
+          }
+          // 用 token 里的 openid 查找用户
           let account = await prisma.account.findUnique({
             where: {
               provider_providerAccountId: {
                 provider: 'wechat',
-                providerAccountId: credentials.openid
+                providerAccountId: payload.openid
               }
             },
             include: { user: true }
           });
-
           let user = account?.user;
-
-          // 如果没有 account，则新建用户和 account
           if (!user) {
             user = await prisma.user.create({
               data: {
-                name: credentials.openid || 'Wechat User',
-                username: null, // 首次登录 username 留空，用户后续可以设置
-                email: `${credentials.openid}@wechat.user`,
+                name: payload.openid || 'Wechat User',
+                username: null,
+                email: payload.email,
                 accounts: {
                   create: {
                     type: 'oauth',
                     provider: 'wechat',
-                    providerAccountId: credentials.openid,
-                    access_token: credentials.session_key || '',
+                    providerAccountId: payload.openid,
                   }
                 }
               }
@@ -159,13 +101,11 @@ export const authOptions: NextAuthOptions = {
                 userId: user.id,
                 type: 'oauth',
                 provider: 'wechat',
-                providerAccountId: credentials.openid,
-                access_token: credentials.session_key || '',
+                providerAccountId: payload.openid,
               }
             });
             console.log('[NextAuth] 创建微信 Account 关联:', user);
           }
-
           if (user) {
             return {
               id: String(user.id),

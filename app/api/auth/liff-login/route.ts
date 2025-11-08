@@ -1,11 +1,10 @@
 import { NextRequest, NextResponse } from 'next/server';
 import prisma from '@/lib/prisma';
+const jwt = require('jsonwebtoken');
 
 /**
- * LIFF 登录 API（完整验证模式）
- * 
- * 功能：验证 access token，调用 LINE API 获取用户信息
- * 安全：后端验证 token 真实性，防止伪造
+ * LIFF 登录 API（安全增强+标准返回结构）
+ * 验证 idToken，查找/创建用户，生成 session token（JWT），只返回 token 给前端
  */
 export async function POST(request: NextRequest) {
   console.log('[LIFF API] 收到 POST 请求');
@@ -63,18 +62,17 @@ export async function POST(request: NextRequest) {
         });
       }
 
-      return NextResponse.json({
-        success: true,
-        user: {
-          id: userData.userId,
-          dbId: user.id,
-          name: user.name,
-          email: user.email,
-          image: user.image,
-        },
-        profile: userData,
-        testMode: true,
-      });
+      // 生成 session token（JWT）
+      const jwtSecret = process.env.NEXTAUTH_SECRET || 'dev_secret';
+      const payload = {
+        uid: user.id,
+        email: user.email,
+        provider: 'line-liff',
+      };
+      const token = jwt.sign(payload, jwtSecret, { expiresIn: '7d' });
+
+      // 只返回 token 给前端
+      return NextResponse.json({ token });
     }
 
     console.log('[LIFF API] 开始完整验证流程');
@@ -99,85 +97,32 @@ export async function POST(request: NextRequest) {
     const verifyData = await verifyResponse.json(); // ✅ 解析响应
     console.log("Token 验证成功:", verifyData);
 
-    // 2. 获取用户 profile（直接用 verifyData，不再请求 profile API）
-    const profileData = {
-      userId: verifyData.sub,
-      displayName: verifyData.name || verifyData.displayName,
-      pictureUrl: verifyData.picture || verifyData.pictureUrl,
-      email: verifyData.email,
-    };
-    console.log('[LIFF API] 用户 profile:', profileData);
-
-    // 3. 解析 ID token 获取 email（如果提供）
-    let email = `${profileData.userId}@line.user`; // 默认邮箱
-    if (idToken) {
-      try {
-        const parts = idToken.split('.');
-        if (parts.length === 3) {
-          const payload = JSON.parse(Buffer.from(parts[1], 'base64').toString());
-          email = payload.email || email;
-          console.log('[LIFF API] 从 ID token 解析到 email:', email);
-        }
-      } catch (error) {
-        console.error('[LIFF API] ID token 解析失败:', error);
-      }
-    }
-
-    const userData = {
-      userId: profileData.userId,
-      displayName: profileData.displayName,
-      pictureUrl: profileData.pictureUrl,
-      email: email,
-    };
-
-    // 4. 查找或创建用户
-    console.log('[LIFF API] 查找或创建用户...');
-
-    // 先通过 LINE Account 查找用户
+    // 查找或创建用户
     let account = await prisma.account.findUnique({
       where: {
         provider_providerAccountId: {
           provider: 'line',
-          providerAccountId: userData.userId
+          providerAccountId: verifyData.sub
         }
       },
-      include: {
-        user: true
-      }
+      include: { user: true }
     });
-
-    let user = account?.user || undefined;
-
-    // 如果没有找到，尝试通过 email 查找
+    let user = account?.user;
     if (!user) {
-      const foundUser = await prisma.user.findUnique({
-        where: { email: userData.email }
-      });
-      user = foundUser || undefined;
-    }
-
-    if (!user) {
-      // 创建新用户和 Account
-      console.log('[LIFF API] 用户不存在，创建新用户');
       user = await prisma.user.create({
         data: {
-          email: userData.email,
-          name: userData.displayName || 'LINE User',
-          username: null, // 首次登录 username 留空，用户后续可以设置
-          image: userData.pictureUrl,
+          email: verifyData.email || `${verifyData.sub}@line.user`,
+          name: verifyData.name || verifyData.displayName || 'LINE User',
+          image: verifyData.picture || verifyData.pictureUrl,
           accounts: {
             create: {
               type: 'oauth',
               provider: 'line',
-              providerAccountId: userData.userId,
-              access_token: idToken,
-              id_token: idToken,
+              providerAccountId: verifyData.sub,
             }
           }
         }
       });
-      console.log('[LIFF API] 新用户创建成功:', user.id);
-
       // 首次 LINE 登录，发送欢迎通知
       await prisma.systemNotification.create({
         data: {
@@ -187,61 +132,19 @@ export async function POST(request: NextRequest) {
           type: "welcome"
         }
       });
-      console.log('[LIFF API] 欢迎通知已发送');
-    } else if (!account) {
-      // 用户存在但没有 LINE Account，创建关联
-      console.log('[LIFF API] 用户已存在，创建 LINE Account 关联');
-      await prisma.account.create({
-        data: {
-          userId: user.id,
-          type: 'oauth',
-          provider: 'line',
-          providerAccountId: userData.userId,
-          access_token: idToken,
-          id_token: idToken,
-        }
-      });
-      // 更新用户信息
-      user = await prisma.user.update({
-        where: { id: user.id },
-        data: {
-          image: userData.pictureUrl || user.image,
-          name: userData.displayName || user.name,
-        }
-      });
-      console.log('[LIFF API] LINE Account 关联创建成功');
-    } else {
-      console.log('[LIFF API] 用户已存在:', user.id);
-      // 更新 token（如果提供）
-      if ( idToken) {
-        await prisma.account.update({
-          where: {
-            provider_providerAccountId: {
-              provider: 'line',
-              providerAccountId: userData.userId
-            }
-          },
-          data: {
-            access_token: account.access_token,
-            id_token: idToken || account.id_token,
-          }
-        });
-      }
     }
 
-    // 5. 返回用户信息
-    return NextResponse.json({
-      success: true,
-      user: {
-        id: userData.userId, // LINE user ID
-        dbId: user.id,
-        name: user.name,
-        email: user.email,
-        image: user.image,
-      },
-      profile: userData,
-    });
+    // 生成 session token（JWT）
+    const jwtSecret = process.env.NEXTAUTH_SECRET || 'dev_secret';
+    const payload = {
+      uid: user.id,
+      email: user.email,
+      provider: 'line-liff',
+    };
+    const token = jwt.sign(payload, jwtSecret, { expiresIn: '7d' });
 
+    // 只返回 token 给前端
+    return NextResponse.json({ token });
   } catch (error) {
     console.error('[LIFF API] Error:', error);
     return NextResponse.json(

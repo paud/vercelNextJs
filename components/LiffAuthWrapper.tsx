@@ -64,14 +64,11 @@ export default function LiffAuthWrapper() {
       if (!res.ok) return;
       try {
         const result = await res.json();
-        if (result && result.user) {
+        if (result && result.token) {
           await signIn('credentials', {
             redirect: false,
             provider: 'line-liff',
-            userId: result.user.id,
-            name: result.user.name,
-            email: result.user.email,
-            image: result.user.image,
+            token: result.token,
           });
         }
       } catch (e) {
