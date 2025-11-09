@@ -1,4 +1,4 @@
-<web-view wx:if="{{code}}" src="{{webviewUrl}}?code={{code}}" style="margin-top:0;"></web-view>
+<web-view wx:if="{{code}}" src="{{webviewUrl}}" style="margin-top:0;"></web-view>
 
 <view wx:elif="{{!code}}" style="height:100vh;display:flex;align-items:center;justify-content:center;">
   <text style="font-size:32rpx;color:#888;">正在登录，请稍候...</text>

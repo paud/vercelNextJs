@@ -18,25 +18,43 @@ export default function WechatAuthWrapper() {
 
   // 如果不在微信小程序 webview 环境，直接 return null
   if (!isWechatMiniProgramWebview()) {
-    console.log('WechatAuthWrapper: 非微信小程序 webview 环境，跳过自动登录');
+    //console.log('WechatAuthWrapper: 非微信小程序 webview 环境，跳过自动登录');
     return null;
   }
 
   useEffect(() => {
+    const urlParams = new URLSearchParams(window.location.search);
+    console.log('WechatAuthWrapper: window.location.search', window.location.search);
+    const code = urlParams.get('code');
+    console.log('WechatAuthWrapper: code from url', code);
+    if (!code || code === '') {
+      //alert('WechatAuthWrapper: code 参数为空，自动登录中止');
+      return;
+    } else {
+      // 存储 code 到 localStorage，供小程序后续查询页面 URL 使用
+      //alert(code)
+      localStorage.setItem('wechat_miniprogram_code', code);
+    }
     if (status === 'loading') return; // 等待 session 加载
+
+    // 记录当前用户所处的URL和用户ID
+    if (session?.user && typeof window !== 'undefined') {
+      const userId = session.user.id;
+      const currentUrl = window.location.href;
+      const code1 = localStorage.getItem('wechat_miniprogram_code') || code;
+      // 可根据实际需求将数据发送到后端或存储
+      fetch('/api/user-location-log', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ userId, url: currentUrl, code: code1, title: '超值分享，快来看看吧' }),
+      });
+    }
+
     if (session?.user) {
       console.log('WechatAuthWrapper: 已登录，无需重复验证', session.user);
       return;
     }
     async function autoWechatLogin() {
-      const urlParams = new URLSearchParams(window.location.search);
-      console.log('WechatAuthWrapper: window.location.search', window.location.search);
-      const code = urlParams.get('code');
-      console.log('WechatAuthWrapper: code from url', code);
-      if (!code || code === '') {
-        //alert('WechatAuthWrapper: code 参数为空，自动登录中止');
-        return;
-      }
 
       // 用 code 请求后端，后端只返回 token
       const res = await fetch('/api/auth/wechat-miniprogram', {
@@ -60,6 +78,7 @@ export default function WechatAuthWrapper() {
           token: result.token,
         });
       }
+
     }
     autoWechatLogin();
   }, [session, status]);

@@ -21,8 +21,8 @@ export async function POST(request: NextRequest) {
     const wxData = await wxRes.json();
     console.log('[WeChat MiniProgram API] 微信接口返回:', wxData);
     if (!wxData.openid) {
-      console.log('[WeChat MiniProgram API] 微信认证失败:', wxData);
-      return NextResponse.json({ error: 'WeChat auth failed', detail: wxData }, { status: 400 });
+      console.log('[WeChat MiniProgram API] 微信认证失败:', { ...wxData, code });
+      return NextResponse.json({ error: 'WeChat auth failed', detail: wxData, code }, { status: 400 });
     }
 
     // 查找或创建用户

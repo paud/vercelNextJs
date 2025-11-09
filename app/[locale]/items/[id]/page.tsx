@@ -157,7 +157,7 @@ export default async function ItemDetailPage({ params }: { params: Promise<{ id:
   const itemDetailKeys = [
     "not_found", "seller", "contact", "anonymous", "no_contact", "published_at", "contact_seller", "contact_seller_message",
     "share_to_line", "comments", "add_comment", "submit_comment", "empty_comment", "no_comments", "post_comment", "comment_user", "comment_time",
-    "login_required_detail", "reply_comment", "submit_reply", "submitting", "cancel"
+    "login_required_detail", "reply_comment", "submit_reply", "submitting", "cancel","share_to_x"
   ];
   const tObj: Record<string, string> = {};
   itemDetailKeys.forEach(key => {

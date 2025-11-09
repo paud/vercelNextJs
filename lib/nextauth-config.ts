@@ -1,6 +1,7 @@
 import { NextAuthOptions } from "next-auth"
 import GoogleProvider from "next-auth/providers/google"
 import LineProvider from "@/lib/providers/line"
+import TwitterProvider from "next-auth/providers/twitter"
 import CredentialsProvider from "next-auth/providers/credentials";
 import prisma from "@/lib/prisma";
 
@@ -14,6 +15,11 @@ export const authOptions: NextAuthOptions = {
     LineProvider({
       clientId: process.env.LINE_CLIENT_ID || "",
       clientSecret: process.env.LINE_CLIENT_SECRET || "",
+    }),
+    TwitterProvider({
+      clientId: process.env.TWITTER_CLIENT_ID || "",
+      clientSecret: process.env.TWITTER_CLIENT_SECRET || "",
+      version: "2.0" // 使用新版API
     }),
     CredentialsProvider({
       name: "Credentials",
@@ -257,6 +263,59 @@ export const authOptions: NextAuthOptions = {
           id: user.id, 
           email: user.email,
           username: (user as any).username 
+        });
+      }
+
+      // Twitter (X) 登录处理
+      if (account?.provider === 'twitter' && user?.id) {
+        // Twitter 通常会返回用户名和 email（新版API可能 email 为空）
+        const twitterEmail = user.email || `${user.id}@twitter.user`;
+        const twitterName = user.name || (profile && profile.name) || 'Twitter User';
+        console.log('[NextAuth Twitter] Processing sign-in:', {
+          userId: user.id,
+          email: twitterEmail,
+          name: twitterName
+        });
+        // 通过 email 查找用户
+        let dbUser = await prisma.user.findUnique({ where: { email: twitterEmail } });
+        if (!dbUser) {
+          // 用户不存在，创建新用户
+          dbUser = await prisma.user.create({
+            data: {
+              email: twitterEmail,
+              name: twitterName,
+              username: null,
+            }
+          });
+          console.log('[NextAuth Twitter] Created new user:', {
+            id: dbUser.id,
+            username: dbUser.username,
+            email: dbUser.email
+          });
+          // 首次 Twitter 登录，发送欢迎通知
+          await prisma.systemNotification.create({
+            data: {
+              userId: dbUser.id,
+              title: "Welcome!",
+              content: "Thank you for registering with X (Twitter). Enjoy our marketplace!",
+              type: "welcome"
+            }
+          });
+        } else {
+          console.log('[NextAuth Twitter] Found existing user:', {
+            id: dbUser.id,
+            username: dbUser.username,
+            email: dbUser.email
+          });
+        }
+        // 设置user对象
+        user.id = String(dbUser.id);
+        user.email = dbUser.email;
+        (user as any).username = dbUser.username;
+        console.log('[NextAuth Twitter] Set user object:', {
+          id: user.id,
+          email: user.email,
+          username: (user as any).username
         });
       }
 
