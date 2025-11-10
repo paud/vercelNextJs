@@ -65,7 +65,11 @@ Page({
         });
         console.log('分享时接口返回:', res.data); // 这里才是后端返回的数据
         if (res.statusCode === 200 && res.data.url) {
-          sharePath = `/pages/index/index?url=${encodeURIComponent(res.data.url)}`;
+          // 去掉 url 中的 ?code=xxx 参数
+          let cleanUrl = res.data.url.replace(/([?&])code=[^&]*(&|$)/, (m, p1, p2) => p2 ? p1 : '');
+          // 如果最后是 ? 或 &，去掉
+          cleanUrl = cleanUrl.replace(/[?&]$/, '');
+          sharePath = `/pages/index/index?url=${encodeURIComponent(cleanUrl)}`;
           shareTitle = res.data.title || shareTitle;
         } else {
           sharePath = `/pages/index/index?url=${encodeURIComponent(WEBVIEW_URL + '/zh')}`;
