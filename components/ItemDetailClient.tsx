@@ -5,6 +5,7 @@ import { useCurrentUser } from "@/hooks/useCurrentUser";
 import React from "react";
 import Image from "next/image";
 import { SiX } from "react-icons/si";
+import { FaFacebook } from "react-icons/fa";
 import { signIn, useSession } from 'next-auth/react';
 import type { Session } from 'next-auth';
 
@@ -219,6 +220,18 @@ export default function ItemDetailClient({ item, tObj, homeTObj, messagesTObj }:
           <SiX className="w-5 h-5 mr-2" color="#fff" />
           {t('share_to_x')}
         </button>
+        {/* Facebook 分享按钮 */}
+        <button
+          className="w-full mb-2 py-2 bg-[#1877F2] text-white rounded-lg font-semibold hover:bg-[#166fe0] transition-colors flex items-center justify-center gap-2 shadow-md hover:shadow-lg focus:outline-none focus:ring-2 focus:ring-[#1877F2] focus:ring-offset-2"
+          onClick={() => {
+            const url = typeof window !== "undefined" ? encodeURIComponent(window.location.href) : "";
+            const quote = encodeURIComponent(item.title + ' - ￥' + item.price);
+            window.open(`https://www.facebook.com/sharer/sharer.php?u=${url}&quote=${quote}`, "_blank");
+          }}
+        >
+          <FaFacebook className="w-5 h-5 mr-2" color="#fff" />
+          {t('share_to_facebook')}
+        </button>
         {isLoggedIn && (
           <ChatModal
             open={showChat}
@@ -239,28 +252,34 @@ export default function ItemDetailClient({ item, tObj, homeTObj, messagesTObj }:
         <div className="text-xs text-gray-400 mt-3 sm:mt-4">
           {t('published_at')}：{new Date(item.createdAt).toLocaleString(homeT('date_locale'))}
         </div>
+       {/* 评论区及后续内容全部隐藏 */}
+        {//false && 
+        (
+          <>
         {/* Google Translate Widget 按钮恢复到评论标题右侧最边边 */}
         <div className="flex items-center justify-between mt-8 mb-2">
           <h2 className="text-lg font-bold">{t('comments')}</h2>
         </div>
-        {comments.length === 0 && <div className="text-gray-400 mb-2">{t('no_comments')}</div>}
-        {renderComments(comments)}
-        {isLoggedIn ? (
-          <form onSubmit={handleCommentSubmit} className="flex flex-col gap-2 items-stretch">
-            <textarea
-              value={commentText}
-              onChange={e => setCommentText(e.target.value)}
-              className="flex-1 px-3 py-4 border rounded text-base resize-vertical"
-              placeholder={t('add_comment')}
-              disabled={commentLoading}
-              style={{ minHeight: '64px', maxHeight: '200px' }}
-            />
-            <button type="submit" className="w-full px-4 py-3 bg-blue-500 text-white rounded mt-1" disabled={commentLoading || !commentText.trim()}>
-              {commentLoading ? t('submit_comment') : t('post_comment')}
-            </button>
-          </form>
-        ) : (
-          <div className="text-red-500">{t('login_required_detail')}</div>
+             {comments.length === 0 && <div className="text-gray-400 mb-2">{t('no_comments')}</div>}
+            {renderComments(comments)}
+            {isLoggedIn ? (
+              <form onSubmit={handleCommentSubmit} className="flex flex-col gap-2 items-stretch">
+                <textarea
+                  value={commentText}
+                  onChange={e => setCommentText(e.target.value)}
+                  className="flex-1 px-3 py-4 border rounded text-base resize-vertical"
+                  placeholder={t('add_comment')}
+                  disabled={commentLoading}
+                  style={{ minHeight: '64px', maxHeight: '200px' }}
+                />
+                <button type="submit" className="w-full px-4 py-3 bg-blue-500 text-white rounded mt-1" disabled={commentLoading || !commentText.trim()}>
+                  {commentLoading ? t('submit_comment') : t('post_comment')}
+                </button>
+              </form>
+            ) : (
+              <div className="text-red-500">{t('login_required_detail')}</div>
+            )}
+          </>
         )}
         {/* Google Translate Widget 移除 */}
       </div>

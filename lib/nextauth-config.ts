@@ -4,6 +4,7 @@ import LineProvider from "@/lib/providers/line"
 import TwitterProvider from "next-auth/providers/twitter"
 import CredentialsProvider from "next-auth/providers/credentials";
 import prisma from "@/lib/prisma";
+import FacebookProvider from "next-auth/providers/facebook";
 
 export const authOptions: NextAuthOptions = {
   secret: process.env.NEXTAUTH_SECRET,
@@ -20,6 +21,11 @@ export const authOptions: NextAuthOptions = {
       clientId: process.env.TWITTER_CLIENT_ID || "",
       clientSecret: process.env.TWITTER_CLIENT_SECRET || "",
       version: "2.0" // 使用新版API
+    }),
+    FacebookProvider({
+      clientId: process.env.FACEBOOK_CLIENT_ID || "",
+      clientSecret: process.env.FACEBOOK_CLIENT_SECRET || "",
+      authorization: "https://www.facebook.com/v11.0/dialog/oauth?scope=public_profile", // 只请求公开信息
     }),
     CredentialsProvider({
       name: "Credentials",
@@ -317,6 +323,34 @@ export const authOptions: NextAuthOptions = {
           email: user.email,
           username: (user as any).username
         });
+      }
+
+      // Facebook 登录处理
+      if (account?.provider === 'facebook' && user?.id) {
+        // Facebook 不返回 email，使用占位邮箱
+        const facebookEmail = user.email || `${user.id}@facebook.user`;
+        const facebookName = user.name || (profile && profile.name) || 'Facebook User';
+        let dbUser = await prisma.user.findUnique({ where: { email: facebookEmail } });
+        if (!dbUser) {
+          dbUser = await prisma.user.create({
+            data: {
+              email: facebookEmail,
+              name: facebookName,
+              username: null,
+            }
+          });
+          await prisma.systemNotification.create({
+            data: {
+              userId: dbUser.id,
+              title: "Welcome!",
+              content: "Thank you for registering with Facebook. Enjoy our marketplace!",
+              type: "welcome"
+            }
+          });
+        }
+        user.id = String(dbUser.id);
+        user.email = dbUser.email;
+        (user as any).username = dbUser.username;
       }
 
       // Credentials 登录也确保 user.id 为字符串

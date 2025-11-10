@@ -5,7 +5,7 @@ import type { ClientSafeProvider } from "next-auth/react";
 import { useEffect, useState } from "react";
 import { useTranslations, useLocale } from "next-intl";
 import Link from "next/link";
-import { FaLine, FaWeixin } from "react-icons/fa";
+import { FaLine, FaWeixin, FaFacebook } from "react-icons/fa";
 import { SiX } from "react-icons/si";
 import LineLoginButton from "@/components/LineLoginButton";
 
@@ -22,6 +22,11 @@ const providerIcons: Record<string, React.ReactNode> = {
   ),
   line: <FaLine className="w-5 h-5 mr-2" />,
   twitter: <SiX className="w-5 h-5 mr-2" color="#fff" />,
+  facebook: (
+    <span className="flex items-center justify-center w-7 h-7 rounded-full bg-white mr-2 border border-[#1877F2]">
+      <FaFacebook className="w-5 h-5" color="#1877F2" />
+    </span>
+  ),
 };
 
 const defaultProviderIcon = (
@@ -33,6 +38,7 @@ const defaultProviderIcon = (
 const providerStyles: Record<string, string> = {
   line: "bg-[#06C755] text-white hover:bg-[#05b74f] border-transparent",
   twitter: "bg-black text-white hover:bg-gray-900 border-transparent",
+  facebook: "bg-[#1877F2] text-white hover:bg-[#166fe0] border-transparent",
 };
 
 function isMiniProgram() {
@@ -140,11 +146,11 @@ export default function SignIn() {
                       key={provider.id}
                       onClick={() => handleSignIn(provider.id)}
                       disabled={!!signingInId}
-                      aria-label={`${t('signin_with')} ${provider.id === 'twitter' ? 'X' : provider.name}`}
+                      aria-label={`${t('signin_with')} ${provider.id === 'twitter' ? 'X' : provider.id === 'facebook' ? 'Facebook' : provider.name}`}
                       className={`flex items-center justify-center py-2.5 px-3 sm:py-3 sm:px-4 rounded-lg font-semibold transition text-base shadow-sm border focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-400 disabled:opacity-60 disabled:cursor-not-allowed ${providerStyles[provider.id] ?? 'bg-white text-gray-800 hover:bg-gray-50 border-gray-200'}`}
                     >
                       {providerIcons[provider.id] ?? defaultProviderIcon}
-                      {t('signin_with')} {provider.id === 'twitter' ? 'X' : provider.name}
+                      {t('signin_with')} {provider.id === 'twitter' ? 'X' : provider.id === 'facebook' ? 'Facebook' : provider.name}
                       {signingInId === provider.id && (
                         <span className="ml-2 inline-block h-4 w-4 border-2 border-blue-600 border-t-transparent rounded-full animate-spin" aria-hidden />
                       )}
