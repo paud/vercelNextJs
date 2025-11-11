@@ -47,7 +47,8 @@
     "capital": "도도부현청 소재지",
     "viewSubLevel": "하위 단계 보기",
     "autoDetectLocation": "자동 위치 확인",
-    "system_notification": "알림"
+    "system_notification": "알림",
+    "game": "게임"
   },
   "Home": {
     "market_title": "중고 마켓플레이스",

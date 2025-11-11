@@ -5,6 +5,9 @@ import { useLocale, useTranslations } from 'next-intl';
 import { useCombinedAuth } from '../hooks/useCombinedAuth';
 import { useCurrentUser } from '../hooks/useCurrentUser';
 import { useState, useEffect } from 'react';
+import { FaGamepad } from "react-icons/fa";
+import { GiGamepad } from "react-icons/gi";
+import { MdSportsEsports } from "react-icons/md";
 
 export default function Footer() {
   const locale = useLocale();
@@ -270,17 +273,18 @@ export default function Footer() {
 
         {/* 发布商品 - 登录用户可发布，未登录显示发布引导到登录 */}
         <Link
-          href={currentUser ? `/${locale}/items/new` : `/${locale}/auth/signin`}
+          href="https://game.zzzz.tech"
+          //target="_blank"
+          rel="noopener noreferrer"
           className="flex flex-col items-center flex-1 text-gray-700 hover:text-green-600 transition-colors py-1 min-w-0"
           style={{ minWidth: 0 }}
         >
           <div className="bg-green-500 rounded-full p-1.5 mb-0.5 flex items-center justify-center" style={{ boxShadow: '0 2px 8px 0 rgba(16,185,129,0.10)' }}>
-            <svg className="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
-            </svg>
+            {/* 游戏手柄图标（react-icons） */}
+            <MdSportsEsports className="w-8 h-8 text-white" />
           </div>
           <span className="text-[11px] font-medium text-green-600 truncate w-full text-center">
-            {t('post')}
+            {t('game')}
           </span>
         </Link>
 

@@ -52,7 +52,8 @@
     "liff_in_line": "在 LINE 中",
     "liff_ready": "LIFF 就绪",
     "liff_auth_status": "认证状态",
-    "liff_user": "LIFF 用户"
+    "liff_user": "LIFF 用户",
+    "game": "游戏"
   },
   "Home": {
     "market_title": "二手市场",

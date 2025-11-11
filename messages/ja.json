@@ -47,7 +47,8 @@
     "capital": "都道府県庁所在地",
     "viewSubLevel": "サブレベルを見る",
     "autoDetectLocation": "自動位置特定",
-    "system_notification": "通知"
+    "system_notification": "通知",
+    "game": "ゲーム"
   },
   "Home": {
     "market_title": "中古マーケットプレイス",

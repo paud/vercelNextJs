@@ -47,7 +47,8 @@
     "capital": "Capital",
     "viewSubLevel": "View Sub Level",
     "autoDetectLocation": "Auto Locate",
-    "system_notification": "Notifications"
+    "system_notification": "Notifications",
+    "game": "Game"
   },
   "Home": {
     "market_title": "Secondhand Marketplace",
