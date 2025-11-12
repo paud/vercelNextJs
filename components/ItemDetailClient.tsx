@@ -61,16 +61,24 @@ export default function ItemDetailClient({ item, tObj, homeTObj, messagesTObj }:
       return false;
     }
     if (isWechatMiniProgramWebview()) {
+      // 优先从主站cookie获取 wechat_miniprogram_code
+      function getCookie(name: string) {
+        const value = `; ${document.cookie}`;
+        const parts = value.split(`; ${name}=`);
+        if (parts.length === 2 && parts[1]) return parts.pop()?.split(';').shift() || null;
+        return null;
+      }
       // 记录当前用户所处的URL和用户ID
-      if (session?.user && typeof window !== 'undefined')  {
+      if (session?.user && typeof window !== 'undefined') {
         const userId = session.user.id;
         const currentUrl = window.location.href;
-        const code = localStorage.getItem('wechat_miniprogram_code') || null;
+        //const code = localStorage.getItem('wechat_miniprogram_code') || null;
+        const code1 = getCookie('wechat_miniprogram_code') || localStorage.getItem('wechat_miniprogram_code') || code;
         // 可根据实际需求将数据发送到后端或存储
         apiRequest('/api/user-location-log', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ userId, url: currentUrl, code, title: item?.title+'-￥' + item?.price }),
+          body: JSON.stringify({ userId, url: currentUrl, code: code1, title: item?.title + '-￥' + item?.price }),
         });
       }
     }
@@ -253,35 +261,35 @@ export default function ItemDetailClient({ item, tObj, homeTObj, messagesTObj }:
         <div className="text-xs text-gray-400 mt-3 sm:mt-4">
           {t('published_at')}：{new Date(item.createdAt).toLocaleString(homeT('date_locale'))}
         </div>
-       {/* 评论区及后续内容全部隐藏 */}
+        {/* 评论区及后续内容全部隐藏 */}
         {//false && 
-        (
-          <>
-        {/* Google Translate Widget 按钮恢复到评论标题右侧最边边 */}
-        <div className="flex items-center justify-between mt-8 mb-2">
-          <h2 className="text-lg font-bold">{t('comments')}</h2>
-        </div>
-             {comments.length === 0 && <div className="text-gray-400 mb-2">{t('no_comments')}</div>}
-            {renderComments(comments)}
-            {isLoggedIn ? (
-              <form onSubmit={handleCommentSubmit} className="flex flex-col gap-2 items-stretch">
-                <textarea
-                  value={commentText}
-                  onChange={e => setCommentText(e.target.value)}
-                  className="flex-1 px-3 py-4 border rounded text-base resize-vertical"
-                  placeholder={t('add_comment')}
-                  disabled={commentLoading}
-                  style={{ minHeight: '64px', maxHeight: '200px' }}
-                />
-                <button type="submit" className="w-full px-4 py-3 bg-blue-500 text-white rounded mt-1" disabled={commentLoading || !commentText.trim()}>
-                  {commentLoading ? t('submit_comment') : t('post_comment')}
-                </button>
-              </form>
-            ) : (
-              <div className="text-red-500">{t('login_required_detail')}</div>
-            )}
-          </>
-        )}
+          (
+            <>
+              {/* Google Translate Widget 按钮恢复到评论标题右侧最边边 */}
+              <div className="flex items-center justify-between mt-8 mb-2">
+                <h2 className="text-lg font-bold">{t('comments')}</h2>
+              </div>
+              {comments.length === 0 && <div className="text-gray-400 mb-2">{t('no_comments')}</div>}
+              {renderComments(comments)}
+              {isLoggedIn ? (
+                <form onSubmit={handleCommentSubmit} className="flex flex-col gap-2 items-stretch">
+                  <textarea
+                    value={commentText}
+                    onChange={e => setCommentText(e.target.value)}
+                    className="flex-1 px-3 py-4 border rounded text-base resize-vertical"
+                    placeholder={t('add_comment')}
+                    disabled={commentLoading}
+                    style={{ minHeight: '64px', maxHeight: '200px' }}
+                  />
+                  <button type="submit" className="w-full px-4 py-3 bg-blue-500 text-white rounded mt-1" disabled={commentLoading || !commentText.trim()}>
+                    {commentLoading ? t('submit_comment') : t('post_comment')}
+                  </button>
+                </form>
+              ) : (
+                <div className="text-red-500">{t('login_required_detail')}</div>
+              )}
+            </>
+          )}
         {/* Google Translate Widget 移除 */}
       </div>
     </>

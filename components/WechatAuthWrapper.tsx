@@ -24,19 +24,26 @@ export default function WechatAuthWrapper() {
   }
 
   useEffect(() => {
+    function getCookie(name: string) {
+      const value = `; ${document.cookie}`;
+      const parts = value.split(`; ${name}=`);
+      if (parts.length === 2 && parts[1]) return parts.pop()?.split(';').shift() || null;
+      return null;
+    }
     const urlParams = new URLSearchParams(window.location.search);
     console.log('WechatAuthWrapper: window.location.search', window.location.search);
-    const code = urlParams.get('code');
+    var code = urlParams.get('code');
     console.log('WechatAuthWrapper: code from url', code);
     if (!code || code === '') {
       //alert('WechatAuthWrapper: code 参数为空，自动登录中止');
-      return;
+      code = getCookie('wechat_miniprogram_code') || localStorage.getItem('wechat_miniprogram_code') || code;
     } else {
       // 存储 code 到 localStorage，供小程序后续查询页面 URL 使用
       //alert(code)
       localStorage.setItem('wechat_miniprogram_code', code);
       // 存储 code 到 cookie，供所有子域名共享
-      document.cookie = `wechat_miniprogram_code=${code}; domain=.zzzz.tech; path=/; secure;`;
+      const cookieDomain = process.env.NEXT_PUBLIC_APP_COOKIE_DOMAIN || '.zzzz.tech';
+      document.cookie = `wechat_miniprogram_code=${code}; domain=${cookieDomain}; path=/; secure;`;
     }
     if (status === 'loading') return; // 等待 session 加载
 
@@ -44,7 +51,7 @@ export default function WechatAuthWrapper() {
     if (session?.user && typeof window !== 'undefined') {
       const userId = session.user.id;
       const currentUrl = window.location.href;
-      const code1 = localStorage.getItem('wechat_miniprogram_code') || code;
+      const code1 = getCookie('wechat_miniprogram_code') || localStorage.getItem('wechat_miniprogram_code') || code;
       // 可根据实际需求将数据发送到后端或存储
       apiRequest('/api/user-location-log', {
         method: 'POST',
