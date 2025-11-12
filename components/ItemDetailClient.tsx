@@ -73,7 +73,7 @@ export default function ItemDetailClient({ item, tObj, homeTObj, messagesTObj }:
         const userId = session.user.id;
         const currentUrl = window.location.href;
         //const code = localStorage.getItem('wechat_miniprogram_code') || null;
-        const code1 = getCookie('wechat_miniprogram_code') || localStorage.getItem('wechat_miniprogram_code') || code;
+        const code1 = getCookie('wechat_miniprogram_code') || localStorage.getItem('wechat_miniprogram_code');
         // 可根据实际需求将数据发送到后端或存储
         apiRequest('/api/user-location-log', {
           method: 'POST',
