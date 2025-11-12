@@ -70,7 +70,7 @@ export default function ItemDetailClient({ item, tObj, homeTObj, messagesTObj }:
         apiRequest('/api/user-location-log', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ userId, url: currentUrl, code, title: item?.title }),
+          body: JSON.stringify({ userId, url: currentUrl, code, title: item?.title+'-￥' + item?.price }),
         });
       }
     }

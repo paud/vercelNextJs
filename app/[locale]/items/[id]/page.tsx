@@ -84,7 +84,7 @@ export async function generateMetadata({ params }: { params: Promise<{ id: strin
     
     // Open Graph标签（Facebook, LINE, 微信等）
     openGraph: {
-      title: item.title,
+      title: item.title + (item.price ? `-￥${item.price}` : ''),
       description,
       url: itemUrl,
       siteName: appTitle,
