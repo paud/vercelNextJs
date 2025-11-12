@@ -1,10 +1,29 @@
 import { cookies } from 'next/headers';
+import jwt from 'jsonwebtoken';
 
 export interface UserInfo {
   id: number;
   username: string;
   email: string;
   name: string | null;
+}
+
+const JWT_SECRET = process.env.JWT_SECRET || '';
+
+export function verifyJWT(req: any, res: any): null | object {
+  const authHeader = req.headers.authorization;
+  if (!authHeader || !authHeader.startsWith('Bearer ')) {
+    res.status(401).json({ error: 'Missing or invalid Authorization header' });
+    return null;
+  }
+  const token = authHeader.replace('Bearer ', '');
+  try {
+    const decoded = jwt.verify(token, JWT_SECRET);
+    return decoded;
+  } catch (err) {
+    res.status(401).json({ error: 'Invalid or expired token' });
+    return null;
+  }
 }
 
 export async function getCurrentUser(): Promise<UserInfo | null> {

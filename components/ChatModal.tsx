@@ -1,6 +1,7 @@
 "use client";
 import { useEffect, useState } from "react";
 import { useTranslations, useLocale } from "next-intl";
+import { apiRequest } from '@/lib/request';
 
 interface ChatModalProps {
   open: boolean;
@@ -38,7 +39,7 @@ export default function ChatModal({ open, onClose, sellerId, itemId, itemTitle, 
     const fetchMessages = async () => {
       setIsLoading(true);
       try {
-        const res = await fetch(`/api/messages?with=${sellerId}`);
+        const res = await apiRequest(`/api/messages?with=${sellerId}`);
         if (res.status === 401) {
           window.location.href = '/users/profile';
           return;
@@ -58,7 +59,7 @@ export default function ChatModal({ open, onClose, sellerId, itemId, itemTitle, 
     if (!newMessage.trim()) return;
     setIsSending(true);
     try {
-      const res = await fetch('/api/messages', {
+      const res = await apiRequest('/api/messages', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({

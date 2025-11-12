@@ -5,6 +5,7 @@ import { useSearchParams, useRouter } from 'next/navigation';
 import { useLocale, useTranslations } from 'next-intl';
 import Link from 'next/link';
 import Image from 'next/image';
+import { apiRequest } from '@/lib/request';
 
 interface Item {
   id: number;
@@ -117,7 +118,7 @@ export default function SearchPage() {
       setIsLoading(true);
       setError('');
       
-      const response = await fetch(`/api/search?q=${encodeURIComponent(searchQuery)}&sort=${sortBy}&order=${orderBy}`);
+      const response = await apiRequest(`/api/search?q=${encodeURIComponent(searchQuery)}&sort=${sortBy}&order=${orderBy}`);
       
       if (response.ok) {
         const result = await response.json();

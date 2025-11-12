@@ -3,6 +3,8 @@ import { getServerSession } from 'next-auth';
 import prisma from '@/lib/prisma';
 import { authOptions } from '@/lib/nextauth-config';
 import { safeContent, defaultSafeContentOptions } from "@/lib/safeContent";
+import { corsEdge } from '@/lib/cors-edge';
+import { verifyJWTEdge } from '@/lib/auth-edge';
 
 // 获取消息列表（支持与某用户的对话、分页）
 export async function GET(req: NextRequest) {
@@ -52,6 +54,11 @@ export async function GET(req: NextRequest) {
 
 // 发送消息
 export async function POST(req: NextRequest) {
+  const corsRes = corsEdge(req);
+  if (corsRes) return corsRes;
+  const authUser = verifyJWTEdge(req);
+  if (authUser instanceof Response) return authUser;
+
   const session = await getServerSession(authOptions);
   if (!session?.user?.id) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });

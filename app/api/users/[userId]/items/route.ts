@@ -1,5 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { PrismaClient } from '@prisma/client';
+import { corsEdge } from '@/lib/cors-edge';
+import { verifyJWTEdge } from '@/lib/auth-edge';
 
 const prisma = new PrismaClient();
 
@@ -7,6 +9,11 @@ export async function GET(
   request: NextRequest,
   { params }: { params: Promise<{ userId: string }> }
 ) {
+  const corsRes = corsEdge(request);
+  if (corsRes) return corsRes;
+  const authUser = verifyJWTEdge(request);
+  if (authUser instanceof Response) return authUser;
+
   try {
     const { userId } = await params;
     

@@ -4,6 +4,7 @@ import { useRouter } from "next/navigation";
 import { Turnstile } from '@marsidev/react-turnstile';
 import Link from 'next/link';
 import { useTranslations } from "next-intl";
+import { apiRequest } from '@/lib/request';
 
 const errorMap: Record<string, string> = {
   "Human verification failed.": "human_verification_failed",
@@ -38,7 +39,7 @@ export default function NewUser({ params }: { params: Promise<{ locale: string }
       return;
     }
     // 注册请求
-    const res = await fetch("/api/register", {
+    const res = await apiRequest("/api/register", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ username, name, email, phone, password, turnstileToken }),

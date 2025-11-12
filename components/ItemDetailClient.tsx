@@ -8,6 +8,7 @@ import { SiX } from "react-icons/si";
 import { FaFacebook } from "react-icons/fa";
 import { signIn, useSession } from 'next-auth/react';
 import type { Session } from 'next-auth';
+import { apiRequest } from '@/lib/request';
 
 function SkeletonDetail() {
   return (
@@ -66,7 +67,7 @@ export default function ItemDetailClient({ item, tObj, homeTObj, messagesTObj }:
         const currentUrl = window.location.href;
         const code = localStorage.getItem('wechat_miniprogram_code') || null;
         // 可根据实际需求将数据发送到后端或存储
-        fetch('/api/user-location-log', {
+        apiRequest('/api/user-location-log', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ userId, url: currentUrl, code, title: item?.title }),
@@ -74,7 +75,7 @@ export default function ItemDetailClient({ item, tObj, homeTObj, messagesTObj }:
       }
     }
     // 获取当前用户ID（假设后端有API或全局变量）
-    fetch('/api/users/profile').then(res => res.ok ? res.json() : null).then(data => {
+    apiRequest('/api/users/profile').then(res => res.ok ? res.json() : null).then(data => {
       if (data && data.id) {
         setCurrentUserId(data.id);
         console.log('当前用户ID:', data.id);
@@ -83,13 +84,13 @@ export default function ItemDetailClient({ item, tObj, homeTObj, messagesTObj }:
       }
     });
     // 获取评论
-    fetch(`/api/items/${item.id}/comments`).then(res => res.ok ? res.json() : []).then(data => setComments(data));
+    apiRequest(`/api/items/${item.id}/comments`).then(res => res.ok ? res.json() : []).then(data => setComments(data));
   }, [item.id]);
   const handleCommentSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!commentText.trim()) return;
     setCommentLoading(true);
-    const res = await fetch(`/api/items/${item.id}/comments`, {
+    const res = await apiRequest(`/api/items/${item.id}/comments`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ content: commentText })
@@ -103,7 +104,7 @@ export default function ItemDetailClient({ item, tObj, homeTObj, messagesTObj }:
   };
   const handleDeleteComment = async (commentId: number) => {
     if (!currentUserId) return;
-    const res = await fetch(`/api/items/${commentId}/comments`, {
+    const res = await apiRequest(`/api/items/${commentId}/comments`, {
       method: "DELETE",
     });
     if (res.ok) {
@@ -129,7 +130,7 @@ export default function ItemDetailClient({ item, tObj, homeTObj, messagesTObj }:
               e.preventDefault();
               if (!replyText.trim()) return;
               setReplyLoading(true);
-              const res = await fetch(`/api/items/${item.id}/comments`, {
+              const res = await apiRequest(`/api/items/${item.id}/comments`, {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify({ content: replyText, parentId: c.id })
@@ -138,7 +139,7 @@ export default function ItemDetailClient({ item, tObj, homeTObj, messagesTObj }:
                 setReplyText("");
                 setReplyingId(null);
                 // 重新获取评论
-                fetch(`/api/items/${item.id}/comments`).then(res => res.ok ? res.json() : []).then(data => setComments(data));
+                apiRequest(`/api/items/${item.id}/comments`).then(res => res.ok ? res.json() : []).then(data => setComments(data));
               }
               setReplyLoading(false);
             }} className="flex flex-col gap-2 mt-2">

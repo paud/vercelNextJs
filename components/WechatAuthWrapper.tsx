@@ -1,5 +1,6 @@
 import { useEffect } from 'react';
 import { signIn, useSession } from 'next-auth/react';
+import { apiRequest } from '@/lib/request';
 
 function isWechatMiniProgramWebview() {
   // 微信小程序 webview 环境判断
@@ -34,6 +35,8 @@ export default function WechatAuthWrapper() {
       // 存储 code 到 localStorage，供小程序后续查询页面 URL 使用
       //alert(code)
       localStorage.setItem('wechat_miniprogram_code', code);
+      // 存储 code 到 cookie，供所有子域名共享
+      document.cookie = `wechat_miniprogram_code=${code}; domain=.zzzz.tech; path=/; secure;`;
     }
     if (status === 'loading') return; // 等待 session 加载
 
@@ -43,7 +46,7 @@ export default function WechatAuthWrapper() {
       const currentUrl = window.location.href;
       const code1 = localStorage.getItem('wechat_miniprogram_code') || code;
       // 可根据实际需求将数据发送到后端或存储
-      fetch('/api/user-location-log', {
+      apiRequest('/api/user-location-log', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ userId, url: currentUrl, code: code1, title: '超值分享，快来看看吧' }),
@@ -57,7 +60,7 @@ export default function WechatAuthWrapper() {
     async function autoWechatLogin() {
 
       // 用 code 请求后端，后端只返回 token
-      const res = await fetch('/api/auth/wechat-miniprogram', {
+      const res = await apiRequest('/api/auth/wechat-miniprogram', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ code }),

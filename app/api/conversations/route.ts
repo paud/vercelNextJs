@@ -2,9 +2,16 @@ import { NextRequest, NextResponse } from 'next/server';
 import { getServerSession } from 'next-auth';
 import prisma from '@/lib/prisma';
 import { authOptions } from '@/lib/nextauth-config';
+import { corsEdge } from '@/lib/cors-edge';
+import { verifyJWTEdge } from '@/lib/auth-edge';
 
 // 获取当前用户的所有会话（与谁有消息往来，最新一条消息、未读数等）
 export async function GET(req: NextRequest) {
+  const corsRes = corsEdge(req);
+  if (corsRes) return corsRes;
+  const authUser = verifyJWTEdge(req);
+  if (authUser instanceof Response) return authUser;
+
   const session = await getServerSession(authOptions);
   if (!session?.user?.id) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });

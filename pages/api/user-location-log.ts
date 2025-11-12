@@ -1,7 +1,13 @@
 import type { NextApiRequest, NextApiResponse } from 'next';
 import prisma from '@/lib/prisma';
+import cors from '@/lib/cors';
+import { verifyJWT } from '@/lib/auth';
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
+  if (cors(req, res)) return;
+  const user = verifyJWT(req, res);
+  if (!user) return;
+
   if (req.method === 'POST') {
     // 记录用户访问
     const { userId, url, code, title } = req.body;

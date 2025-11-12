@@ -1,8 +1,15 @@
 import { handleUpload } from '@vercel/blob/client';
 import { NextRequest } from 'next/server';
 import { safeContent, defaultSafeContentOptions } from '@/lib/safeContent';
+import { corsEdge } from '@/lib/cors-edge';
+import { verifyJWTEdge } from '@/lib/auth-edge';
 
 export async function POST(request: NextRequest): Promise<Response> {
+  const corsRes = corsEdge(request);
+  if (corsRes) return corsRes;
+  const authUser = verifyJWTEdge(request);
+  if (authUser instanceof Response) return authUser;
+
   const body = (await request.json()) as any; // 兼容无类型导出
   // 对文件名和 tokenPayload 进行安全过滤（如有）
   if ('filename' in body && typeof body.filename === 'string' && body.filename) {

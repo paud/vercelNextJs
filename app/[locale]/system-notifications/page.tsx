@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import { useTranslations, useLocale } from "next-intl";
 import { useCombinedAuth } from "@/hooks/useCombinedAuth";
 import UserHeader from '../../../components/UserHeader';
+import { apiRequest } from '@/lib/request';
 
 interface Notification {
   id: number;
@@ -40,7 +41,7 @@ export default function SystemNotificationsPage() {
     setLoading(true);
     setError(null);
     try {
-      const res = await fetch("/api/system-notifications");
+      const res = await apiRequest("/api/system-notifications");
       if (!res.ok) throw new Error("Failed to fetch");
       const data = await res.json();
       setNotifications(data);
@@ -69,7 +70,7 @@ export default function SystemNotificationsPage() {
 
   async function markRead(ids: number[]) {
     if (!ids.length) return;
-    await fetch("/api/system-notifications/read", {
+    await apiRequest("/api/system-notifications/read", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ ids })
@@ -79,7 +80,7 @@ export default function SystemNotificationsPage() {
   }
   async function deleteNotifications(ids: number[]) {
     if (!ids.length) return;
-    await fetch("/api/system-notifications/delete", {
+    await apiRequest("/api/system-notifications/delete", {
       method: "DELETE",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ ids })

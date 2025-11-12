@@ -7,6 +7,7 @@ import { useCombinedAuth } from '../hooks/useCombinedAuth';
 import InstallPWAButton from "@/components/InstallPWAButton";
 import { GiSouthKorea } from 'react-icons/gi';
 import ReactCountryFlag from "react-country-flag";
+import { apiRequest } from '@/lib/request';
 
 
 export default function Header() {
@@ -93,7 +94,7 @@ export default function Header() {
     const fetchRegions = async () => {
       setRegionsLoading(true);
       try {
-        const response = await fetch('/api/regions');
+        const response = await apiRequest('/api/regions');
         if (response.ok) {
           const data = await response.json();
           setAvailableRegions(data.regions || []);
@@ -134,7 +135,7 @@ export default function Header() {
 
     setRegionsLoading(true);
     try {
-      const response = await fetch('/api/regions/tree');
+      const response = await apiRequest('/api/regions/tree');
       if (response.ok) {
         const data = await response.json();
         setTreeData(data.treeData || []);

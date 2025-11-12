@@ -1,5 +1,6 @@
 import { useEffect } from 'react';
 import { signIn } from 'next-auth/react';
+import { apiRequest } from '@/lib/request';
 
 // 获取 LIFF 相关 localStorage 的 key 列表
 const getLiffLocalStorageKeys = (prefix: string) => {
@@ -56,7 +57,7 @@ export default function LiffAuthWrapper() {
         window.liff.login({ redirectUri: window.location.href });
         return;
       }
-      const res = await fetch('/api/auth/liff-login', {
+      const res = await apiRequest('/api/auth/liff-login', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ idToken }),

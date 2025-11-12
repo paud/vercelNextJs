@@ -7,6 +7,7 @@ import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { useCombinedAuth } from '../../../../../hooks/useCombinedAuth';
 import { safeContent, defaultSafeContentOptions } from "@/lib/safeContent";
+import { apiRequest } from '@/lib/request';
 
 interface Item {
   id: number;
@@ -41,7 +42,7 @@ export default function EditItemPage({ params }: { params: Promise<{ id: string;
 
     const fetchItem = async (itemId: string) => {
         try {
-            const response = await fetch(`/api/items/${itemId}`);
+            const response = await apiRequest(`/api/items/${itemId}`);
             if (response.ok) {
                 const itemData = await response.json();
                 setItem(itemData);
@@ -124,7 +125,7 @@ export default function EditItemPage({ params }: { params: Promise<{ id: string;
         const safeImageUrl = safeContent(imageUrl, defaultSafeContentOptions);
         try {
             console.log('Updating item:', { title: safeTitle, description: safeDescription, price: parseFloat(price), imageUrl: safeImageUrl });
-            const res = await fetch(`/api/items/${item.id}`, {
+            const res = await apiRequest(`/api/items/${item.id}`, {
                 method: "PUT",
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify({ 

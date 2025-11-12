@@ -8,6 +8,7 @@ import UserHeader from '../../../../components/UserHeader';
 import { useSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
 import { Dialog } from '@headlessui/react';
+import { apiRequest } from '@/lib/request';
 
 interface UserInfo {
   id: number;
@@ -84,7 +85,7 @@ export default function ProfilePage() {
     if (!currentUser) return;
 
     try {
-      const response = await fetch('/api/users/profile', {
+      const response = await apiRequest('/api/users/profile', {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',
@@ -135,7 +136,7 @@ export default function ProfilePage() {
       return;
     }
     try {
-      const response = await fetch('/api/users/profile', {
+      const response = await apiRequest('/api/users/profile', {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ userId: currentUser.id, password: newPassword })

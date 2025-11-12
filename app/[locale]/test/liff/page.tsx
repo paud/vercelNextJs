@@ -1,6 +1,7 @@
 'use client';
 
 import { useState } from 'react';
+import { apiRequest } from '@/lib/request';
 
 export default function LiffTestPage() {
   const [testMode, setTestMode] = useState<'line-app' | 'browser'>('line-app');
@@ -49,7 +50,7 @@ export default function LiffTestPage() {
       // 测试后端 API
       setTestResult(prev => prev + '🔄 调用后端 API...\n');
       
-      const response = await fetch('/api/auth/liff-login', {
+      const response = await apiRequest('/api/auth/liff-login', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({

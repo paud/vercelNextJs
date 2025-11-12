@@ -3,10 +3,17 @@ import { PrismaClient } from '@prisma/client';
 import { safeContent, defaultSafeContentOptions } from "@/lib/safeContent";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/nextauth-config";
+import { corsEdge } from '@/lib/cors-edge';
+import { verifyJWTEdge } from '@/lib/auth-edge';
 
 const prisma = new PrismaClient();
 
 export async function PUT(request: NextRequest) {
+  const corsRes = corsEdge(request);
+  if (corsRes) return corsRes;
+  const user = verifyJWTEdge(request);
+  if (user instanceof Response) return user;
+
   try {
     const { userId, name, email, phone } = await request.json();
     const safeName = safeContent(name, defaultSafeContentOptions);

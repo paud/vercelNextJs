@@ -5,6 +5,8 @@ import { authOptions } from "@/lib/nextauth-config";
 import fs from "fs";
 import path from "path";
 import { safeContent, defaultSafeContentOptions } from "@/lib/safeContent";
+import { corsEdge } from '@/lib/cors-edge';
+import { verifyJWTEdge } from '@/lib/auth-edge';
 
 function getLocaleMessages(locale: string) {
   const supported = ["en", "zh", "ko"];
@@ -23,6 +25,11 @@ function getAnonymous() {
 }
 
 export async function GET(req: Request, context: { params: Promise<{ id: string }> }) {
+  const corsRes = corsEdge(req);
+  if (corsRes) return corsRes;
+  const authUser = verifyJWTEdge(req);
+  if (authUser instanceof Response) return authUser;
+
   try {
     const { id } = await context.params;
     const itemId = Number(id);

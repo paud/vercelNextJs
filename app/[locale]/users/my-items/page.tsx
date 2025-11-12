@@ -6,6 +6,7 @@ import { useLocale, useTranslations } from 'next-intl';
 import Link from 'next/link';
 import { useCurrentUser } from '../../../../hooks/useCurrentUser';
 import UserHeader from '../../../../components/UserHeader';
+import { apiRequest } from '@/lib/request';
 
 interface UserInfo {
   id: number;
@@ -40,7 +41,7 @@ export default function MyItemsPage() {
   const fetchMyItems = async (userId: string | number) => {
     try {
       setIsLoadingItems(true);
-      const response = await fetch(`/api/users/${userId}/items`);
+      const response = await apiRequest(`/api/users/${userId}/items`);
       if (response.ok) {
         const userItems = await response.json();
         setItems(userItems);
@@ -60,7 +61,7 @@ export default function MyItemsPage() {
     
     if (confirm(t('delete_confirm'))) {
       try {
-        const response = await fetch(`/api/items/${itemId}`, {
+        const response = await apiRequest(`/api/items/${itemId}`, {
           method: 'DELETE',
         });
 

@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import prisma from '@/lib/prisma';
+import { apiRequest } from '@/lib/request';
 
 /**
  * 微信小程序自动登录 API（安全标准版，无JWT）

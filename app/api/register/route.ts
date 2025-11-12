@@ -3,7 +3,7 @@ import prisma from "@/lib/prisma";
 import { safeContent, defaultSafeContentOptions } from "@/lib/safeContent";
 //import bcrypt from "bcryptjs";
 
-export async function POST(req: Request) {
+export async function POST(req: Request) { 
   const body = await req.json();
   const { username, name, email, phone, password, turnstileToken } = body;
   const safeUsername = safeContent(username, defaultSafeContentOptions);

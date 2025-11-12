@@ -434,4 +434,16 @@ export const authOptions: NextAuthOptions = {
   pages: {
     signIn: `/${typeof window !== 'undefined' ? (window.location.pathname.split('/')[1] || 'en') : 'en'}/auth/signin`,
   },
+  cookies: {
+    sessionToken: {
+      name: `next-auth.session-token`,
+      options: {
+        domain: process.env.NEXTAUTH_COOKIE_DOMAIN || '.zzzz.tech', // 支持环境变量配置主域名
+        path: '/',
+        sameSite: 'lax',
+        secure: true,
+        httpOnly: true,
+      },
+    },
+  },
 }

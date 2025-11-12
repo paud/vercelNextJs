@@ -8,6 +8,7 @@ import { useState, useEffect } from 'react';
 import { FaGamepad } from "react-icons/fa";
 import { GiGamepad } from "react-icons/gi";
 import { MdSportsEsports } from "react-icons/md";
+import { apiRequest } from '@/lib/request';
 
 export default function Footer() {
   const locale = useLocale();
@@ -47,7 +48,7 @@ export default function Footer() {
   useEffect(() => {
     const fetchRegions = async () => {
       try {
-        const response = await fetch('/api/regions');
+        const response = await apiRequest('/api/regions');
         if (response.ok) {
           const data = await response.json();
           setAvailableRegions(data.regions || []);
@@ -83,7 +84,7 @@ export default function Footer() {
         
         try {
           // 调用后端API进行地区检测
-          const response = await fetch('/api/auto-detect-region', {
+          const response = await apiRequest('/api/auto-detect-region', {
             method: 'POST',
             headers: {
               'Content-Type': 'application/json',
@@ -206,7 +207,7 @@ export default function Footer() {
     if (!isLoggedIn) return;
     const fetchUnread = async () => {
       try {
-        const res = await fetch('/api/messages/unread');
+        const res = await apiRequest('/api/messages/unread');
         const data = await res.json();
         // unread.ts 返回的是 [{ senderId, _count: { _all: number } }, ...]
         const total = Array.isArray(data) ? data.reduce((sum, u) => sum + (u._count?._all || 0), 0) : 0;
@@ -274,7 +275,7 @@ export default function Footer() {
         {/* 发布商品 - 登录用户可发布，未登录显示发布引导到登录 */}
         <Link
           href="https://game.zzzz.tech"
-          //target="_blank"
+          
           rel="noopener noreferrer"
           className="flex flex-col items-center flex-1 text-gray-700 hover:text-green-600 transition-colors py-1 min-w-0"
           style={{ minWidth: 0 }}

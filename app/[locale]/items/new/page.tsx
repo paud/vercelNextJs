@@ -7,6 +7,7 @@ import ImageUpload from '@/components/ImageUpload';
 import UserHeader from '../../../../components/UserHeader';
 import { useCurrentUser } from '../../../../hooks/useCurrentUser';
 import { safeContent, defaultSafeContentOptions } from "@/lib/safeContent";
+import { apiRequest } from '@/lib/request';
 
 interface FormData {
   title: string;
@@ -69,7 +70,7 @@ export default function NewItem({ params }: { params: Promise<{ locale: string }
       const safeTitle = safeContent(formData.title, defaultSafeContentOptions);
       const safeDescription = safeContent(formData.description, defaultSafeContentOptions);
       const safeImageUrl = safeContent(formData.imageUrl, defaultSafeContentOptions);
-      const response = await fetch('/api/items', {
+      const response = await apiRequest('/api/items', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

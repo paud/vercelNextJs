@@ -1,6 +1,7 @@
 "use client";
 import Link from "next/link";
 import Image from "next/image";
+import { apiRequest } from '@/lib/request';
 
 export default function ItemsListClient({ items, tObj, homeTObj }: { items: any[], tObj: Record<string, string>, homeTObj: Record<string, string> }) {
   function SkeletonCard() {

@@ -7,6 +7,7 @@ import Link from 'next/link';
 import { useCurrentUser } from '../../../hooks/useCurrentUser';
 import UserHeader from '../../../components/UserHeader';
 import ChatModal from '../../../components/ChatModal';
+import { apiRequest } from '@/lib/request';
 
 interface Message {
   id: number;
@@ -88,7 +89,7 @@ export default function MessagesPage() {
   const fetchConversations = async () => {
     try {
       setIsLoading(true);
-      const response = await fetch('/api/messages/conversations');
+      const response = await apiRequest('/api/messages/conversations');
       const data = await response.json();
       // data: [{ userId, lastMessage, unread }]
       const conversations: Conversation[] = await Promise.all(
@@ -114,7 +115,7 @@ export default function MessagesPage() {
   // 获取所有未读消息总数
   const fetchUnreadTotal = async () => {
     try {
-      const res = await fetch('/api/messages/unread');
+      const res = await apiRequest('/api/messages/unread');
       const data = await res.json();
       // unread.ts 返回的是 [{ senderId, _count: { _all: number } }, ...]
       const total = Array.isArray(data) ? data.reduce((sum, u) => sum + (u._count?._all || 0), 0) : 0;
@@ -128,7 +129,7 @@ export default function MessagesPage() {
   const fetchMessagesWithUser = async (userId: number) => {
     console.log('fetchMessagesWithUser userId:', userId);
     try {
-      const res = await fetch(`/api/messages?with=${userId}`);
+      const res = await apiRequest(`/api/messages?with=${userId}`);
       const data = await res.json();
       return data;
     } catch {
@@ -139,10 +140,10 @@ export default function MessagesPage() {
   // 标记消息为已读
   const markAsRead = async (userId: number) => {
     try {
-      await fetch('/api/messages/read', {
+      await apiRequest('/api/messages/read', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ withUserId: userId })
+        body: JSON.stringify({ conversationId: userId })
       });
     } catch {}
   };
@@ -169,12 +170,12 @@ export default function MessagesPage() {
     try {
       setIsSending(true);
 
-      const response = await fetch('/api/messages', {
+      const response = await apiRequest('/api/messages', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          content: newMessage,
-          receiverId: selectedConversation.userId
+          with: selectedConversation.userId,
+          content: newMessage
         })
       });
 

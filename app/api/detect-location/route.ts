@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
+import { apiRequest } from '@/lib/request';
 
 // 通过 Nominatim API 获取地理位置信息
 async function getLocationInfo(latitude: number, longitude: number) {

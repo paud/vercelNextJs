@@ -2,6 +2,7 @@
 import { Turnstile } from '@marsidev/react-turnstile';
 import { useState } from 'react';
 import Link from 'next/link';
+import { apiRequest } from '@/lib/request';
 
 interface RegisterFormProps {
   locale: string;

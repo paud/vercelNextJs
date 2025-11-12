@@ -1,4 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
+import { apiRequest } from '@/lib/request';
+import { corsEdge } from '@/lib/cors-edge';
 
 // 通过 Nominatim API 获取市一级地理信息
 async function getCityLevelInfo(latitude: number, longitude: number, locale?: string) {
@@ -91,6 +93,9 @@ async function getCityLevelInfo(latitude: number, longitude: number, locale?: st
 
 
 export async function POST(request: NextRequest) {
+  const corsRes = corsEdge(request);
+  if (corsRes) return corsRes;
+
   try {
     const { latitude, longitude, locale } = await request.json();
 

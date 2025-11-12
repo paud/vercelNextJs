@@ -1,8 +1,15 @@
 import { NextResponse } from "next/server";
 import prisma from "@/lib/prisma";
 import { safeContent, defaultSafeContentOptions } from "@/lib/safeContent";
+import { corsEdge } from '@/lib/cors-edge';
+import { verifyJWTEdge } from '@/lib/auth-edge';
 
 export async function POST(req: Request) {
+  const corsRes = corsEdge(req);
+  if (corsRes) return corsRes;
+  const authUser = verifyJWTEdge(req);
+  if (authUser instanceof Response) return authUser;
+
   console.log('POST /api/items called');
   try {
     const data = await req.json();

@@ -6,6 +6,7 @@ import { useRouter } from 'next/navigation';
 import { useLocale, useTranslations } from 'next-intl';
 import { useCombinedAuth } from '../hooks/useCombinedAuth';
 import { getSession } from "next-auth/react";
+import { apiRequest } from '@/lib/request';
 
 interface UserHeaderProps {
   children?: React.ReactNode;
@@ -40,7 +41,7 @@ export default function UserHeader({
   // 获取未读消息和通知数
   useEffect(() => {
     // 获取未读私信数
-    fetch('/api/messages/unread')
+    apiRequest('/api/messages/unread')
       .then(res => res.ok ? res.json() : [])
       .then(data => {
         if (Array.isArray(data)) {
@@ -49,7 +50,7 @@ export default function UserHeader({
       })
       .catch(() => {});
     // 获取未读系统通知数
-    fetch('/api/system-notifications')
+    apiRequest('/api/system-notifications')
       .then(res => res.ok ? res.json() : [])
       .then(data => {
         if (Array.isArray(data)) {

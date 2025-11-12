@@ -4,6 +4,7 @@ import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useState, useEffect, Suspense } from "react";
 import Image from "next/image";
+import { apiRequest } from '@/lib/request';
 
 function HomeContent() {
   const t = useTranslations('Home');
@@ -67,7 +68,7 @@ function HomeContent() {
   async function loadPage(pageNum: number, reset = false) {
     setLoading(true);
     const offset = pageNum * PAGE_SIZE;
-    const res = await fetch(`/api/items?sort=${sort}&order=${order}&limit=${PAGE_SIZE}&offset=${offset}`);
+    const res = await apiRequest(`/api/items?sort=${sort}&order=${order}&limit=${PAGE_SIZE}&offset=${offset}`);
     const data = await res.json();
     setTotal(data.total);
     if (reset) {
