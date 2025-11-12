@@ -9,6 +9,7 @@ import { NextRequest } from 'next/server';
 export async function verifyJWTEdge(request: NextRequest) {
   // 使用 NextAuth 官方 getToken 方法自动解析 session-token
   const token = await getToken({ req: request, secret: JWT_SECRET });
+  return token;
   if (!token) {
     console.warn('[verifyJWTEdge] Missing or invalid NextAuth token');
     return NextResponse.json({ error: 'Missing or invalid token' }, { status: 401 });

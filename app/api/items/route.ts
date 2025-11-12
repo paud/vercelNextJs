@@ -84,8 +84,6 @@ export async function POST(req: NextRequest) {
 }
 
 export async function GET(req: NextRequest) {
-  const authUser = await verifyJWTEdge(req);
-  if (authUser instanceof Response) return authUser;
 
   try {
     const { searchParams } = new URL(req.url);
