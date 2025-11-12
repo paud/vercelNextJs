@@ -63,7 +63,7 @@ export async function POST(request: NextRequest) {
       provider: 'wechat-miniprogram',
     };
     const token = jwt.sign(payload, jwtSecret, { expiresIn: '7d' });
-
+    localStorage.setItem('wechat_miniprogram_token', token);
     // 只返回 token
     return NextResponse.json({ token });
   } catch (error) {
