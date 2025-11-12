@@ -1,12 +1,7 @@
-// 统一 API 请求工具，自动加 JWT
+// 统一 API 请求工具，自动加 JWT（cookie方式）
 export async function apiRequest(url: string, options: RequestInit = {}) {
-  // 从 localStorage 或 cookie 获取 JWT
-  const token = typeof window !== 'undefined' ? localStorage.getItem('jwt') : null;
-  const headers = {
-    ...(options.headers || {}),
-    ...(token ? { Authorization: `Bearer ${token}` } : {}),
-  };
-  const response = await fetch(url, { ...options, headers });
+  // 自动带上 cookie（如 next-auth.session-token），用于 JWT 鉴权
+  const response = await fetch(url, { ...options, credentials: 'include' });
   return response;
 }
 

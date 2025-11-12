@@ -46,13 +46,16 @@ export default function MessagesPage() {
   const searchParams = useSearchParams();
   const hasAutoOpened = useRef(false);
 
-  // 关闭聊天窗口的函数
+  // 关闭聊天窗口的函数（关闭时立即刷新会话列表和未读数）
   const closeChatWindow = () => {
     setIsChatOpen(false);
     // 如果当前历史记录状态是聊天窗口，则回到之前的状态
     if (window.history.state?.chatOpen) {
       window.history.back();
     }
+    // 关闭时立即刷新会话列表和未读数
+    fetchConversations();
+    fetchUnreadTotal();
   };
 
   useEffect(() => {
@@ -137,13 +140,13 @@ export default function MessagesPage() {
     }
   };
 
-  // 标记消息为已读
+  // 标记消息为已读（修正参数为 withUserId）
   const markAsRead = async (userId: number) => {
     try {
       await apiRequest('/api/messages/read', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ conversationId: userId })
+        body: JSON.stringify({ withUserId: userId }) // 修正参数名
       });
     } catch {}
   };
@@ -153,15 +156,19 @@ export default function MessagesPage() {
     fetchUnreadTotal();
   }, []);
 
-  // 打开会话时拉取历史并标记为已读
+  // 打开会话时拉取历史并标记为已读（优化：先弹窗，后只更新 messages 字段，并打日志）
   const handleOpenConversation = async (conversation: Conversation) => {
+    console.log('[ChatModal] 即将弹出对话框，userId:', conversation.userId);
     setSelectedConversation(conversation);
+    // 异步拉取消息和标记已读
     const messages = await fetchMessagesWithUser(conversation.userId);
-    setSelectedConversation(prev => prev ? { ...prev, messages } : null);
+    setSelectedConversation(prev => prev ? { ...prev, messages } : prev);
     await markAsRead(conversation.userId);
-    fetchUnreadTotal(); // 刷新未读总数
-    fetchConversations(); // 刷新会话列表未读数
-    setIsChatOpen(true);
+    // 异步刷新未读总数和会话列表（不阻塞弹窗，也不重置 selectedConversation）
+    fetchUnreadTotal();
+    fetchConversations();
+    console.log('[ChatModal] 对话框已弹出，消息已拉取，userId:', conversation.userId);
+    setIsChatOpen(true); // 立即弹出对话框
   };
 
   const sendMessage = async () => {
@@ -232,6 +239,34 @@ export default function MessagesPage() {
       }
     }
   }, [searchParams, conversations]);
+
+  // 聊天窗口打开时定时拉取消息（每15秒）
+  useEffect(() => {
+    let intervalId: NodeJS.Timeout | null = null;
+    if (isChatOpen && selectedConversation) {
+      intervalId = setInterval(async () => {
+        const messages = await fetchMessagesWithUser(selectedConversation.userId);
+        setSelectedConversation(prev => prev ? { ...prev, messages } : null);
+      }, 15000); // 15秒刷新一次
+    }
+    return () => {
+      if (intervalId) clearInterval(intervalId);
+    };
+  }, [isChatOpen, selectedConversation]);
+
+  // 定时自动刷新会话列表和未读数（每60秒），对话框打开时暂停
+  useEffect(() => {
+    let intervalId: NodeJS.Timeout | null = null;
+    if (currentUser && !isChatOpen) { // 只有未打开对话框时才自动刷新
+      intervalId = setInterval(() => {
+        fetchConversations();
+        fetchUnreadTotal();
+      }, 60000); // 60秒刷新一次
+    }
+    return () => {
+      if (intervalId) clearInterval(intervalId);
+    };
+  }, [currentUser, isChatOpen]);
 
   if (isLoading) {
     return (
@@ -313,6 +348,7 @@ export default function MessagesPage() {
         {/* 手机端聊天窗口 - 确保在Footer之上 */}
         {isChatOpen && selectedConversation && (
           <ChatModal
+            key={selectedConversation.userId} // 保证 key 只用 userId，避免对象引用变化导致重挂载
             open={isChatOpen}
             onClose={closeChatWindow}
             sellerId={selectedConversation.userId}

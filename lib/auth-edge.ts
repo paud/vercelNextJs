@@ -1,19 +1,18 @@
 // Next.js 13+ Edge API 路由 JWT 鉴权
 import { NextResponse } from 'next/server';
-import jwt from 'jsonwebtoken';
+import { getToken } from 'next-auth/jwt';
 
-const JWT_SECRET = process.env.JWT_SECRET || '';
+const JWT_SECRET = process.env.NEXTAUTH_SECRET || '';
 
-export function verifyJWTEdge(request: Request) {
-  const authHeader = request.headers.get('authorization');
-  if (!authHeader || !authHeader.startsWith('Bearer ')) {
-    return NextResponse.json({ error: 'Missing or invalid Authorization header' }, { status: 401 });
+import { NextRequest } from 'next/server';
+
+export async function verifyJWTEdge(request: NextRequest) {
+  // 使用 NextAuth 官方 getToken 方法自动解析 session-token
+  const token = await getToken({ req: request, secret: JWT_SECRET });
+  if (!token) {
+    console.warn('[verifyJWTEdge] Missing or invalid NextAuth token');
+    return NextResponse.json({ error: 'Missing or invalid token' }, { status: 401 });
   }
-  const token = authHeader.replace('Bearer ', '');
-  try {
-    const decoded = jwt.verify(token, JWT_SECRET);
-    return decoded;
-  } catch (err) {
-    return NextResponse.json({ error: 'Invalid or expired token' }, { status: 401 });
-  }
+  console.log('[verifyJWTEdge] NextAuth token decoded:', token);
+  return token;
 }
