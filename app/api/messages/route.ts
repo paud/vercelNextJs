@@ -56,7 +56,7 @@ export async function GET(req: NextRequest) {
 export async function POST(req: NextRequest) {
   const corsRes = corsEdge(req);
   if (corsRes) return corsRes;
-  const authUser = verifyJWTEdge(req);
+  const authUser = await verifyJWTEdge(req);
   if (authUser instanceof Response) return authUser;
 
   const session = await getServerSession(authOptions);

@@ -9,7 +9,7 @@ import { verifyJWTEdge } from '@/lib/auth-edge';
 export async function DELETE(req: NextRequest) {
   const corsRes = corsEdge(req);
   if (corsRes) return corsRes;
-  const authUser = verifyJWTEdge(req);
+  const authUser = await verifyJWTEdge(req);
   if (authUser instanceof Response) return authUser;
 
   const session = await getServerSession(authOptions);

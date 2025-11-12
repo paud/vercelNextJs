@@ -6,10 +6,10 @@ import { corsEdge } from '@/lib/cors-edge';
 import { verifyJWTEdge } from '@/lib/auth-edge';
 
 // GET /api/messages/conversations 获取当前用户的所有会话（最近联系人+最后一条消息+未读数）
-export async function GET(request: Request) {
-  const corsRes = corsEdge(request);
+export async function GET(req: NextRequest) {
+  const corsRes = corsEdge(req);
   if (corsRes) return corsRes;
-  const authUser = verifyJWTEdge(request);
+  const authUser = await verifyJWTEdge(req);
   if (authUser instanceof Response) return authUser;
 
   const session = await getServerSession(authOptions);

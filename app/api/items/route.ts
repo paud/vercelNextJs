@@ -1,13 +1,13 @@
-import { NextResponse } from "next/server";
+import { NextResponse, NextRequest } from "next/server";
 import prisma from "@/lib/prisma";
 import { safeContent, defaultSafeContentOptions } from "@/lib/safeContent";
 import { corsEdge } from '@/lib/cors-edge';
 import { verifyJWTEdge } from '@/lib/auth-edge';
 
-export async function POST(req: Request) {
+export async function POST(req: NextRequest) {
   const corsRes = corsEdge(req);
   if (corsRes) return corsRes;
-  const authUser = verifyJWTEdge(req);
+  const authUser = await verifyJWTEdge(req);
   if (authUser instanceof Response) return authUser;
 
   console.log('POST /api/items called');
@@ -83,7 +83,10 @@ export async function POST(req: Request) {
   }
 }
 
-export async function GET(req: Request) {
+export async function GET(req: NextRequest) {
+  const authUser = await verifyJWTEdge(req);
+  if (authUser instanceof Response) return authUser;
+
   try {
     const { searchParams } = new URL(req.url);
     const sort = searchParams.get("sort") || "createdAt";

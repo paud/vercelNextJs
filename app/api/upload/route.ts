@@ -7,7 +7,7 @@ import { verifyJWTEdge } from '@/lib/auth-edge';
 export async function POST(request: NextRequest): Promise<Response> {
   const corsRes = corsEdge(request);
   if (corsRes) return corsRes;
-  const authUser = verifyJWTEdge(request);
+  const authUser = await verifyJWTEdge(request);
   if (authUser instanceof Response) return authUser;
 
   const body = (await request.json()) as any; // 兼容无类型导出

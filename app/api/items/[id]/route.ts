@@ -11,7 +11,7 @@ export async function DELETE(
 ) {
   const corsRes = corsEdge(request);
   if (corsRes) return corsRes;
-  const authUser = verifyJWTEdge(request);
+  const authUser = await verifyJWTEdge(request);
   if (authUser instanceof Response) return authUser;
 
   try {
@@ -64,9 +64,12 @@ export async function DELETE(
 }
 
 export async function GET(
-  request: NextRequest,
+  req: NextRequest,
   { params }: { params: Promise<{ id: string }> }
 ) {
+  const authUser = await verifyJWTEdge(req);
+  if (authUser instanceof Response) return authUser;
+
   try {
     const { id } = await params;
     
@@ -113,7 +116,7 @@ export async function PUT(
 ) {
   const corsRes = corsEdge(request);
   if (corsRes) return corsRes;
-  const authUser = verifyJWTEdge(request);
+  const authUser = await verifyJWTEdge(request);
   if (authUser instanceof Response) return authUser;
 
   try {

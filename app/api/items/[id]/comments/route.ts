@@ -1,4 +1,4 @@
-import { NextResponse } from "next/server";
+import { NextResponse, NextRequest } from "next/server";
 import prisma from "@/lib/prisma";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/nextauth-config";
@@ -24,10 +24,10 @@ function getAnonymous() {
   return "Anonymous";
 }
 
-export async function GET(req: Request, context: { params: Promise<{ id: string }> }) {
+export async function GET(req: NextRequest, context: { params: Promise<{ id: string }> }) {
   const corsRes = corsEdge(req);
   if (corsRes) return corsRes;
-  const authUser = verifyJWTEdge(req);
+  const authUser = await verifyJWTEdge(req);
   if (authUser instanceof Response) return authUser;
 
   try {

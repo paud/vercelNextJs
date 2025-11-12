@@ -11,7 +11,7 @@ export async function GET(
 ) {
   const corsRes = corsEdge(request);
   if (corsRes) return corsRes;
-  const authUser = verifyJWTEdge(request);
+  const authUser = await verifyJWTEdge(request);
   if (authUser instanceof Response) return authUser;
 
   try {

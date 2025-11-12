@@ -11,7 +11,7 @@ const prisma = new PrismaClient();
 export async function PUT(request: NextRequest) {
   const corsRes = corsEdge(request);
   if (corsRes) return corsRes;
-  const user = verifyJWTEdge(request);
+  const user = await verifyJWTEdge(request);
   if (user instanceof Response) return user;
 
   try {
@@ -96,7 +96,10 @@ export async function PUT(request: NextRequest) {
   }
 }
 
-export async function GET(request: NextRequest) {
+export async function GET(req: NextRequest) {
+  const authUser = await verifyJWTEdge(req);
+  if (authUser instanceof Response) return authUser;
+
   // 使用 next-auth 获取当前登录用户 session
   const session = await getServerSession(authOptions);
   if (!session?.user?.id) {
