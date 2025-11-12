@@ -14,6 +14,5 @@ export async function verifyJWTEdge(request: NextRequest) {
     return NextResponse.json({ error: 'Missing or invalid token' }, { status: 401 });
   }
   console.log('[verifyJWTEdge] NextAuth token decoded:', token);
-  // 返回标准对象，避免直接返回 JWT 类型
-  return { user: token }; // 或返回你需要的用户信息
+  return token;
 }
