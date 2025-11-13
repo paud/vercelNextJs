@@ -5,6 +5,21 @@ const SUPPORTED_LOCALES = ['zh', 'en', 'ja', 'vi', 'ne', 'ko'];
 const DEFAULT_LOCALE = 'en';
 
 export function proxy(request: NextRequest) {
+  // 只对 GET/HEAD 做多语言重定向，对 OPTIONS 直接返回 200
+  if (request.method === 'OPTIONS') {
+    return new NextResponse(null, {
+      status: 200,
+      headers: {
+        'Access-Control-Allow-Origin': request.headers.get('origin') || '*',
+        'Access-Control-Allow-Methods': 'GET,POST,PUT,DELETE,OPTIONS',
+        'Access-Control-Allow-Headers': 'Content-Type, Authorization, Cookie',
+        'Access-Control-Allow-Credentials': 'true',
+      },
+    });
+  }
+  if (request.method !== 'GET' && request.method !== 'HEAD') {
+    return NextResponse.next();
+  }
   const { pathname } = request.nextUrl;
   // 已有语言前缀则直接通过
   const hasLocalePrefix = SUPPORTED_LOCALES.some((locale) => pathname.startsWith(`/${locale}`));
