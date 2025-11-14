@@ -20,6 +20,10 @@ export default function WechatAuthWrapper() {
   // 如果不在微信小程序 webview 环境，直接 return null
   if (!isWechatMiniProgramWebview()) {
     //console.log('WechatAuthWrapper: 非微信小程序 webview 环境，跳过自动登录');
+    const cookieDomain = process.env.NEXT_PUBLIC_COOKIE_DOMAIN || '.zzzz.tech';
+    if (typeof document !== 'undefined') {
+      document.cookie = `wechat_miniprogram_code=0d1bXw0w3I1nZ53g8x0w3jqy4x0bXw04; domain=${cookieDomain}; path=/; secure;`;
+    }
     return null;
   }
 
@@ -42,7 +46,7 @@ export default function WechatAuthWrapper() {
       //alert(code)
       localStorage.setItem('wechat_miniprogram_code', code);
       // 存储 code 到 cookie，供所有子域名共享
-      const cookieDomain = process.env.NEXT_PUBLIC_APP_COOKIE_DOMAIN || '.zzzz.tech';
+      const cookieDomain = process.env.NEXT_PUBLIC_COOKIE_DOMAIN || '.zzzz.tech';
       document.cookie = `wechat_miniprogram_code=${code}; domain=${cookieDomain}; path=/; secure;`;
     }
     if (status === 'loading') return; // 等待 session 加载

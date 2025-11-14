@@ -1,11 +1,17 @@
 import { NextRequest, NextResponse } from 'next/server';
 import prisma from '@/lib/prisma';
+import { corsEdge } from '@/lib/cors-edge';
 
 /**
  * 微信小程序 code 登录 API（wechat_signin_by_code）
  * 只需传入 code，即可自动查找/创建用户并生成 session-token（JWT）
  * 返回 { token }，前端可用于 next-auth credentials 登录
  */
+export async function OPTIONS(request: Request) {
+  // 专门处理 CORS 预检请求，始终返回 Response
+  return corsEdge(request, true) ?? new Response(null, { status: 200 });
+}
+
 export async function POST(request: NextRequest) {
   try {
     const body = await request.json();
@@ -69,4 +75,8 @@ export async function POST(request: NextRequest) {
   } catch (error) {
     return NextResponse.json({ error: 'Internal server error', detail: String(error) }, { status: 500 });
   }
+}
+
+export async function GET(request: NextRequest) {
+  return NextResponse.json({ name: 'wechat_signin_by_code' });
 }

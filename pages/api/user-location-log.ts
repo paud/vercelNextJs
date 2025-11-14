@@ -1,10 +1,11 @@
 import type { NextApiRequest, NextApiResponse } from 'next';
 import prisma from '@/lib/prisma';
-//import cors from '@/lib/cors';
+import cors from '@/lib/cors';
 //import { verifyJWT } from '@/lib/auth';
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
-  //if (cors(req, res)) return; // 处理 CORS 预检请求
+  // 允许所有跨域调用
+  if (cors(req, res, true)) return; // 处理 CORS 预检请求
 
   // JWT鉴权，未通过直接返回
   //const user = verifyJWT(req, res);
