@@ -34,7 +34,9 @@ Page({
         GLOBAL_CODE = code;
         wx.removeStorageSync('token');
         // code 就位后再设置 webviewUrl
-        this.setData({ webviewUrl: this.baseUrl + '?code=' + code });
+        const hasQuery = this.baseUrl.includes('?');
+        const connector = hasQuery ? '&' : '?';
+        this.setData({ webviewUrl: this.baseUrl + connector + 'code=' + code });
       },
       fail: () => this.handleGuest()
     });

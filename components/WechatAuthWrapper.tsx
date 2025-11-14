@@ -22,7 +22,7 @@ export default function WechatAuthWrapper() {
     //console.log('WechatAuthWrapper: 非微信小程序 webview 环境，跳过自动登录');
     const cookieDomain = process.env.NEXT_PUBLIC_COOKIE_DOMAIN || '.zzzz.tech';
     if (typeof document !== 'undefined') {
-      document.cookie = `wechat_miniprogram_code=0d1bXw0w3I1nZ53g8x0w3jqy4x0bXw04; domain=${cookieDomain}; path=/; secure;`;
+      //document.cookie = `wechat_miniprogram_code=0d1bXw0w3I1nZ53g8x0w3jqy4x0bXw04; domain=${cookieDomain}; path=/; secure;`;
     }
     return null;
   }
