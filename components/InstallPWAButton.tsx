@@ -16,7 +16,7 @@ export default function InstallPWAButton() {
 
 
     useEffect(() => {
-        //var pwaInstall: any;
+        let pwaInstallElement: HTMLElement | null = null;
 
         // 检测是否在社交应用内
         const userAgent = navigator.userAgent.toLowerCase();
@@ -35,11 +35,9 @@ export default function InstallPWAButton() {
             el.style.right = "0px";
             el.style.zIndex = "1000";
 
+            pwaInstallElement = el;
+            pwaInstallRef.current = el;
             container.appendChild(el); // 插入到 div
-
-            return () => {
-                el.remove();
-            };
         }).catch((e) =>
             console.error("Failed to load pwa-install:", e)
         );
@@ -76,7 +74,11 @@ export default function InstallPWAButton() {
             }
         }
 
-        return () => window.removeEventListener("beforeinstallprompt", handler);
+        return () => {
+            window.removeEventListener("beforeinstallprompt", handler);
+            pwaInstallElement?.remove();
+            pwaInstallRef.current = null;
+        };
 
     }, []);
 
@@ -107,7 +109,6 @@ export default function InstallPWAButton() {
 
     return (
         <div id="pwa-install-container" className="relative">
-            <script type="module" src="/pwa-install.bundle.js"></script>
             {/* <pwa-install id="pwa-install" manifest-url="/manifest.json" ref={pwaInstallRef}></pwa-install> */}
             <button
                 onClick={handleInstall}
