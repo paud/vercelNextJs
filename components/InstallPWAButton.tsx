@@ -20,7 +20,7 @@ export default function InstallPWAButton() {
 
         // 检测是否在社交应用内
         const userAgent = navigator.userAgent.toLowerCase();
-        const inSocialApp = /line\/|fbav|fbios|fb_iab|fb4a|messenger|micromessenger|twitter|instagram/.test(userAgent);
+        const inSocialApp = /line\/|fbav|fbios|fb_iab|fb4a|messenger|micromessenger|twitter|instagram|simpower/.test(userAgent);
         setIsSocialApp(inSocialApp);
 
         import("@khmyznikov/pwa-install").then(() => {
